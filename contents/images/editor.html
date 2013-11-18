@@ -1,0 +1,39 @@
+<html>
+<head>
+	<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+	<script src="/js/jquery.Jcrop.min.js"></script>
+	<link rel="stylesheet" href="/css/jquery.Jcrop.css" type="text/css" />
+	<script language="Javascript">
+		timeout = null
+  		function showCoords(c)
+  		{
+      		// variables can be accessed here as
+      		// c.x, c.y, c.x2, c.y2, c.w, c.h
+      		if (timeout != null)
+      			clearTimeout(timeout);
+
+      		timeout = setTimeout(function() {
+      			console.log("change url")
+      			$("#out").attr("src", "/blob/crop_"+c.w+"x"+c.h+"+"+c.x+"+"+c.y+"/images/expired.png")//IMG_06102011_152958
+            $.get( "/blob/crop_"+c.w+"x"+c.h+"+"+c.x+"+"+c.y+",ascii/images/expired.png", function( data ) {
+
+              $("#ascii").html( data.match(/.{100}/g).join("<br>") );
+            });
+      		}, 150);
+  		};
+	</script>
+</head>
+<body>
+	<img src="/blob/images/expired.png" id="target" />
+	<script language="Javascript">
+    	jQuery(function($) {
+    	    $('#target').Jcrop({
+    	    	onSelect: showCoords,
+    	    	onChange: showCoords
+    	    });
+    	});
+	</script>
+	<img id="out"/>
+  <div id="ascii" style="font-family: 'Courier New', Courier, monospace;"></div>
+</body>
+</html>
