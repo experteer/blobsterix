@@ -23,5 +23,9 @@ module BlobServer
 		get "*any", lambda {|env|
 			Http.NextApi
 		}
+
+		put "*any", lambda {|env|
+			Http.NextApi
+		}
 	end
 end
