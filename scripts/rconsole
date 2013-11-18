@@ -1,0 +1,9 @@
+begin
+  require "pry"
+  require "goliath/api"
+  require "blob_server"
+  Pry.start
+  exit
+rescue LoadError => e
+  warn "=> Unable to load pry"
+end

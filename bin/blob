@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+require 'goliath'
+#require 'goliath/api'
+#require 'goliath/runner'
+
+require 'blob_server'
+
+# runner = Goliath::Runner.new(ARGV, nil)
+# runner.api = BlobServer::Service.new
+# runner.app = Goliath::Rack::Builder.build(BlobServer::Service, runner.api)
+# runner.run
