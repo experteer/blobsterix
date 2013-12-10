@@ -48,7 +48,7 @@ module BlobServer::Transformations
 				key = [bucket, id.gsub("/", "_")].join("_")
 				if not BlobServer.cache.exists?(key)
 					metaData = BlobServer.storage.get(bucket, id)
-					BlobServer.cache.put(key, metaData.data) if metaData.check(key)
+					BlobServer.cache.put(key, metaData.data) if metaData.valid
 				end
 				BlobServer.cache.get(key)
 			end
