@@ -72,7 +72,7 @@
         <h1>
           Blobsterix
         </h1>
-        <h2>A new way to manage content
+        <h2>A new way to manage (binary) content
         </h2>
         <p>
           Daniel Sudmann
@@ -90,15 +90,37 @@
           History
         </h3>
         <ul>
-          <li>Currently all content is served through the application servers</li>
-          <li>This takes time that could be used to process application logic</li>
+          <li>Currently all binary content is served through the application servers
+          (cpu cicles, traffic)</li>
           <li>All images have to be saved in all relevant formats at all times</li>
-          <li>This is espicially true for mobile content</li>
+          <li>Introducing new formats/sizes is PITA</li>
+          <li>Optimizing for mobile (WebP) is hard (content negotiation not
+          implemented/hard to do)</li>
+          <li>Lots of code just to handle binaries</li>
         </ul>
+      </article>
+
+      <article>
+        <h1>Blobsterix</h1>
       </article>
       
       <article>
-        <h1>Goals</h1>
+        <h3>
+          Higher level goals
+        </h3>
+        <ul>
+          <li>Give flexibility for storing arbitrary things and transform them</li>
+          <li>Give flexibility for optimizations (mobile)</li>
+          <li>Extract service to make main app smaller</li>
+          <li>Releasing Blobsterix as OS to show how cool we are (HR)</li>
+          <li>Give challenging task to students</li>
+          <li>Exploring new technologies</li>
+        </ul>
+      </article>
+
+      
+      <article>
+        <h1>Requirements (main)</h1>
       </article>
       
       <article>
@@ -106,46 +128,16 @@
           Goals
         </h3>
         <ul>
-          <li>Only store one version of an image in the permanent storage</li>
-          <li>Be able to serve the image even to mobile devices in the needed sizes</li>
-          <li>Cleanup not needed versions of content</li>
-          <li>Manage access to content without the application backend</li>
+          <li>Only store one source version of a file in the permanent storage</li>
+          <li>Be able to serve the file in different formats</li>
+          <li>Caching the derived versions of a file</li>
+          <li>Manage access to formats and file without the application backend</li>
+          <li>No application code in Blobsterix (zero config, share
+          nothing)</li>
         </ul>
       </article>
 
-      <article>
-        <h3>
-          Use cases
-        </h3>
-        <ul>
-          <li>It allows for on the fly transformation of images</li>
-          <li>Images can be scaled, cropped, recolored and even water marked</li>
-          <li>Content can be transformed to downloadable pdfs on the fly</li>
-          <li>Access can be managed without access to the application server</li>
-        </ul>
-      </article>
       
-      <article>
-        <h1>
-          Architecture
-        </h1>
-      </article>
-
-      <article>
-        <h3>
-          Architecture
-        </h3>
-        <p>
-          The system consists of two parts:
-        </p>
-        <p>1. A s3 access tool that allows upload and download of content</p>
-        <ul>
-          <li>Only accessable from the intranet to manage the content</li>
-        </ul>
-        <p>
-          2. A external access point that serves content transformed for the client
-        </p>
-      </article>
       
       <article>
         <h1>
@@ -190,10 +182,82 @@
             });
           </script>
       </article>
-      
+
+
       <article>
         <h3>
-          Thank you!
+          Use cases
+        </h3>
+        <ul>
+          <li>It allows for on the fly transformation of images (format and
+          content) </li>
+          <li>It does content negotiation with the client</li>
+          <li>Images can be scaled, cropped, recolored and even water marked</li>
+          <li>PDFs could be renderer to html</li>
+          <li>URLs contents could be downloaded and be cached (job
+          screenshots ;-) )</li>
+          <li>http://cloudinary.com/</li>
+        </ul>
+      </article>
+
+      <article>
+        <h1>
+          Dependencies
+        </h1>
+        <ul>
+          <li>ruby 1.9 (fibers)</li>
+          <li>lighttpd 1.5 (if you want X-Sendfile)</li>
+          <li>goliath</li>
+        </ul>
+      </article>
+
+      <article>
+        <h1>
+          Architecture
+        </h1>
+      </article>
+
+      <article>
+        <h3>
+          Interface
+        </h3>
+        <ol>
+        <li>A s3 compatible interface that allows upload and download of content
+        (internal use only)</li>
+        <li>An external access point that serves content transformed for the
+        client (manipulation secured and time secured)</li>
+        </ol>
+      </article>
+
+      <article>
+        <h3>
+          Internal architecture
+        </h3>
+        <p>
+        <img src="images/arch1.png" width="600px"/>
+        </p>
+      </article>
+
+      <article>
+        <h3>
+          Going forward
+        </h3>
+        <p>
+          Making it robust and production ready until end of November (monitoring, client
+          code)
+        </p>
+        <p>
+          Development of migration plan because of the dependencies. Either
+          change our ops and/or wait until we're ruby 2.0 capable. 
+        </p>
+        <p>
+          Migrate current assets system to Blobsterix until Q2
+        </p>
+      </article>
+
+      <article>
+        <h3>
+          Thank you! - Questions?
         </h3>
       </article>
 
