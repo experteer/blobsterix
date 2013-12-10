@@ -57,7 +57,7 @@ module BlobServer::Transformations
 
 				metaData = get_original_file(input[:bucket], input[:id])
 
-				if metaData.size > 0
+				if metaData.valid
 					chain = TransformationChain.new(preferred_key, metaData)
 					input[:trafo].each {|trafo_pair|
 						chain.add(findTransformation(trafo_pair[0], chain.last_type), trafo_pair[1])
