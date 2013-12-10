@@ -26,13 +26,13 @@ module BlobServer
 			end
 			def data()
 				#puts "Do a file read"
-				File.read(File.join(@base, @key))
+				File.exists?(File.join(@base, @key)) ? File.read(File.join(@base, @key)) : ""
 			end
 			def path()
 				File.join(@base, @key)
 			end
 			def size()
-				File.join(@base, @key).size
+				File.exists?(File.join(@base, @key)) ? File.join(@base, @key).size : 0
 			end
 			def last_modified()
 				File.ctime(File.join(@base, @key)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
@@ -40,11 +40,14 @@ module BlobServer
 			def header()
 				{"Etag" => etag, "Content-Type" => mimetype, "Last-Modified" => last_modified, "Cache-Control" => "max-age=#{60*60*24}", "Expires" => (Time.new+(60*60*24)).strftime("%Y-%m-%dT%H:%M:%S.000Z")}
 			end
+			def valid()
+				File.exists?(File.join(@base, @key))
+			end
 
 			private
 				def get_mime()
 					#puts "mime for #{File.join(@base, @key)}"
-					@mimeclass ||= MimeMagic.by_magic(File.open(File.join(@base, @key))) || MimeMagic.new("text/plain")
+					@mimeclass ||= (MimeMagic.by_magic(File.open(File.join(@base, @key))) if File.exists?(File.join(@base, @key)) )|| MimeMagic.new("text/plain")
 				end
 		end
 	end

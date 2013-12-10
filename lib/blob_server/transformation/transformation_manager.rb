@@ -48,7 +48,7 @@ module BlobServer::Transformations
 				key = [bucket, id.gsub("/", "_")].join("_")
 				if not BlobServer.cache.exists?(key)
 					metaData = BlobServer.storage.get(bucket, id)
-					BlobServer.cache.put(key, metaData.data)
+					BlobServer.cache.put(key, metaData.data) if metaData.check(key)
 				end
 				BlobServer.cache.get(key)
 			end
@@ -57,13 +57,15 @@ module BlobServer::Transformations
 
 				metaData = get_original_file(input[:bucket], input[:id])
 
-				chain = TransformationChain.new(preferred_key, metaData)
-				input[:trafo].each {|trafo_pair|
-					chain.add(findTransformation(trafo_pair[0], chain.last_type), trafo_pair[1])
-				}
-				chain.finish(input[:type], findTransformation_out(chain.last_type, input[:type]))
+				if metaData.size > 0
+					chain = TransformationChain.new(preferred_key, metaData)
+					input[:trafo].each {|trafo_pair|
+						chain.add(findTransformation(trafo_pair[0], chain.last_type), trafo_pair[1])
+					}
+					chain.finish(input[:type], findTransformation_out(chain.last_type, input[:type]))
 
-				chain.do()
+					chain.do()
+				end
 			end
 			def finish_connection(preferred_key)
 				@running_transformations[preferred_key].each{|fiber|

@@ -67,7 +67,7 @@ module BlobServer
 					metaData(bucket, key)
 				else
 					@metaData.delete(key)
-					nil
+					BlobServer::Storage::BlobMetaData.new
 				end
 			end
 

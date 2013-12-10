@@ -27,6 +27,9 @@ module BlobServer
 			def size()
 				0
 			end
+			def valid()
+				false
+			end
 			def response(with_data=true, _etag=nil, env = nil, xfile = false)
 				BlobServer::Http::DataResponse.new(self, with_data, _etag, env).call(xfile)
 			end

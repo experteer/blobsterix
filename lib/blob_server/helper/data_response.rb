@@ -11,7 +11,9 @@ module BlobServer
 			end
 
 			def call(xfile=false)
-				if xfile and etag != meta.etag
+				if not meta.valid
+					Http.NotFound()
+				elsif xfile and etag != meta.etag
 					[200, meta.header.merge({"X-Sendfile" => meta.path}), ""]
 				elsif etag != meta.etag
 					if env != nil and meta.size > 30000
