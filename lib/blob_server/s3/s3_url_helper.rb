@@ -1,10 +1,18 @@
 module BlobServer
 	module S3UrlHelper
+		HOST_PATH = /(\w+)(\.s3)?\.\w+\.\w+/
+		def bucket_matcher(str)
+			if str.include?("s3")
+				str.match(/(\w+)\.s3\.\w+\.\w+/)
+			else
+				str.match(/(\w+)\.\w+\.\w+/)
+			end
+		end
 		def favicon(env)
 			file(env).match /favicon/
 		end
 		def bucket(env)
-			host = env['HTTP_HOST'].match(/((\w+\.*)+)\.s3\.amazonaws\.com/)
+			host = bucket_matcher(env['HTTP_HOST'])#.match(HOST_PATH)#/((\w+\.*)+)\.s3\.amazonaws\.com/)
 			#puts "HOST: #{env['HTTP_HOST']}"
 			if host
 				host[1]
@@ -21,7 +29,7 @@ module BlobServer
 			end
 		end
 		def bucket?(env)
-			host = env['HTTP_HOST'].match(/((\w+\.*)+)\.s3\.amazonaws\.com/)
+			host = bucket_matcher(env['HTTP_HOST'])#.match(HOST_PATH)#/((\w+\.*)+)\.s3\.amazonaws\.com/)
 			#puts "HOST: #{env['HTTP_HOST']}"
 			host || env[nil][:bucket] || included_bucket(env)
 		end
