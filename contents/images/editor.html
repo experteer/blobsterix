@@ -14,8 +14,8 @@
 
       		timeout = setTimeout(function() {
       			console.log("change url")
-      			$("#out").attr("src", "/blob/crop_"+c.w+"x"+c.h+"+"+c.x+"+"+c.y+"/images/expired.png")//IMG_06102011_152958
-            $.get( "/blob/crop_"+c.w+"x"+c.h+"+"+c.x+"+"+c.y+",ascii/images/expired.png", function( data ) {
+      			$("#out").attr("src", "/blob/v1/crop_"+c.w+"x"+c.h+"+"+c.x+"+"+c.y+"/images/expired.png")//IMG_06102011_152958
+            $.get( "/blob/v1/crop_"+c.w+"x"+c.h+"+"+c.x+"+"+c.y+",ascii/images/expired.png", function( data ) {
 
               $("#ascii").html( data.match(/.{100}/g).join("<br>") );
             });
@@ -24,7 +24,7 @@
 	</script>
 </head>
 <body>
-	<img src="/blob/images/expired.png" id="target" />
+	<img src="/blob/v1/images/expired.png" id="target" />
 	<script language="Javascript">
     	jQuery(function($) {
     	    $('#target').Jcrop({

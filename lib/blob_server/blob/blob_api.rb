@@ -2,18 +2,30 @@ module BlobServer
 	class BlobApi < AppRouterBase
 		extend BlobUrlHelper
 
+		get "/blob/v1", lambda{|env|
+			Http.NotAllowed "listing blob server not allowed"
+		}
+
 		get "/blob", lambda{|env|
 			Http.NotAllowed "listing blob server not allowed"
 		}
 
-		get "/blob/(:trafo/):bucket/*file.:format", lambda {|env|
+		put "/blob/v1", lambda{|env|
+			Http.NotAllowed "listing blob server not allowed"
+		}
+
+		put "/blob", lambda{|env|
+			Http.NotAllowed "listing blob server not allowed"
+		}
+
+		get "/blob/v1/(:trafo/):bucket/*file.:format", lambda {|env|
 			#p "Trafo: #{env[nil][:trafo]}"
 			accept = AcceptType.get(env, format(env))[0]
 			data = BlobServer.transformation.run(:bucket => bucket(env), :id => file(env), :type => accept, :trafo => (env[nil][:trafo] || ""))
 			data.response(true, env["HTTP_IF_NONE_MATCH"], env, env["HTTP_X_FILE"] === "yes")
 		}
 
-		get "/blob/(:trafo/):bucket/*file", lambda {|env|
+		get "/blob/v1/(:trafo/):bucket/*file", lambda {|env|
 			#p "No Format: #{env[nil][:trafo]}"
 			accept = AcceptType.get(env, nil)[0]
 			data = BlobServer.transformation.run(:bucket => bucket(env), :id => file(env), :type => accept, :trafo => (env[nil][:trafo] || ""))
