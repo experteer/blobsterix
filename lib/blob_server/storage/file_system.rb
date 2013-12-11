@@ -91,8 +91,8 @@ module BlobServer
 			def delete(bucket)
 				puts "Delete bucket #{File.join("#{contents}/", bucket)}"
 				Dir.rmdir(File.join("#{contents}", bucket)) if bucket_exist(bucket)
-				Nokogiri::XML::Builder.new do |xml|
-				end
+				#Nokogiri::XML::Builder.new do |xml|
+				#end
 			end
 
 			def delete_key(bucket, key)
@@ -101,8 +101,8 @@ module BlobServer
 					@metaData.delete(key)
 					File.delete(File.join("#{contents}", bucket, key))
 				end
-				Nokogiri::XML::Builder.new do |xml|
-				end
+				#Nokogiri::XML::Builder.new do |xml|
+				#end
 			end
 		end
 	end

@@ -46,7 +46,7 @@ module BlobServer
 
 		delete "/", lambda{|env|
 			if bucket?(env)
-				Http.OK BlobServer.storage.delete(bucket(env)), "xml"
+				Http.OK_no_data BlobServer.storage.delete(bucket(env)), "xml"
 			else
 				Http.NotFound "no such bucket"
 			end
@@ -54,7 +54,7 @@ module BlobServer
 
 		delete "/*file.:format", lambda{|env|
 			if bucket?(env)
-				Http.OK BlobServer.storage.delete_key(bucket(env), file(env)), "xml"
+				Http.OK_no_data BlobServer.storage.delete_key(bucket(env), file(env)), "xml"
 			else
 				Http.NotFound "no such bucket"
 			end
@@ -62,7 +62,7 @@ module BlobServer
 
 		delete "/*file", lambda{|env|
 			if bucket?(env)
-				Http.OK BlobServer.storage.delete_key(bucket(env), file(env)), "xml"
+				Http.OK_no_data BlobServer.storage.delete_key(bucket(env), file(env)), "xml"
 			else
 				Http.NotFound "no such bucket"
 			end

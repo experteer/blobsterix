@@ -12,5 +12,8 @@ module BlobServer
 		def self.OK(data="", content_type="txt")
 			[200, {"Content-Type" => MimeMagic.by_extension(content_type).type}, data]
 		end
+		def self.OK_no_data(data="", content_type="txt")
+			[204, {}, ""]
+		end
 	end
 end

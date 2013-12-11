@@ -41,5 +41,9 @@ module BlobServer
 		put "*any", lambda {|env|
 			Http.NextApi
 		}
+
+		delete "*any", lambda {|env|
+			Http.NextApi
+		}
 	end
 end
