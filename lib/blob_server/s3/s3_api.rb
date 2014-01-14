@@ -31,17 +31,43 @@ module BlobServer
 				Http.OK BlobServer.storage.list(bucket(env)).to_xml, "xml"
 			end
 		}
+		head "/*bucket_or_file.:format", lambda{|env|
+			return Http.NotFound if favicon(env)
+			puts "S3 head"
 
+			if bucket?(env)
+				if meta = BlobServer.storage.get(bucket(env), file(env))
+					meta.response(false)
+				else
+					Http.NotFound
+				end
+			else
+				Http.OK BlobServer.storage.list(bucket(env)).to_xml, "xml"
+			end
+		}
+		head "/*bucket_or_file", lambda{|env|
+			return [404, {}, ""] if favicon(env)
+			puts "S3 head"
+
+			if bucket?(env)
+				if meta = BlobServer.storage.get(bucket(env), file(env))
+					meta.response(false)
+				else
+					Http.NotFound
+				end
+			else
+				Http.OK BlobServer.storage.list(bucket(env)).to_xml, "xml"
+			end
+		}
 
 		put "/", lambda{|env|
 			Http.OK BlobServer.storage.create(bucket(env)), "xml"
 		}
 		put "/*file.:format", lambda{|env|
-			BlobServer.storage.put(bucket(env), file(env), env['rack.input']).response(false)
+			upload_data(env)
 		}
 		put "/*file", lambda{|env|
-			meta = BlobServer.storage.put(bucket(env), file(env), env['rack.input'])
-			meta.response(false)
+			upload_data(env)
 		}
 
 		delete "/", lambda{|env|

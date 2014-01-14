@@ -17,6 +17,9 @@ module BlobServer
 					f.write(data)
 				}
 			end
+			def delete(key)
+				File.delete(File.join(path, key)) if exists?(key)
+			end
 			def exists?(key)
 				File.exist?(File.join(path, key))
 			end

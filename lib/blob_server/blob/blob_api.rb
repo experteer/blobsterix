@@ -34,6 +34,24 @@ module BlobServer
 			data.response(true, env["HTTP_IF_NONE_MATCH"], env, env["HTTP_X_FILE"] === "yes")
 		}
 
+		head "/blob/v1/(:trafo.)*bucket_or_file.:format", lambda {|env|
+			#env[nil][:trafo] = env["params"]["trafo"]
+			#p "Trafo: #{env[nil][:trafo]}"
+			puts "Blob head"
+			accept = AcceptType.get(env, format(env))[0]
+			data = BlobServer.transformation.run(:bucket => bucket(env), :id => file(env), :type => accept, :trafo => (env[nil][:trafo] || ""))
+			data.response(false)
+		}
+
+		head "/blob/v1/(:trafo.)*bucket_or_file", lambda {|env|
+			#env[nil][:trafo] = env["params"]["trafo"]
+			#p "No Format: #{env[nil][:trafo]}"
+			puts "Blob head"
+			accept = AcceptType.get(env, nil)[0]
+			data = BlobServer.transformation.run(:bucket => bucket(env), :id => file(env), :type => accept, :trafo => (env[nil][:trafo] || ""))
+			data.response(false)
+		}
+
 		get "*any", lambda {|env|
 			Http.NextApi
 		}

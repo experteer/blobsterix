@@ -11,6 +11,33 @@ module BlobServer
 		def favicon(env)
 			file(env).match /favicon/
 		end
+		def cache_upload(env)
+			BlobServer.cache.put(cache_upload_key(env), env['rack.input'].read)
+		end
+		def cached_upload(env)
+			cache_upload(env) if not BlobServer.cache.exists?(cache_upload_key(env))
+			BlobServer.cache.get(cache_upload_key(env))
+		end
+		def cached_upload_clear(env)
+			BlobServer.cache.delete(cache_upload_key(env))
+		end
+		def cache_upload_key(env)
+			"upload/"+bucket(env).gsub("/", "_")+"_"+file(env).gsub("/", "_")
+		end
+		def trafo(env)
+			env["HTTP_X_AMZ_META_TRAFO"] || ""
+		end
+		def upload_data(env)
+			source = cached_upload(env)
+			accept = source.accept_type()
+			trafo = trafo(env)
+			file = file(env)
+			bucket = bucket(env)
+			puts "Bucket: #{bucket} - File: #{file} - Accept: #{accept} - Trafo: #{trafo}"
+			data = BlobServer.transformation.run(:source => source, :bucket => bucket, :id => file, :type => accept, :trafo => trafo)
+			cached_upload_clear(env)
+			BlobServer.storage.put(bucket, file, data).response(false)
+		end
 		def bucket(env)
 			host = bucket_matcher(env['HTTP_HOST'])#.match(HOST_PATH)#/((\w+\.*)+)\.s3\.amazonaws\.com/)
 			#puts "HOST: #{env['HTTP_HOST']}"

@@ -7,6 +7,9 @@ module BlobServer
 			def etag()
 				""
 			end
+			def read()
+				data()
+			end
 			def data()
 				""
 			end
@@ -26,6 +29,9 @@ module BlobServer
 			end
 			def size()
 				0
+			end
+			def accept_type()
+				AcceptType.new
 			end
 			def valid()
 				false

@@ -12,13 +12,15 @@ module BlobServer::Transformations
 		end
 		def run(input)
 			prepare_input(input)
-			preferred_key = cache_key(input[:bucket], input[:id], input[:trafo], input[:type])
+
+			preferred_key = input[:target] || cache_key(input[:bucket], input[:id], input[:trafo], input[:type])
 
 			if @running_transformations.has_key?(preferred_key)
 				@running_transformations[preferred_key] << Fiber.current
 				puts "Transformation exists wait for it to finish"
 				Fiber.yield
 			end
+
 			return BlobServer.cache.get(preferred_key) if BlobServer.cache.exists?(preferred_key)
 
 			@running_transformations[preferred_key] = [Fiber.current]
@@ -36,7 +38,10 @@ module BlobServer::Transformations
 			BlobServer.cache.exists?(preferred_key) ? BlobServer.cache.get(preferred_key) : BlobServer::Storage::BlobMetaData.new
 		end
 		def cache_key(bucket, id, trafo, accept_type)
-			"#{bucket}_#{id.gsub("/","_")}_#{trafo.map {|trafo_pair|"#{trafo_pair[0]}_#{trafo_pair[1]}"}.join(",")}.#{accept_type.subtype}"
+			puts "Calc cache key[#{trafo}]"
+			key = "#{bucket}_#{id.gsub("/","_")}_#{trafo.map {|trafo_pair|"#{trafo_pair[0]}_#{trafo_pair[1]}"}.join(",")}.#{accept_type.subtype}"
+			puts "Done calc cache key"
+			key
 		end
 		private
 			def auto_load()
@@ -55,7 +60,7 @@ module BlobServer::Transformations
 			def run_transformation(preferred_key, input)
 				puts "Load: #{input[:bucket]}, #{input[:id]}"
 
-				metaData = get_original_file(input[:bucket], input[:id])
+				metaData = input[:source] || get_original_file(input[:bucket], input[:id])
 
 				if metaData.valid
 					chain = TransformationChain.new(preferred_key, metaData)
