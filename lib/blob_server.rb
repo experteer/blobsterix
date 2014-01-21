@@ -24,6 +24,7 @@ require 'blob_server/mimemagic/magic'
 require 'blob_server/helper/http.rb'
 require 'blob_server/helper/accept_type.rb'
 require 'blob_server/helper/data_response.rb'
+require 'blob_server/helper/murmur.rb'
 
 #router base
 require 'blob_server/router/app_router'
