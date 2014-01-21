@@ -1,3 +1,4 @@
+#only usefull to hash strings
 class Murmur
   def self.force_overflow_signed(i)
     force_overflow_unsigned(i + 2**31) - 2**31
