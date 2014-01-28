@@ -4,6 +4,10 @@ class Murmur
     force_overflow_unsigned(i + 2**31) - 2**31
   end
 
+  def self.force_overflow_unsigned_16(i)
+    i % 2**16   # or equivalently: i & 0xffffffff
+  end
+
   def self.force_overflow_unsigned(i)
     i % 2**32   # or equivalently: i & 0xffffffff
   end
@@ -37,13 +41,13 @@ class Murmur
       len-=8
     end
 
-    h ^= data.slice(6) << 48 if len == 7
-    h ^= data.slice(5) << 40 if len >= 6
-    h ^= data.slice(4) << 32 if len >= 5
-    h ^= data.slice(3) << 24 if len >= 4
-    h ^= data.slice(2) << 16 if len >= 3
-    h ^= data.slice(1) << 8 if len >= 2
-    h ^= data.slice(0) if len >= 1
+    h ^= data.slice(6).to_i << 48 if len == 7
+    h ^= data.slice(5).to_i << 40 if len >= 6
+    h ^= data.slice(4).to_i << 32 if len >= 5
+    h ^= data.slice(3).to_i << 24 if len >= 4
+    h ^= data.slice(2).to_i << 16 if len >= 3
+    h ^= data.slice(1).to_i << 8 if len >= 2
+    h ^= data.slice(0).to_i if len >= 1
 
     h = force_overflow_unsigned_64(h * m) if len
 
@@ -52,6 +56,11 @@ class Murmur
     h ^= h >> r
 
     h
+  end
+
+  def self.get_num(num)
+    return num if num.class == Fixnum
+    num.to_s.unpack("C")[0]
   end
 
   #32bit processors
@@ -65,7 +74,7 @@ class Murmur
     h1 = seed ^ len
     h2 = 0
 
-    data = String.new key
+    data = String.new(key)#.force_encoding('ASCII-8BIT')
     
     while len >= 8
       k1 = data.slice!(0..3).unpack("I")[0]
@@ -105,11 +114,11 @@ class Murmur
       len -= 4
     end
 
-    h2 ^= data.slice(2) << 16 if len == 3
-    h2 ^= data.slice(1) << 8 if len >= 2
-    h2 ^= data.slice(0) if len >= 1
+    h2 ^= (get_num(data[2]) << 16) if len == 3
+    h2 ^= (get_num(data[1]) << 8).to_i if len >= 2
+    h2 ^= (get_num(data[0])) if len >= 1
 
-    h2 = force_overflow_unsigned(h2 * m) if len
+    h2 = force_overflow_unsigned(h2 * m) if len > 0
 
     h1 ^= h2 >> 18
     h1 = force_overflow_unsigned(h1 * m)
@@ -125,5 +134,25 @@ class Murmur
 
     h
   end
+
+  def self.map_filename(filename)
+    hash = Murmur.Hash64B(filename)
+    bits =  hash.to_s(2)
+    parts = []
+    6.times {
+      len = 11
+      len = bits.length if len >= bits.length
+      parts.push(bits.slice!(0, len))
+    }
+    path = parts.map{|s| s.to_i(2).to_s(16)}
+    path.push(filename)
+    path.join("/")
+  end
 end
-puts "Hash: #{Murmur.Hash64B("adlfgsdkghsg5a1")}"
+
+# hash = Murmur.Hash64B("experteer.p")
+# puts "Hash: #{hash}"
+# puts Murmur.map_filename("experteer.png")
+
+
+#puts 2.to_s(2)

@@ -9,12 +9,23 @@ module BlobServer
 				@metaData = {}
 			end
 
-			def contents
-				@contents
+			def contents(bucket=nil, key=nil)
+				if bucket
+					File.join(@contents, bucket)
+					File.join(@contents, bucket, Murmur.map_filename(key.gsub("/", ",_,"))) if key
+				else
+					@contents
+				end
+			end
+
+			def contents_prepare(bucket, key=nil)
+				p = contents(bucket, key)
+				FileUtils.mkdir_p(File.dirname(p))
+				p
 			end
 
 			def metaData(bucket, key)
-				@metaData[[bucket, key].join("_")] ||= BlobServer::Storage::FileSystemMetaData.new(File.join(contents, bucket), key)
+				@metaData[[bucket, key].join("_")] ||= BlobServer::Storage::FileSystemMetaData.new(File.dirname(contents(bucket, key)), key.gsub("/", ",_,"))
 			end
 
 			def time_string_of(*file_name)
@@ -27,7 +38,9 @@ module BlobServer
 
 			def bucket_files(bucket)
 				if (bucket_exist(bucket))
-					Dir.glob("#{contents}/#{bucket}/**/*").map{|e|e.gsub("#{contents}/#{bucket}/","")}
+					Dir.glob("#{contents}/#{bucket}/**/*").select{|e| !File.directory?(e)}.map{ |e|
+						e.gsub("#{contents}/#{bucket}/","").gsub(/\w+\/\w+\/\w+\/\w+\/\w+\/\w+\//, "").gsub(",_,", "/")
+					}
 				else
 					[]
 				end
@@ -46,11 +59,12 @@ module BlobServer
 						b = Bucket.new(bucket, time_string_of(bucket))
 						bucket_files(bucket).each do |file|
 							b.contents << BucketEntry.new(file) do |entry|
-								entry.last_modified =  metaData(bucket, file).last_modified
-								entry.etag =  metaData(bucket, file).etag
-								entry.size =  metaData(bucket, file).size
-								entry.mimetype = metaData(bucket, file).mimetype
-							end if not File.directory? File.join("#{contents}", bucket, file) and !(file =='.' || file == '..')
+								meta = metaData(bucket, file)
+								entry.last_modified =  meta.last_modified
+								entry.etag =  meta.etag
+								entry.size =  meta.size
+								entry.mimetype = meta.mimetype
+							end
 						end
 						b
 					else
@@ -62,8 +76,8 @@ module BlobServer
 			end
 
 			def get(bucket, key)
-				puts "GET: #{contents}/#{bucket}/#{key}"
-				if (not File.directory?(File.join(contents, bucket, key))) and bucket_files(bucket).include?(key)
+				puts "GET: #{contents(bucket, key)}"
+				if (not File.directory?(contents(bucket, key))) and bucket_files(bucket).include?(key)
 					metaData(bucket, key)
 				else
 					@metaData.delete(key)
@@ -72,9 +86,8 @@ module BlobServer
 			end
 
 			def put(bucket, key, value)
-				puts "Write data to #{File.join("#{contents}/", bucket, key)}"
-				FileUtils.mkdir_p(File.dirname(File.join("#{contents}/", bucket, key)))
-				File.open(File.join("#{contents}/", bucket, key), 'wb') {|f| f.write(value.read) }
+				puts "Write data to #{contents(bucket, key)}"
+				File.open(contents_prepare(bucket, key), 'wb') {|f| f.write(value.read) }
 				@metaData.delete(key)
 				metaData(bucket, key)
 			end
@@ -89,17 +102,17 @@ module BlobServer
 			end
 
 			def delete(bucket)
-				puts "Delete bucket #{File.join("#{contents}/", bucket)}"
+				puts "Delete bucket #{contents(bucket)}"
 				Dir.rmdir(File.join("#{contents}", bucket)) if bucket_exist(bucket)
 				#Nokogiri::XML::Builder.new do |xml|
 				#end
 			end
 
 			def delete_key(bucket, key)
-				puts "Delete File #{File.join("#{contents}/", bucket, key)}"
+				puts "Delete File #{contents(bucket, key)}"
 				if bucket_files(bucket).include? key
 					@metaData.delete(key)
-					File.delete(File.join("#{contents}", bucket, key))
+					File.delete(contents(bucket, key))
 				end
 				#Nokogiri::XML::Builder.new do |xml|
 				#end

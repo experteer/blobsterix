@@ -3,25 +3,28 @@ module BlobServer
 		class Cache
 			def initialize(path="../cache")
 				@path = path
-				@metaData = {}
 			end
-			def path()
-				@path
+			def path_prepare(key)
+				p = path(key)
+				FileUtils.mkdir_p(File.dirname(p))
+				p
+			end
+			def path(key=nil)
+				key ? File.join(@path, Murmur.map_filename(key)) : @path
 			end
 			def get(key)
-				@metaData[key] ||= FileSystemMetaData.new(path, key)
+				FileSystemMetaData.new(path, Murmur.map_filename(key))
 			end
 			def put(key, data)
-				FileUtils.mkdir_p(File.dirname(File.join(path, key)))
-				File.open(File.join(path, key), "wb") {|f|
+				File.open(path_prepare(key), "wb") {|f|
 					f.write(data)
 				}
 			end
 			def delete(key)
-				File.delete(File.join(path, key)) if exists?(key)
+				File.delete(path(key)) if exists?(key)
 			end
 			def exists?(key)
-				File.exist?(File.join(path, key))
+				File.exist?(path(key))
 			end
 		end
 	end

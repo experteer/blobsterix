@@ -29,6 +29,7 @@ module BlobServer::Transformations
 			keys <<  file_path
 			last_key = "#{@input_data.path}"
 
+
 			@transformations.each{|trafo|
 				new_key = keys.delete_at(0)
 				trafo[0].transform(last_key, new_key, trafo[1])
@@ -50,7 +51,7 @@ module BlobServer::Transformations
 		end
 
 		def file_path()
-			@file_path ||= File.join(BlobServer.cache.path, cache_key)
+			@file_path ||= BlobServer.cache.path_prepare(cache_key)
 		end
 	end
 end
