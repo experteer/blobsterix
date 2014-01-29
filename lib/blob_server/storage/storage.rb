@@ -19,11 +19,7 @@ module BlobServer
 			def delete(bucket)
 				nil
 			end
-			def delete(bucket, key)
-				nil
-			end
-			#not needed actually
-			def post(bucket, value)
+			def delete_key(bucket, key)
 				nil
 			end
 		end
