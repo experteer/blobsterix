@@ -12,7 +12,7 @@ module BlobServer
 			def contents(bucket=nil, key=nil)
 				if bucket
 					File.join(@contents, bucket)
-					File.join(@contents, bucket, Murmur.map_filename(key.gsub("/", ",_,"))) if key
+					File.join(@contents, bucket, Murmur.map_filename(key.gsub("/", "\\"))) if key
 				else
 					@contents
 				end
@@ -25,7 +25,7 @@ module BlobServer
 			end
 
 			def metaData(bucket, key)
-				@metaData[[bucket, key].join("_")] ||= BlobServer::Storage::FileSystemMetaData.new(File.dirname(contents(bucket, key)), key.gsub("/", ",_,"))
+				BlobServer::Storage::FileSystemMetaData.new(contents(bucket, key))
 			end
 
 			def time_string_of(*file_name)
@@ -39,7 +39,7 @@ module BlobServer
 			def bucket_files(bucket)
 				if (bucket_exist(bucket))
 					Dir.glob("#{contents}/#{bucket}/**/*").select{|e| !File.directory?(e)}.map{ |e|
-						e.gsub("#{contents}/#{bucket}/","").gsub(/\w+\/\w+\/\w+\/\w+\/\w+\/\w+\//, "").gsub(",_,", "/")
+						e.gsub("#{contents}/#{bucket}/","").gsub(/\w+\/\w+\/\w+\/\w+\/\w+\/\w+\//, "").gsub("\\", "/")
 					}
 				else
 					[]
@@ -80,30 +80,27 @@ module BlobServer
 				if (not File.directory?(contents(bucket, key))) and bucket_files(bucket).include?(key)
 					metaData(bucket, key)
 				else
-					@metaData.delete(key)
 					BlobServer::Storage::BlobMetaData.new
 				end
 			end
 
 			def put(bucket, key, value)
 				puts "Write data to #{contents(bucket, key)}"
-				File.open(contents_prepare(bucket, key), 'wb') {|f| f.write(value.read) }
-				@metaData.delete(key)
-				metaData(bucket, key)
+				metaData(bucket, key).write() {|f| f.write(value.read) }
 			end
 
 			def post(bucket, value)
 			end
 
 			def create(bucket)
-				FileUtils.mkdir_p(File.join("#{contents}", bucket)) if not File.exist?(File.join("#{contents}", bucket))
+				FileUtils.mkdir_p(contents(bucket)) if not File.exist?(contents(bucket))
 				Nokogiri::XML::Builder.new do |xml|
 				end
 			end
 
 			def delete(bucket)
 				puts "Delete bucket #{contents(bucket)}"
-				Dir.rmdir(File.join("#{contents}", bucket)) if bucket_exist(bucket)
+				Dir.rmdir(contents(bucket)) if bucket_exist(bucket)
 				#Nokogiri::XML::Builder.new do |xml|
 				#end
 			end
@@ -111,8 +108,7 @@ module BlobServer
 			def delete_key(bucket, key)
 				puts "Delete File #{contents(bucket, key)}"
 				if bucket_files(bucket).include? key
-					@metaData.delete(key)
-					File.delete(contents(bucket, key))
+					metaData(bucket, key).delete
 				end
 				#Nokogiri::XML::Builder.new do |xml|
 				#end

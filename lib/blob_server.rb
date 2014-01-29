@@ -14,6 +14,7 @@ require 'mini_magick'
 #require 'ruby-webp'
 #require 'grape'
 #require 'evma_httpserver'
+require 'json'
 
 #utility
 require 'blob_server/mimemagic/tables'

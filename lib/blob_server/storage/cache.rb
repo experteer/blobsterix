@@ -13,15 +13,15 @@ module BlobServer
 				key ? File.join(@path, Murmur.map_filename(key)) : @path
 			end
 			def get(key)
-				FileSystemMetaData.new(path, Murmur.map_filename(key))
+				FileSystemMetaData.new(path(key))
 			end
 			def put(key, data)
-				File.open(path_prepare(key), "wb") {|f|
+				FileSystemMetaData.new(path(key)).write() {|f|
 					f.write(data)
 				}
 			end
 			def delete(key)
-				File.delete(path(key)) if exists?(key)
+				FileSystemMetaData.new(path(key)).delete if exists?(key)
 			end
 			def exists?(key)
 				File.exist?(path(key))

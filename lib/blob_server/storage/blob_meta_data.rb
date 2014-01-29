@@ -36,6 +36,14 @@ module BlobServer
 			def valid()
 				false
 			end
+			def write()
+				if block_given?
+					#should yield file
+				end
+				self
+			end
+			def delete()
+			end
 			def response(with_data=true, _etag=nil, env = nil, xfile = false)
 				BlobServer::Http::DataResponse.new(self, with_data, _etag, env).call(xfile)
 			end

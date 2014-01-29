@@ -28,15 +28,15 @@ module BlobServer
 
 			private
 				def chunkresponse
-					f = File.open(path)
+					f = File.open(meta.path)
 					EM.next_tick do
 						send_chunk(f)
 					end
-					[200, header, (with_data ? Goliath::Response::STREAMING : "")]
+					[200, meta.header, (with_data ? Goliath::Response::STREAMING : "")]
 				end
 
 				def send_chunk(file)
-					dat = f.read(30000)
+					dat = file.read(30000)
 					again = if dat != nil
 						env.stream_send(dat)
 						true
