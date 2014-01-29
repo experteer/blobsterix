@@ -25,6 +25,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "nokogiri"
   #gem.add_dependency "ruby-vips"
   gem.add_dependency "ruby-webp"
+  gem.add_dependency "rubigen"
   gem.add_dependency "mini_magick", "~> 3.5.0"
 
   gem.add_development_dependency "rspec", "~> 2.6"

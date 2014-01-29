@@ -10,6 +10,20 @@ require 'blobsterix'
 # runner.app = Goliath::Rack::Builder.build(BlobServer::Service, runner.api)
 # runner.run
 
+class Generator
+  def initialize(args)
+    args.each{|command|
+      @param ||= command if command != "generate" and @type
+      @type ||= command if command != "generate"
+    }
+  end
+
+  def run()
+    puts "Doing #{@type} with #{@param} in #{Dir.pwd}"
+  end
+end
+
+
 exit if ARGV.length == 0
 if ARGV[0] == "server"
   runner = Goliath::Runner.new(ARGV, nil)
@@ -17,5 +31,5 @@ if ARGV[0] == "server"
   runner.app = Goliath::Rack::Builder.build(BlobServer::Service, runner.api)
   runner.run
 elsif ARGV[0] == "generate"
-  generator = BlobServer::Generator.new
+  Generator.new(ARGV).run
 end
