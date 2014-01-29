@@ -75,12 +75,11 @@ module BlobServer
 			end
 
 			def to_json
-        {'mimetype' => mimetype, 'mediatype' => mediatype, 'etag' => etag, 'size' => size}.to_json
+        as_json.to_json
 	    end
 
-	    def self.from_json string
-	        data = JSON.load string
-	        self.new data['a'], data['b']
+	    def as_json
+	    	{'mimetype' => mimetype, 'mediatype' => mediatype, 'etag' => etag, 'size' => size}
 	    end
 
 			private

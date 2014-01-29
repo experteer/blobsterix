@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-require File.expand_path('../lib/blob_server/version', __FILE__)
+require File.expand_path('../lib/blobsterix/version', __FILE__)
 
 Gem::Specification.new do |gem|
   gem.authors       = ["dsudmann"]
@@ -9,9 +9,9 @@ Gem::Specification.new do |gem|
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($\)
-  gem.executables   = ["blob", "console", "test"]#gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
+  gem.executables   = ["blobsterix", "console", "test"]#gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
-  gem.name          = "blob_server"
+  gem.name          = "blobsterix"
   gem.require_paths = ["lib"]
   gem.version       = BlobServer::VERSION
 

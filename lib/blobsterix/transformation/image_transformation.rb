@@ -141,6 +141,60 @@ module BlobServer::Transformations::Impl
 		end
 	end
 
+	class Image2Json < BlobServer::Transformations::Transformation
+		def name()
+			"json"
+		end
+		
+		def input_type()
+			@input_type ||= BlobServer::AcceptType.new "image/*"
+		end
+
+		def output_type()
+			@output_type ||= BlobServer::AcceptType.new "text/json"
+		end
+
+		def is_format?()
+			true
+		end
+
+		def transform(input_path, target_path, value)
+			type = "image/*"
+			File.open(input_path) {|file|
+				type = MimeMagic.by_magic(file).type
+			}
+			
+			image = type === "image/webp" ? {:width => "unknown", :height => "unknown"} : MiniMagick::Image.open(input_path)
+			File.open(target_path, "w") {|file|
+				file.write({:width => image[:width], :height => image[:height]}.merge(BlobServer::Storage::FileSystemMetaData.new(input_path).as_json).to_json)
+			}
+		end
+	end
+
+	class Image2Json < BlobServer::Transformations::Transformation
+		def name()
+			"json_all"
+		end
+		
+		def input_type()
+			@input_type ||= BlobServer::AcceptType.new "*/*"
+		end
+
+		def output_type()
+			@output_type ||= BlobServer::AcceptType.new "text/json"
+		end
+
+		def is_format?()
+			true
+		end
+
+		def transform(input_path, target_path, value)
+			File.open(target_path, "w") {|file|
+				file.write(BlobServer::Storage::FileSystemMetaData.new(input_path).to_json)
+			}
+		end
+	end
+
 	class RawTransformation < BlobServer::Transformations::Transformation
 		def name()
 			"raw"

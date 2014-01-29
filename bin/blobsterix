@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+#require 'goliath'
+require 'goliath/api'
+require 'goliath/runner'
+
+require 'blobsterix'
+
+# runner = Goliath::Runner.new(ARGV, nil)
+# runner.api = BlobServer::Service.new
+# runner.app = Goliath::Rack::Builder.build(BlobServer::Service, runner.api)
+# runner.run
+
+exit if ARGV.length == 0
+if ARGV[0] == "server"
+  runner = Goliath::Runner.new(ARGV, nil)
+  runner.api = BlobServer::Service.new
+  runner.app = Goliath::Rack::Builder.build(BlobServer::Service, runner.api)
+  runner.run
+elsif ARGV[0] == "generate"
+  generator = BlobServer::Generator.new
+end
