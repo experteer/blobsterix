@@ -30,6 +30,7 @@ module BlobServer
 								entry.etag =  meta.etag
 								entry.size =  meta.size
 								entry.mimetype = meta.mimetype
+								entry.fullpath = contents(bucket, file).gsub("#{contents}/", "")
 							end
 						end
 						b
@@ -87,7 +88,7 @@ module BlobServer
 
 				def bucket_files(bucket)
 					if (bucket_exist(bucket))
-						Dir.glob("#{contents}/#{bucket}/**/*").select{|e| !File.directory?(e)}.map{ |e|
+						Dir.glob("#{contents}/#{bucket}/**/*").select{|e| !File.directory?(e) and not e.end_with?(".meta")}.map{ |e|
 							e.gsub("#{contents}/#{bucket}/","").gsub(/\w+\/\w+\/\w+\/\w+\/\w+\/\w+\//, "").gsub("\\", "/")
 						}
 					else

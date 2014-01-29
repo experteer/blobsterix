@@ -1,7 +1,7 @@
 module BlobServer
 	module Storage
 		class BucketEntry
-			attr_accessor :key, :last_modified, :etag, :size, :storage_class, :mimetype
+			attr_accessor :key, :last_modified, :etag, :size, :storage_class, :mimetype, :fullpath
 			def initialize(key)
 				@key = key
 				@last_modified = "2009-10-12T17:50:30.000Z"
@@ -9,6 +9,7 @@ module BlobServer
 				@size = "0"
 				@storage_class = "STANDARD"
 				@mimetype = "none"
+				@fullpath = ""
 				yield self if block_given?
 			end
 
@@ -20,6 +21,7 @@ module BlobServer
 					xml.Size size
 					xml.StorageClass storage_class
 					xml.MimeType mimetype
+					xml.FullPath fullpath
 				}
 			end
 		end
