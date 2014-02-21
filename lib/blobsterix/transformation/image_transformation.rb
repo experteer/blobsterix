@@ -217,6 +217,32 @@ module BlobServer::Transformations::Impl
 		end
 	end
 
+	class Text2ImageTransformation < BlobServer::Transformations::Transformation
+		def name()
+			"text2image"
+		end
+
+		def is_format?()
+			true
+		end
+
+		def output_type()
+			@output_type ||= BlobServer::AcceptType.new "image/png"
+		end
+
+		def input_type()
+			@input_type ||= BlobServer::AcceptType.new "text/plain"
+		end
+
+		def transform(input_path, target_path, value)
+			puts "Render webpage: #{File.expand_path(input_path, Dir.pwd)}"
+
+			system("phantomjs rasterice.js 'file://#{File.expand_path(input_path, Dir.pwd)}' '#{File.expand_path(target_path, Dir.pwd)}'")
+
+			puts "Render webpage Done"
+		end
+	end
+
 	class AsciiTransformation < BlobServer::Transformations::Transformation
 		def name()
 			"ascii"
@@ -236,6 +262,33 @@ module BlobServer::Transformations::Impl
 
 		def transform(input_path, target_path, value)
 			system("convert #{input_path} jpg:- | jp2a --width=#{value and value.size > 0 ? value : 100} - > #{target_path}")
+		end
+	end
+
+	class AsciiHTMLTransformation < BlobServer::Transformations::Transformation
+		def name()
+			"asciihtml"
+		end
+
+		def is_format?()
+			true
+		end
+
+		def input_type()
+			@input_type ||= BlobServer::AcceptType.new "image/*"
+		end
+
+		def output_type()
+			@output_type ||= BlobServer::AcceptType.new "text/plain"
+		end
+
+		def transform(input_path, target_path, value)
+			parts = value.split("x")[0]
+			lines = parts[0]
+			em = parts.length > 1 ? parts[1].to_i : 1
+			system("convert #{input_path} jpg:- | jp2a --width=#{lines and lines.to_i > 0 ? value : 100} - > #{target_path}")
+			text = File.read(target_path)
+			File.write(target_path, "<html><body style='font-size: #{em}em'><pre>#{text.gsub("\n", "<br>")}</pre></body></html>")
 		end
 	end
 

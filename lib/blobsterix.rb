@@ -6,7 +6,7 @@ require 'scanf'
 require 'nokogiri'
 require 'journey'
 #require 'vips'
-require 'pry'
+#require 'pry'
 require 'eventmachine'
 require 'em-synchrony'
 require 'mini_magick'
@@ -61,12 +61,11 @@ require 'blobsterix/service'
 
 module BlobServer
   def self.storage
-  	@@storage ||= Storage::FileSystem.new("../contents")
+    puts "Doing in #{Dir.pwd}"
+    @@storage ||= Storage::FileSystem.new(File.join(BLOBSTERIX_DATA_DIR, "contents"))
   end
   def self.cache
-  	#@@cache ||= Storage::Cache.new("../cache")
-  	@@cache ||= Storage::Cache.new("../cache")
-  	#@@cache ||= Storage::Cache.new("/tmp/blobsterix/cache")
+    @@cache ||= Storage::Cache.new(File.join(BLOBSTERIX_DATA_DIR, "cache"))
   end
 
   def self.transformation

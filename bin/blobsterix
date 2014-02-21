@@ -9,6 +9,10 @@ require 'blobsterix'
 # runner.api = BlobServer::Service.new
 # runner.app = Goliath::Rack::Builder.build(BlobServer::Service, runner.api)
 # runner.run
+require "fileutils"
+
+BLOBSTERIX_GEM_DIR = File.join(File.dirname(__FILE__), "../")
+BLOBSTERIX_DATA_DIR = Dir.pwd
 
 class Generator
   def initialize(args)
@@ -20,6 +24,12 @@ class Generator
 
   def run()
     puts "Doing #{@type} with #{@param} in #{Dir.pwd}"
+
+    init if @type == "init"
+  end
+
+  def init()
+    FileUtils.cp(File.join(BLOBSTERIX_GEM_DIR, "config/GemFile"), File.join(BLOBSTERIX_DATA_DIR, "GemFile"))
   end
 end
 
