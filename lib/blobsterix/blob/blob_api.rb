@@ -22,7 +22,12 @@ module BlobServer
 			#env[nil][:trafo] = env["params"]["trafo"]
 			#p "Trafo: #{env[nil][:trafo]}"
 			accept = AcceptType.get(env, format(env))[0]
-			data = BlobServer.transformation.run(:bucket => bucket(env), :id => file(env), :type => accept, :trafo => (env[nil][:trafo] || ""))
+
+			# check trafo encryption
+			trafo_string = BlobServer.decrypt_trafo(env[nil][:trafo] || "")
+			return BlobServer::Storage::BlobMetaData.new.response if !trafo_string
+
+			data = BlobServer.transformation.run(:bucket => bucket(env), :id => file(env), :type => accept, :trafo => trafo_string)
 			data.response(true, env["HTTP_IF_NONE_MATCH"], env, env["HTTP_X_FILE"] === "yes")
 		}
 
@@ -30,7 +35,12 @@ module BlobServer
 			#env[nil][:trafo] = env["params"]["trafo"]
 			#p "No Format: #{env[nil][:trafo]}"
 			accept = AcceptType.get(env, nil)[0]
-			data = BlobServer.transformation.run(:bucket => bucket(env), :id => file(env), :type => accept, :trafo => (env[nil][:trafo] || ""))
+
+			# check trafo encryption
+			trafo_string = BlobServer.decrypt_trafo(env[nil][:trafo] || "")
+			return BlobServer::Storage::BlobMetaData.new.response if !trafo_string
+
+			data = BlobServer.transformation.run(:bucket => bucket(env), :id => file(env), :type => accept, :trafo => trafo_string)
 			data.response(true, env["HTTP_IF_NONE_MATCH"], env, env["HTTP_X_FILE"] === "yes")
 		}
 
@@ -39,7 +49,12 @@ module BlobServer
 			#p "Trafo: #{env[nil][:trafo]}"
 			puts "Blob head"
 			accept = AcceptType.get(env, format(env))[0]
-			data = BlobServer.transformation.run(:bucket => bucket(env), :id => file(env), :type => accept, :trafo => (env[nil][:trafo] || ""))
+
+			# check trafo encryption
+			trafo_string = BlobServer.decrypt_trafo(env[nil][:trafo] || "")
+			return BlobServer::Storage::BlobMetaData.new.response if !trafo_string
+
+			data = BlobServer.transformation.run(:bucket => bucket(env), :id => file(env), :type => accept, :trafo => trafo_string)
 			data.response(false)
 		}
 
@@ -48,7 +63,12 @@ module BlobServer
 			#p "No Format: #{env[nil][:trafo]}"
 			puts "Blob head"
 			accept = AcceptType.get(env, nil)[0]
-			data = BlobServer.transformation.run(:bucket => bucket(env), :id => file(env), :type => accept, :trafo => (env[nil][:trafo] || ""))
+
+			# check trafo encryption
+			trafo_string = BlobServer.decrypt_trafo(env[nil][:trafo] || "")
+			return BlobServer::Storage::BlobMetaData.new.response if !trafo_string
+
+			data = BlobServer.transformation.run(:bucket => bucket(env), :id => file(env), :type => accept, :trafo => trafo_string)
 			data.response(false)
 		}
 

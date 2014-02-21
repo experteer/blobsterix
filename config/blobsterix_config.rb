@@ -26,10 +26,10 @@ module BlobServer
 
   # Override those if you want to change the default storage and cache system.
   # def self.storage
-  #   @@storage ||= Storage::FileSystem.new(File.join(BLOBSTERIX_DATA_DIR, "contents"))
+  #   @@storage ||= Storage::FileSystem.new(BlobServer.storage_dir)
   # end
   # def self.cache
-  #   @@cache ||= Storage::Cache.new(File.join(BLOBSTERIX_DATA_DIR, "cache"))
+  #   @@cache ||= Storage::Cache.new(BlobServer.cache_dir)
   # end
 
 

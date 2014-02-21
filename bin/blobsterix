@@ -25,17 +25,19 @@ class Generator
   def run()
     puts "Doing #{@type} with #{@param} in #{Dir.pwd}"
 
-    init(@param) if @type == "init"
-    transformation(@param) if @type == "transformator"
+    init(@param||"") if @type == "init"
+    transformation(@param||"NewTrafo") if @type == "transformator"
   end
 
-  def init(folder="")
+  def init(folder)
+    puts "Init new Blobsterix Server"
+    FileUtils.mkdir_p(File.join(BLOBSTERIX_DATA_DIR, folder))
     FileUtils.cp(File.join(BLOBSTERIX_GEM_DIR, "config/Gemfile"), File.join(BLOBSTERIX_DATA_DIR, folder, "Gemfile")) if !File.exist?(File.join(BLOBSTERIX_DATA_DIR, folder, "Gemfile"))
     FileUtils.cp(File.join(BLOBSTERIX_GEM_DIR, "config/blobsterix_config.rb"), File.join(BLOBSTERIX_DATA_DIR, folder, "blobsterix_config.rb")) if !File.exist?(File.join(BLOBSTERIX_DATA_DIR, folder, "blobsterix_config.rb"))
     FileUtils.mkdir_p(File.join(BLOBSTERIX_DATA_DIR, folder, "transformators"))
   end
 
-  def transformation(name="NewTrafo")
+  def transformation(name)
     trafo_dir = File.join(BLOBSTERIX_DATA_DIR, "transformators")
     FileUtils.mkdir_p(trafo_dir)
     new_transformator = File.read(File.join(BLOBSTERIX_GEM_DIR, "config/transformation_template.rb"))

@@ -96,11 +96,7 @@ module BlobServer::Transformations
 				if input[:trafo].is_a?(String)
 					trafo = []
 
-					#check for trafo string integrity
-					trafo_string = BlobServer.decrypt_trafo(input[:trafo])
-					return false if not trafo_string
-
-					trafo_string.split(",").each{|command|
+					input[:trafo].split(",").each{|command|
 						parts = command.split("_")
 						key = parts.delete_at(0)
 						trafo << [key, parts.join("_")]
