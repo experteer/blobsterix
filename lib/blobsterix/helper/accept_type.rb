@@ -41,7 +41,7 @@ module BlobServer
 		end
 
 		def is? other_type
-			mediatype === other_type.mediatype
+			mediatype === other_type.mediatype || mediatype === "*" || other_type.mediatype === "*"
 		end
 
 		def equal? other_type

@@ -77,6 +77,10 @@ module BlobServer
     @@cache ||= Storage::Cache.new(BlobServer.cache_dir)
   end
 
+  def self.decrypt_trafo(trafo_string)
+    trafo_string
+  end
+
   def self.transformation
   	@@transformation ||= BlobServer::Transformations::TransformationManager.new
   end

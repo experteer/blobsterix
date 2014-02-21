@@ -11,7 +11,7 @@ module BlobServer::Transformations
 			self
 		end
 		def run(input)
-			prepare_input(input)
+			return BlobServer::Storage::BlobMetaData.new if not prepare_input(input)
 
 			preferred_key = input[:target] || cache_key(input[:bucket], input[:id], input[:trafo], input[:type])
 
@@ -95,7 +95,12 @@ module BlobServer::Transformations
 			def prepare_input(input)
 				if input[:trafo].is_a?(String)
 					trafo = []
-					input[:trafo].split(",").each{|command| 
+
+					#check for trafo string integrity
+					trafo_string = BlobServer.decrypt_trafo(input[:trafo])
+					return false if not trafo_string
+
+					trafo_string.split(",").each{|command|
 						parts = command.split("_")
 						key = parts.delete_at(0)
 						trafo << [key, parts.join("_")]
@@ -104,6 +109,7 @@ module BlobServer::Transformations
 				end
 
 				input[:type] = BlobServer::AcceptType.new(input[:type]) if input[:type].is_a?(String) or input[:type].is_a?(Array)
+				true
 			end
 	end
 end
