@@ -26,22 +26,54 @@ class Generator
     puts "Doing #{@type} with #{@param} in #{Dir.pwd}"
 
     init if @type == "init"
+    transformation(@param) if @type == "transformator"
   end
 
   def init()
     FileUtils.cp(File.join(BLOBSTERIX_GEM_DIR, "config/Gemfile"), File.join(BLOBSTERIX_DATA_DIR, "Gemfile"))
+    FileUtils.cp(File.join(BLOBSTERIX_GEM_DIR, "config/blobsterix_config.rb"), File.join(BLOBSTERIX_DATA_DIR, "blobsterix_config.rb"))
+    FileUtils.mkdir_p(File.join(BLOBSTERIX_DATA_DIR, "transformators"))
+  end
+
+  def transformation(name="NewTrafo")
+    trafo_dir = File.join(BLOBSTERIX_DATA_DIR, "transformators")
+    FileUtils.mkdir_p(trafo_dir)
+    new_transformator = File.read(File.join(BLOBSTERIX_GEM_DIR, "config/transformation_template.rb"))
+    new_transformator = new_transformator.gsub("$ClassName", name)
+    new_transformator = new_transformator.gsub("$url_name", name.downcase)
+    File.write(File.join(trafo_dir, "#{name.downcase}_transformation.rb"), "w+")
   end
 end
+class BlobsterixRunner
 
+  def run_blobsterix()
+    require_config()
+    require_transformators()
 
+    runner = Goliath::Runner.new(ARGV, nil)
+    runner.api = BlobServer::Service.new
+    runner.app = Goliath::Rack::Builder.build(BlobServer::Service, runner.api)
+    runner.run
+  end
+
+  private
+    def require_config()
+      require File.join(BLOBSTERIX_DATA_DIR, "blobsterix_config.rb") if (File.exist?(File.join(BLOBSTERIX_DATA_DIR, "blobsterix_config.rb")))
+    end
+
+    def require_transformators()
+      trafo_dir = File.join(BLOBSTERIX_DATA_DIR, "transformators")
+      return if not File.exist?(trafo_dir)
+      Dir.entries(trafo_dir).each{|dir|
+        if !File.directory? File.join(trafo_dir,dir) and !(dir =='.' || dir == '..')
+          require "#{File.join(trafo_dir,dir)}"
+        end
+      }
+    end
+end
 exit if ARGV.length == 0
 if ARGV[0] == "server"
-  require File.join(BLOBSTERIX_DATA_DIR, "blobsterix_config.rb") if (File.exist?(File.join(BLOBSTERIX_DATA_DIR, "blobsterix_config.rb")))
-  
-  runner = Goliath::Runner.new(ARGV, nil)
-  runner.api = BlobServer::Service.new
-  runner.app = Goliath::Rack::Builder.build(BlobServer::Service, runner.api)
-  runner.run
+  BlobsterixRunner.new.run_blobsterix
 elsif ARGV[0] == "generate"
   Generator.new(ARGV).run
 end

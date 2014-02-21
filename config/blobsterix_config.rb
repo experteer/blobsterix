@@ -1,7 +1,15 @@
 module BlobServer
   # Override those methods if you want to change the storage and cache dirs from their default location
-  # def self.storage
+  # def self.storage_dir
+  #   File.join(BLOBSTERIX_DATA_DIR, "contents")
+  # end
 
+  # def self.cache_dir
+  #   File.join(BLOBSTERIX_DATA_DIR, "cache")
+  # end
+
+  # Override those if you want to change the default storage and cache system.
+  # def self.storage
   #   @@storage ||= Storage::FileSystem.new(File.join(BLOBSTERIX_DATA_DIR, "contents"))
   # end
   # def self.cache

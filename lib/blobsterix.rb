@@ -60,12 +60,21 @@ require 'blobsterix/transformation/image_transformation'
 require 'blobsterix/service'
 
 module BlobServer
+  def self.storage_dir
+    File.join(BLOBSTERIX_DATA_DIR, "contents")
+  end
+
   def self.storage
     puts "Doing in #{Dir.pwd}"
-    @@storage ||= Storage::FileSystem.new(File.join(BLOBSTERIX_DATA_DIR, "contents"))
+    @@storage ||= Storage::FileSystem.new(BlobServer.storage_dir)
   end
+
+  def self.cache_dir
+    File.join(BLOBSTERIX_DATA_DIR, "cache")
+  end
+
   def self.cache
-    @@cache ||= Storage::Cache.new(File.join(BLOBSTERIX_DATA_DIR, "cache"))
+    @@cache ||= Storage::Cache.new(BlobServer.cache_dir)
   end
 
   def self.transformation
