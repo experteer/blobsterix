@@ -42,7 +42,7 @@ class Generator
 
 
     FileUtils.cp(File.join(BLOBSTERIX_GEM_DIR, "config/Gemfile"), File.join(BLOBSTERIX_DATA_DIR, folder, "Gemfile")) if !File.exist?(File.join(BLOBSTERIX_DATA_DIR, folder, "Gemfile"))
-    FileUtils.cp(File.join(BLOBSTERIX_GEM_DIR, "config/blobsterix_config.rb"), File.join(BLOBSTERIX_DATA_DIR, folder, "blobsterix_config.rb")) if !File.exist?(File.join(BLOBSTERIX_DATA_DIR, folder, "blobsterix_config.rb"))
+    FileUtils.cp(File.join(BLOBSTERIX_GEM_DIR, "config/blobsterix_config.rb"), File.join(BLOBSTERIX_DATA_DIR, folder, "config.rb")) if !File.exist?(File.join(BLOBSTERIX_DATA_DIR, folder, "config.rb"))
     
   end
 
@@ -77,7 +77,7 @@ class BlobsterixRunner
 
   private
     def require_config()
-      require File.join(BLOBSTERIX_DATA_DIR, "blobsterix_config.rb") if (File.exist?(File.join(BLOBSTERIX_DATA_DIR, "blobsterix_config.rb")))
+      require File.join(BLOBSTERIX_DATA_DIR, "config.rb") if (File.exist?(File.join(BLOBSTERIX_DATA_DIR, "config.rb")))
     end
 
     def require_transformators()
