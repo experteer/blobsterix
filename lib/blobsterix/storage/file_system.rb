@@ -6,6 +6,7 @@ module BlobServer
 
 			def initialize(path="../contents")
 				@contents = path
+				FileUtils.mkdir_p(@contents)
 			end
 
 			def bucket_exist(bucket="root")

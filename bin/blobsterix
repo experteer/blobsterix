@@ -29,13 +29,15 @@ class Generator
   end
 
   def init()
-    FileUtils.cp(File.join(BLOBSTERIX_GEM_DIR, "config/GemFile"), File.join(BLOBSTERIX_DATA_DIR, "GemFile"))
+    FileUtils.cp(File.join(BLOBSTERIX_GEM_DIR, "config/Gemfile"), File.join(BLOBSTERIX_DATA_DIR, "Gemfile"))
   end
 end
 
 
 exit if ARGV.length == 0
 if ARGV[0] == "server"
+  require File.join(BLOBSTERIX_DATA_DIR, "blobsterix_config.rb") if (File.exist?(File.join(BLOBSTERIX_DATA_DIR, "blobsterix_config.rb")))
+  
   runner = Goliath::Runner.new(ARGV, nil)
   runner.api = BlobServer::Service.new
   runner.app = Goliath::Rack::Builder.build(BlobServer::Service, runner.api)
