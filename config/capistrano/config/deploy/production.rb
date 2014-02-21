@@ -1,0 +1,1 @@
+server 'blob1.experteer.com', :app, :web, :db, :primary => true
