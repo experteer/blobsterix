@@ -1,36 +1,6 @@
-ab -n 100 -c 50 http://localhost:3000/blob/rotate_10/images/expired.png > cache/log_00 &
-ab -n 100 -c 50 http://localhost:3000/blob/rotate_20/images/expired.png > cache/log_01 &
-ab -n 100 -c 50 http://localhost:3000/blob/rotate_30/images/expired.png > cache/log_02 &
-ab -n 100 -c 50 http://localhost:3000/blob/rotate_40/images/expired.png > cache/log_03 &
-ab -n 100 -c 50 http://localhost:3000/blob/rotate_50/images/expired.png > cache/log_04 &
-ab -n 100 -c 50 http://localhost:3000/blob/rotate_60/images/expired.png > cache/log_05 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_70/images/expired.png > cache/log_06 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_80/images/expired.png > cache/log_07 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_90/images/expired.png > cache/log_08 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_100/images/expired.png > cache/log_09 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_110/images/expired.png > cache/log_10 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_120/images/expired.png > cache/log_11 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_130/images/expired.png > cache/log_12 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_140/images/expired.png > cache/log_13 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_150/images/expired.png > cache/log_14 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_160/images/expired.png > cache/log_15 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_170/images/expired.png > cache/log_16 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_180/images/expired.png > cache/log_17 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_10/images/expired.png > cache/log_18 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_20/images/expired.png > cache/log_19 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_30/images/expired.png > cache/log_20 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_40/images/expired.png > cache/log_21 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_50/images/expired.png > cache/log_22 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_60/images/expired.png > cache/log_23 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_70/images/expired.png > cache/log_24 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_80/images/expired.png > cache/log_25 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_90/images/expired.png > cache/log_26 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_100/images/expired.png > cache/log_27 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_110/images/expired.png > cache/log_28 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_120/images/expired.png > cache/log_29 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_130/images/expired.png > cache/log_30 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_140/images/expired.png > cache/log_31 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_150/images/expired.png > cache/log_32 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_160/images/expired.png > cache/log_33 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_170/images/expired.png > cache/log_34 &
-# ab -n 100 -c 50 http://localhost:3000/blob/resize_200,rotate_180/images/expired.png > cache/log_35 &
+ab -n 100 -c 50 http://localhost:9000/blob/v1/rotate_10.images/expired.png > cache/log_00 &
+ab -n 100 -c 50 http://localhost:9000/blob/v1/rotate_20.images/expired.png > cache/log_01 &
+ab -n 100 -c 50 http://localhost:9000/blob/v1/rotate_30.images/expired.png > cache/log_02 &
+ab -n 100 -c 50 http://localhost:9000/blob/v1/rotate_40.images/expired.png > cache/log_03 &
+ab -n 100 -c 50 http://localhost:9000/blob/v1/rotate_50.images/expired.png > cache/log_04 &
+ab -n 100 -c 50 http://localhost:9000/blob/v1/rotate_60.images/expired.png > cache/log_05 &
