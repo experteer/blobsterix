@@ -1,4 +1,4 @@
-module BlobServer
+module Blobsterix
 	class Service < Goliath::API
 		use Goliath::Rack::Params
 =begin

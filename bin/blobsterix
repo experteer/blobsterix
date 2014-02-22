@@ -5,10 +5,6 @@ require 'goliath/runner'
 
 require 'blobsterix'
 
-# runner = Goliath::Runner.new(ARGV, nil)
-# runner.api = BlobServer::Service.new
-# runner.app = Goliath::Rack::Builder.build(BlobServer::Service, runner.api)
-# runner.run
 require "fileutils"
 
 BLOBSTERIX_GEM_DIR = File.join(File.dirname(__FILE__), "../")
@@ -63,13 +59,13 @@ class BlobsterixRunner
 
     runner = Goliath::Runner.new(ARGV, nil)
 
-    runner.port = BlobServer.port if BlobServer.respond_to?(:port)
-    runner.address = BlobServer.address if BlobServer.respond_to?(:address)
+    runner.port = Blobsterix.port if Blobsterix.respond_to?(:port)
+    runner.address = Blobsterix.address if Blobsterix.respond_to?(:address)
 
-    Goliath.env = BlobServer.env if BlobServer.respond_to?(:env)
+    Goliath.env = Blobsterix.env if Blobsterix.respond_to?(:env)
 
-    runner.api = BlobServer::Service.new
-    runner.app = Goliath::Rack::Builder.build(BlobServer::Service, runner.api)
+    runner.api = Blobsterix::Service.new
+    runner.app = Goliath::Rack::Builder.build(Blobsterix::Service, runner.api)
 
     puts "Now starting Blobsterix...."
     runner.run
@@ -91,7 +87,7 @@ class BlobsterixRunner
     end
 end
 
-puts "Blobsterix #{BlobServer::VERSION}"
+puts "Blobsterix #{Blobsterix::VERSION}"
 if ARGV.length == 0
   puts "Usage: "
   puts "\tserver (goliath server options) - \n\t\tStarts blobsterix. When a blobsterix config is present in the executing folder it \n\t\twill be used otherwise blobsterix will run with standard options."

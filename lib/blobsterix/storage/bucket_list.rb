@@ -1,4 +1,4 @@
-module BlobServer
+module Blobsterix
 	module Storage
 		class BucketList
 			attr_accessor :buckets

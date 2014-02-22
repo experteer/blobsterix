@@ -1,4 +1,4 @@
-module BlobServer
+module Blobsterix
 	module Storage
 		class FileSystemMetaData < BlobMetaData
 

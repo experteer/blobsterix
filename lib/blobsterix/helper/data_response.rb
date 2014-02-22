@@ -1,4 +1,4 @@
-module BlobServer
+module Blobsterix
 	module Http
 		class DataResponse
 			attr_reader :meta, :with_data, :etag, :env

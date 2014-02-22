@@ -1,4 +1,4 @@
-module BlobServer::Transformations
+module Blobsterix::Transformations
 	class TransformationManager
 		def initialize()
 			@transformations = []
@@ -6,12 +6,12 @@ module BlobServer::Transformations
 			auto_load
 		end
 		def add(trafo)
-			transformation = (trafo.is_a?(String) ? ::BlobServer::Transformations::Impl::const_get(trafo).new : trafo)
+			transformation = (trafo.is_a?(String) ? ::Blobsterix::Transformations::Impl::const_get(trafo).new : trafo)
 			@transformations << transformation if @transformations.select{|trafo|trafo.name === transformation.name}.empty?
 			self
 		end
 		def run(input)
-			return BlobServer::Storage::BlobMetaData.new if not prepare_input(input)
+			return Blobsterix::Storage::BlobMetaData.new if not prepare_input(input)
 
 			preferred_key = input[:target] || cache_key(input[:bucket], input[:id], input[:trafo], input[:type])
 
@@ -21,7 +21,7 @@ module BlobServer::Transformations
 				Fiber.yield
 			end
 
-			return BlobServer.cache.get(preferred_key) if BlobServer.cache.exists?(preferred_key)
+			return Blobsterix.cache.get(preferred_key) if Blobsterix.cache.exists?(preferred_key)
 
 			@running_transformations[preferred_key] = [Fiber.current]
 
@@ -35,7 +35,7 @@ module BlobServer::Transformations
 
 			#puts "Finish connection: #{Fiber.current.id}"
 			
-			BlobServer.cache.exists?(preferred_key) ? BlobServer.cache.get(preferred_key) : BlobServer::Storage::BlobMetaData.new
+			Blobsterix.cache.exists?(preferred_key) ? Blobsterix.cache.get(preferred_key) : Blobsterix::Storage::BlobMetaData.new
 		end
 		def cache_key(bucket, id, trafo, accept_type)
 			puts "Calc cache key[#{trafo}]"
@@ -45,17 +45,17 @@ module BlobServer::Transformations
 		end
 		private
 			def auto_load()
-				BlobServer::Transformations::Impl.constants.each{|c|
+				Blobsterix::Transformations::Impl.constants.each{|c|
 					add(c.to_s)
 				}
 			end
 			def get_original_file(bucket, id)
 				key = [bucket, id.gsub("/", "_")].join("_")
-				if not BlobServer.cache.exists?(key)
-					metaData = BlobServer.storage.get(bucket, id)
-					BlobServer.cache.put(key, metaData.data) if metaData.valid
+				if not Blobsterix.cache.exists?(key)
+					metaData = Blobsterix.storage.get(bucket, id)
+					Blobsterix.cache.put(key, metaData.data) if metaData.valid
 				end
-				BlobServer.cache.get(key)
+				Blobsterix.cache.get(key)
 			end
 			def run_transformation(preferred_key, input)
 				puts "Load: #{input[:bucket]}, #{input[:id]}"
@@ -104,7 +104,7 @@ module BlobServer::Transformations
 					input[:trafo] = trafo
 				end
 
-				input[:type] = BlobServer::AcceptType.new(input[:type]) if input[:type].is_a?(String) or input[:type].is_a?(Array)
+				input[:type] = Blobsterix::AcceptType.new(input[:type]) if input[:type].is_a?(String) or input[:type].is_a?(Array)
 				true
 			end
 	end

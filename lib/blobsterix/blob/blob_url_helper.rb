@@ -1,4 +1,4 @@
-module BlobServer
+module Blobsterix
 	module BlobUrlHelper
 		HOST_PATH = /(\w+)(\.s3)?\.\w+\.\w+/
 		def bucket_matcher(str)

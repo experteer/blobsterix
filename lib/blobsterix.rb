@@ -59,14 +59,14 @@ require 'blobsterix/transformation/image_transformation'
 #service base
 require 'blobsterix/service'
 
-module BlobServer
+module Blobsterix
   def self.storage_dir
     File.join(BLOBSTERIX_DATA_DIR, "contents")
   end
 
   def self.storage
     puts "Doing in #{Dir.pwd}"
-    @@storage ||= Storage::FileSystem.new(BlobServer.storage_dir)
+    @@storage ||= Storage::FileSystem.new(Blobsterix.storage_dir)
   end
 
   def self.cache_dir
@@ -74,7 +74,7 @@ module BlobServer
   end
 
   def self.cache
-    @@cache ||= Storage::Cache.new(BlobServer.cache_dir)
+    @@cache ||= Storage::Cache.new(Blobsterix.cache_dir)
   end
 
   def self.decrypt_trafo(trafo_string)
@@ -82,6 +82,6 @@ module BlobServer
   end
 
   def self.transformation
-  	@@transformation ||= BlobServer::Transformations::TransformationManager.new
+  	@@transformation ||= Blobsterix::Transformations::TransformationManager.new
   end
 end

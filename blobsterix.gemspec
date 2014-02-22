@@ -13,7 +13,7 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.name          = "blobsterix"
   gem.require_paths = ["lib"]
-  gem.version       = BlobServer::VERSION
+  gem.version       = Blobsterix::VERSION
 
 
   gem.add_dependency "json",        "~> 1.8.1"

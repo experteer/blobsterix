@@ -1,4 +1,4 @@
-module BlobServer
+module Blobsterix
 	class BlobApi < AppRouterBase
 		extend BlobUrlHelper
 
@@ -24,10 +24,10 @@ module BlobServer
 			accept = AcceptType.get(env, format(env))[0]
 
 			# check trafo encryption
-			trafo_string = BlobServer.decrypt_trafo(env[nil][:trafo] || "")
-			return BlobServer::Storage::BlobMetaData.new.response if !trafo_string
+			trafo_string = Blobsterix.decrypt_trafo(env[nil][:trafo] || "")
+			return Blobsterix::Storage::BlobMetaData.new.response if !trafo_string
 
-			data = BlobServer.transformation.run(:bucket => bucket(env), :id => file(env), :type => accept, :trafo => trafo_string)
+			data = Blobsterix.transformation.run(:bucket => bucket(env), :id => file(env), :type => accept, :trafo => trafo_string)
 			data.response(true, env["HTTP_IF_NONE_MATCH"], env, env["HTTP_X_FILE"] === "yes")
 		}
 
@@ -37,10 +37,10 @@ module BlobServer
 			accept = AcceptType.get(env, nil)[0]
 
 			# check trafo encryption
-			trafo_string = BlobServer.decrypt_trafo(env[nil][:trafo] || "")
-			return BlobServer::Storage::BlobMetaData.new.response if !trafo_string
+			trafo_string = Blobsterix.decrypt_trafo(env[nil][:trafo] || "")
+			return Blobsterix::Storage::BlobMetaData.new.response if !trafo_string
 
-			data = BlobServer.transformation.run(:bucket => bucket(env), :id => file(env), :type => accept, :trafo => trafo_string)
+			data = Blobsterix.transformation.run(:bucket => bucket(env), :id => file(env), :type => accept, :trafo => trafo_string)
 			data.response(true, env["HTTP_IF_NONE_MATCH"], env, env["HTTP_X_FILE"] === "yes")
 		}
 
@@ -51,10 +51,10 @@ module BlobServer
 			accept = AcceptType.get(env, format(env))[0]
 
 			# check trafo encryption
-			trafo_string = BlobServer.decrypt_trafo(env[nil][:trafo] || "")
-			return BlobServer::Storage::BlobMetaData.new.response if !trafo_string
+			trafo_string = Blobsterix.decrypt_trafo(env[nil][:trafo] || "")
+			return Blobsterix::Storage::BlobMetaData.new.response if !trafo_string
 
-			data = BlobServer.transformation.run(:bucket => bucket(env), :id => file(env), :type => accept, :trafo => trafo_string)
+			data = Blobsterix.transformation.run(:bucket => bucket(env), :id => file(env), :type => accept, :trafo => trafo_string)
 			data.response(false)
 		}
 
@@ -65,10 +65,10 @@ module BlobServer
 			accept = AcceptType.get(env, nil)[0]
 
 			# check trafo encryption
-			trafo_string = BlobServer.decrypt_trafo(env[nil][:trafo] || "")
-			return BlobServer::Storage::BlobMetaData.new.response if !trafo_string
+			trafo_string = Blobsterix.decrypt_trafo(env[nil][:trafo] || "")
+			return Blobsterix::Storage::BlobMetaData.new.response if !trafo_string
 
-			data = BlobServer.transformation.run(:bucket => bucket(env), :id => file(env), :type => accept, :trafo => trafo_string)
+			data = Blobsterix.transformation.run(:bucket => bucket(env), :id => file(env), :type => accept, :trafo => trafo_string)
 			data.response(false)
 		}
 

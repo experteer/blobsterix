@@ -1,4 +1,4 @@
-module BlobServer
+module Blobsterix
 	class AppRouterBase
 
 		def self.get(path, controller)

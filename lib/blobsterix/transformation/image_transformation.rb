@@ -1,14 +1,14 @@
-module BlobServer::Transformations::Impl
-	class ColorSpaceImage < BlobServer::Transformations::Transformation
+module Blobsterix::Transformations::Impl
+	class ColorSpaceImage < Blobsterix::Transformations::Transformation
 		def name()
 			"grayscale"
 		end
 		def input_type()
-			@input_type ||= BlobServer::AcceptType.new "image/*"
+			@input_type ||= Blobsterix::AcceptType.new "image/*"
 		end
 
 		def output_type()
-			@output_type ||= BlobServer::AcceptType.new "image/*"
+			@output_type ||= Blobsterix::AcceptType.new "image/*"
 		end
 
 		def transform(input_path, target_path, value)
@@ -17,16 +17,16 @@ module BlobServer::Transformations::Impl
 			image.write target_path
 		end
 	end
-	class RotateImage < BlobServer::Transformations::Transformation
+	class RotateImage < Blobsterix::Transformations::Transformation
 		def name()
 			"rotate"
 		end
 		def input_type()
-			@input_type ||= BlobServer::AcceptType.new "image/*"
+			@input_type ||= Blobsterix::AcceptType.new "image/*"
 		end
 
 		def output_type()
-			@output_type ||= BlobServer::AcceptType.new "image/*"
+			@output_type ||= Blobsterix::AcceptType.new "image/*"
 		end
 
 		def transform(input_path, target_path, value)
@@ -39,16 +39,16 @@ module BlobServer::Transformations::Impl
 		end
 	end
 
-	class AdaptiveResizeImage < BlobServer::Transformations::Transformation
+	class AdaptiveResizeImage < Blobsterix::Transformations::Transformation
 		def name()
 			"aresize"
 		end
 		def input_type()
-			@input_type ||= BlobServer::AcceptType.new "image/*"
+			@input_type ||= Blobsterix::AcceptType.new "image/*"
 		end
 
 		def output_type()
-			@output_type ||= BlobServer::AcceptType.new "image/*"
+			@output_type ||= Blobsterix::AcceptType.new "image/*"
 		end
 
 		def transform(input_path, target_path, value)
@@ -58,16 +58,16 @@ module BlobServer::Transformations::Impl
 		end
 	end
 
-	class ResizeImage < BlobServer::Transformations::Transformation
+	class ResizeImage < Blobsterix::Transformations::Transformation
 		def name()
 			"resize"
 		end
 		def input_type()
-			@input_type ||= BlobServer::AcceptType.new "image/*"
+			@input_type ||= Blobsterix::AcceptType.new "image/*"
 		end
 
 		def output_type()
-			@output_type ||= BlobServer::AcceptType.new "image/*"
+			@output_type ||= Blobsterix::AcceptType.new "image/*"
 		end
 
 		def transform(input_path, target_path, value)
@@ -77,16 +77,16 @@ module BlobServer::Transformations::Impl
 		end
 	end
 
-	class ShrinkImage < BlobServer::Transformations::Transformation
+	class ShrinkImage < Blobsterix::Transformations::Transformation
 		def name()
 			"shrink"
 		end
 		def input_type()
-			@input_type ||= BlobServer::AcceptType.new "image/*"
+			@input_type ||= Blobsterix::AcceptType.new "image/*"
 		end
 
 		def output_type()
-			@output_type ||= BlobServer::AcceptType.new "image/*"
+			@output_type ||= Blobsterix::AcceptType.new "image/*"
 		end
 
 		def transform(input_path, target_path, value)
@@ -96,16 +96,16 @@ module BlobServer::Transformations::Impl
 		end
 	end
 
-	class CropImage < BlobServer::Transformations::Transformation
+	class CropImage < Blobsterix::Transformations::Transformation
 		def name()
 			"crop"
 		end
 		def input_type()
-			@input_type ||= BlobServer::AcceptType.new "image/*"
+			@input_type ||= Blobsterix::AcceptType.new "image/*"
 		end
 
 		def output_type()
-			@output_type ||= BlobServer::AcceptType.new "image/*"
+			@output_type ||= Blobsterix::AcceptType.new "image/*"
 		end
 
 		def transform(input_path, target_path, value)
@@ -115,13 +115,13 @@ module BlobServer::Transformations::Impl
 		end
 	end
 
-	class Image2HTML < BlobServer::Transformations::Transformation
+	class Image2HTML < Blobsterix::Transformations::Transformation
 		def input_type()
-			@input_type ||= BlobServer::AcceptType.new "image/*"
+			@input_type ||= Blobsterix::AcceptType.new "image/*"
 		end
 
 		def output_type()
-			@output_type ||= BlobServer::AcceptType.new "text/html"
+			@output_type ||= Blobsterix::AcceptType.new "text/html"
 		end
 
 		def is_format?()
@@ -141,17 +141,17 @@ module BlobServer::Transformations::Impl
 		end
 	end
 
-	class Image2Json < BlobServer::Transformations::Transformation
+	class Image2Json < Blobsterix::Transformations::Transformation
 		def name()
 			"json"
 		end
 		
 		def input_type()
-			@input_type ||= BlobServer::AcceptType.new "image/*"
+			@input_type ||= Blobsterix::AcceptType.new "image/*"
 		end
 
 		def output_type()
-			@output_type ||= BlobServer::AcceptType.new "text/json"
+			@output_type ||= Blobsterix::AcceptType.new "text/json"
 		end
 
 		def is_format?()
@@ -166,22 +166,22 @@ module BlobServer::Transformations::Impl
 			
 			image = type === "image/webp" ? {:width => "unknown", :height => "unknown"} : MiniMagick::Image.open(input_path)
 			File.open(target_path, "w") {|file|
-				file.write({:width => image[:width], :height => image[:height]}.merge(BlobServer::Storage::FileSystemMetaData.new(input_path).as_json).to_json)
+				file.write({:width => image[:width], :height => image[:height]}.merge(Blobsterix::Storage::FileSystemMetaData.new(input_path).as_json).to_json)
 			}
 		end
 	end
 
-	class Image2Json < BlobServer::Transformations::Transformation
+	class Image2Json < Blobsterix::Transformations::Transformation
 		def name()
 			"json_all"
 		end
 		
 		def input_type()
-			@input_type ||= BlobServer::AcceptType.new "*/*"
+			@input_type ||= Blobsterix::AcceptType.new "*/*"
 		end
 
 		def output_type()
-			@output_type ||= BlobServer::AcceptType.new "text/json"
+			@output_type ||= Blobsterix::AcceptType.new "text/json"
 		end
 
 		def is_format?()
@@ -190,12 +190,12 @@ module BlobServer::Transformations::Impl
 
 		def transform(input_path, target_path, value)
 			File.open(target_path, "w") {|file|
-				file.write(BlobServer::Storage::FileSystemMetaData.new(input_path).to_json)
+				file.write(Blobsterix::Storage::FileSystemMetaData.new(input_path).to_json)
 			}
 		end
 	end
 
-	class RawTransformation < BlobServer::Transformations::Transformation
+	class RawTransformation < Blobsterix::Transformations::Transformation
 		def name()
 			"raw"
 		end
@@ -205,11 +205,11 @@ module BlobServer::Transformations::Impl
 		end
 
 		def input_type()
-			@input_type ||= BlobServer::AcceptType.new "image/*"
+			@input_type ||= Blobsterix::AcceptType.new "image/*"
 		end
 
 		def output_type()
-			@output_type ||= BlobServer::AcceptType.new "image/*"
+			@output_type ||= Blobsterix::AcceptType.new "image/*"
 		end
 
 		def transform(input_path, target_path, value)
@@ -217,7 +217,7 @@ module BlobServer::Transformations::Impl
 		end
 	end
 
-	class Text2ImageTransformation < BlobServer::Transformations::Transformation
+	class Text2ImageTransformation < Blobsterix::Transformations::Transformation
 		def name()
 			"text2image"
 		end
@@ -227,11 +227,11 @@ module BlobServer::Transformations::Impl
 		end
 
 		def output_type()
-			@output_type ||= BlobServer::AcceptType.new "image/png"
+			@output_type ||= Blobsterix::AcceptType.new "image/png"
 		end
 
 		def input_type()
-			@input_type ||= BlobServer::AcceptType.new "text/plain"
+			@input_type ||= Blobsterix::AcceptType.new "text/plain"
 		end
 
 		def transform(input_path, target_path, value)
@@ -243,7 +243,7 @@ module BlobServer::Transformations::Impl
 		end
 	end
 
-	class AsciiTransformation < BlobServer::Transformations::Transformation
+	class AsciiTransformation < Blobsterix::Transformations::Transformation
 		def name()
 			"ascii"
 		end
@@ -253,11 +253,11 @@ module BlobServer::Transformations::Impl
 		end
 
 		def input_type()
-			@input_type ||= BlobServer::AcceptType.new "image/*"
+			@input_type ||= Blobsterix::AcceptType.new "image/*"
 		end
 
 		def output_type()
-			@output_type ||= BlobServer::AcceptType.new "text/plain"
+			@output_type ||= Blobsterix::AcceptType.new "text/plain"
 		end
 
 		def transform(input_path, target_path, value)
@@ -265,7 +265,7 @@ module BlobServer::Transformations::Impl
 		end
 	end
 
-	class AsciiHTMLTransformation < BlobServer::Transformations::Transformation
+	class AsciiHTMLTransformation < Blobsterix::Transformations::Transformation
 		def name()
 			"asciihtml"
 		end
@@ -275,11 +275,11 @@ module BlobServer::Transformations::Impl
 		end
 
 		def input_type()
-			@input_type ||= BlobServer::AcceptType.new "image/*"
+			@input_type ||= Blobsterix::AcceptType.new "image/*"
 		end
 
 		def output_type()
-			@output_type ||= BlobServer::AcceptType.new "text/plain"
+			@output_type ||= Blobsterix::AcceptType.new "text/plain"
 		end
 
 		def transform(input_path, target_path, value)
@@ -292,7 +292,7 @@ module BlobServer::Transformations::Impl
 		end
 	end
 
-	class PngTransformation < BlobServer::Transformations::Transformation
+	class PngTransformation < Blobsterix::Transformations::Transformation
 		def name()
 			"png"
 		end
@@ -302,11 +302,11 @@ module BlobServer::Transformations::Impl
 		end
 
 		def input_type()
-			@input_type ||= BlobServer::AcceptType.new "image/*"
+			@input_type ||= Blobsterix::AcceptType.new "image/*"
 		end
 
 		def output_type()
-			@output_type ||= BlobServer::AcceptType.new "image/png"
+			@output_type ||= Blobsterix::AcceptType.new "image/png"
 		end
 
 		def transform(input_path, target_path, value)
@@ -314,7 +314,7 @@ module BlobServer::Transformations::Impl
 		end
 	end
 
-	class JPegTransformation < BlobServer::Transformations::Transformation
+	class JPegTransformation < Blobsterix::Transformations::Transformation
 		def name()
 			"jpg"
 		end
@@ -324,11 +324,11 @@ module BlobServer::Transformations::Impl
 		end
 
 		def input_type()
-			@input_type ||= BlobServer::AcceptType.new "image/*"
+			@input_type ||= Blobsterix::AcceptType.new "image/*"
 		end
 
 		def output_type()
-			@output_type ||= BlobServer::AcceptType.new "image/jpeg"
+			@output_type ||= Blobsterix::AcceptType.new "image/jpeg"
 		end
 
 		def transform(input_path, target_path, value)
@@ -336,7 +336,7 @@ module BlobServer::Transformations::Impl
 		end
 	end
 
-	class GifTransformation < BlobServer::Transformations::Transformation
+	class GifTransformation < Blobsterix::Transformations::Transformation
 		def name()
 			"gif"
 		end
@@ -346,11 +346,11 @@ module BlobServer::Transformations::Impl
 		end
 
 		def input_type()
-			@input_type ||= BlobServer::AcceptType.new "image/*"
+			@input_type ||= Blobsterix::AcceptType.new "image/*"
 		end
 
 		def output_type()
-			@output_type ||= BlobServer::AcceptType.new "image/gif"
+			@output_type ||= Blobsterix::AcceptType.new "image/gif"
 		end
 
 		def transform(input_path, target_path, value)
@@ -358,7 +358,7 @@ module BlobServer::Transformations::Impl
 		end
 	end
 
-	class WebPTransformation < BlobServer::Transformations::Transformation
+	class WebPTransformation < Blobsterix::Transformations::Transformation
 		def name()
 			"webp"
 		end
@@ -368,11 +368,11 @@ module BlobServer::Transformations::Impl
 		end
 
 		def input_type()
-			@input_type ||= BlobServer::AcceptType.new "image/*"
+			@input_type ||= Blobsterix::AcceptType.new "image/*"
 		end
 
 		def output_type()
-			@output_type ||= BlobServer::AcceptType.new "image/webp"
+			@output_type ||= Blobsterix::AcceptType.new "image/webp"
 		end
 
 		def transform(input_path, target_path, value)
@@ -381,17 +381,17 @@ module BlobServer::Transformations::Impl
 		end
 	end
 
-	class SleepTransformation < BlobServer::Transformations::Transformation
+	class SleepTransformation < Blobsterix::Transformations::Transformation
 		def name()
 			"sleep"
 		end
 
 		def input_type()
-			@input_type ||= BlobServer::AcceptType.new "image/*"
+			@input_type ||= Blobsterix::AcceptType.new "image/*"
 		end
 
 		def output_type()
-			@output_type ||= BlobServer::AcceptType.new "image/*"
+			@output_type ||= Blobsterix::AcceptType.new "image/*"
 		end
 
 		def transform(input_path, target_path, value)

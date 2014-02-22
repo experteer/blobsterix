@@ -1,4 +1,4 @@
-module BlobServer::Transformations
+module Blobsterix::Transformations
 	class Transformation
 		def initialize()
 		end
@@ -12,11 +12,11 @@ module BlobServer::Transformations
 		end
 
 		def input_type()
-			BlobServer::AcceptType.new
+			Blobsterix::AcceptType.new
 		end
 
 		def output_type()
-			BlobServer::AcceptType.new
+			Blobsterix::AcceptType.new
 		end
 
 		def transform(input_path, target_path, value)

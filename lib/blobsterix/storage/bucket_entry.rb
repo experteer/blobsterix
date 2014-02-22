@@ -1,4 +1,4 @@
-module BlobServer
+module Blobsterix
 	module Storage
 		class BucketEntry
 			attr_accessor :key, :last_modified, :etag, :size, :storage_class, :mimetype, :fullpath

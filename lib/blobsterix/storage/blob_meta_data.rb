@@ -1,4 +1,4 @@
-module BlobServer
+module Blobsterix
 	module Storage
 		class BlobMetaData
 			def check(key)
@@ -45,7 +45,7 @@ module BlobServer
 			def delete()
 			end
 			def response(with_data=true, _etag=nil, env = nil, xfile = false)
-				BlobServer::Http::DataResponse.new(self, with_data, _etag, env).call(xfile)
+				Blobsterix::Http::DataResponse.new(self, with_data, _etag, env).call(xfile)
 			end
 		end
 	end

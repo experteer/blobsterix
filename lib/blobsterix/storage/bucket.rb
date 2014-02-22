@@ -1,4 +1,4 @@
-module BlobServer
+module Blobsterix
 	module Storage
 		class Bucket
 			attr_accessor :name, :creation_date, :contents

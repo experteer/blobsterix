@@ -1,5 +1,5 @@
-module BlobServer::Transformations::Impl
-  class $ClassNameTransformation < BlobServer::Transformations::Transformation
+module Blobsterix::Transformations::Impl
+  class $ClassNameTransformation < Blobsterix::Transformations::Transformation
 
     def name()
       #this function should return the name of the trafo that will be used in the url
@@ -17,17 +17,17 @@ module BlobServer::Transformations::Impl
     end
 
     def input_type()
-      # this function should return a BlobServer::AcceptType that tells the transformator
+      # this function should return a Blobsterix::AcceptType that tells the transformator
       # which formats are supported
       # its normal mimetype
-      @input_type ||= BlobServer::AcceptType.new "*/*"
+      @input_type ||= Blobsterix::AcceptType.new "*/*"
     end
 
     def output_type()
-       # this function should return a BlobServer::AcceptType that tells the transformator
+       # this function should return a Blobsterix::AcceptType that tells the transformator
       # which format is produced by this transformation
       # its normal mimetype
-      @output_type ||= BlobServer::AcceptType.new "text/plain"
+      @output_type ||= Blobsterix::AcceptType.new "text/plain"
     end
 
     def transform(input_path, target_path, value)

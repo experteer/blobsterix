@@ -1,4 +1,4 @@
-module BlobServer
+module Blobsterix
 	module Storage
 		class Storage
 			def list(bucket="root")

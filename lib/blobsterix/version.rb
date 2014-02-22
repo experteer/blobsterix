@@ -1,3 +1,3 @@
-module BlobServer
+module Blobsterix
   VERSION = "0.0.1"
 end

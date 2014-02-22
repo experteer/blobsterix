@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require 'blob_server'
 
-trafoManager = BlobServer::Transformations::TransformationManager.new.add("ImageTransformation")
+trafoManager = Blobsterix::Transformations::TransformationManager.new.add("ImageTransformation")
 
 bucket = "test"
 id = "droid2.png"

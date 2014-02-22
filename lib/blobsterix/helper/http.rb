@@ -1,4 +1,4 @@
-module BlobServer
+module Blobsterix
 	module Http
 		def self.NextApi(data="Not Found", content_type="txt")
 			[600, {"Content-Type" => MimeMagic.by_extension(content_type).type}, data]

@@ -1,4 +1,4 @@
-module BlobServer
+module Blobsterix
 
   # If this function is uncommented it should return an environment
   # this env will override the one supplied from the command line
@@ -26,17 +26,17 @@ module BlobServer
 
   # Override those if you want to change the default storage and cache system.
   # def self.storage
-  #   @@storage ||= Storage::FileSystem.new(BlobServer.storage_dir)
+  #   @@storage ||= Storage::FileSystem.new(Blobsterix.storage_dir)
   # end
   # def self.cache
-  #   @@cache ||= Storage::Cache.new(BlobServer.cache_dir)
+  #   @@cache ||= Storage::Cache.new(Blobsterix.cache_dir)
   # end
 
 
   # Override this method if you want to use a different transformation manager.
   # normally not needed
   # def self.transformation
-  #   @@transformation ||= BlobServer::Transformations::TransformationManager.new
+  #   @@transformation ||= Blobsterix::Transformations::TransformationManager.new
   # end
 
   # Override this method incase you expect the trafo string in a special format.

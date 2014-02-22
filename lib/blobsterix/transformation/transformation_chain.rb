@@ -1,4 +1,4 @@
-module BlobServer::Transformations
+module Blobsterix::Transformations
 	class TransformationChain
 		def initialize(key, input_data)
 			@key = key
@@ -11,7 +11,7 @@ module BlobServer::Transformations
 		end
 
 		def last_type()
-			return BlobServer::AcceptType.new(@input_data.mimetype) if @transformations.empty?
+			return Blobsterix::AcceptType.new(@input_data.mimetype) if @transformations.empty?
 			@transformations.last[0].output_type
 		end
 
@@ -51,7 +51,7 @@ module BlobServer::Transformations
 		end
 
 		def file_path()
-			@file_path ||= BlobServer.cache.path_prepare(cache_key)
+			@file_path ||= Blobsterix.cache.path_prepare(cache_key)
 		end
 	end
 end

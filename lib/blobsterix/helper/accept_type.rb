@@ -1,4 +1,4 @@
-module BlobServer
+module Blobsterix
 	class AcceptType
 
 		def self.parse(header, format)

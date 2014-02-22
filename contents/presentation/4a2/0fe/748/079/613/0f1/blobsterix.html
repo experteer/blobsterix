@@ -34,8 +34,8 @@
 
               timeout = setTimeout(function() {
                 console.log("change url")
-                $("#out").attr("src", "/blob/v1/crop_"+c.w+"x"+c.h+"+"+c.x+"+"+c.y+"/presentation/crop.png")
-                $("#croplink").text("/blob/v1/crop_"+c.w+"x"+c.h+"+"+c.x+"+"+c.y+"/presentation/crop.png")
+                $("#out").attr("src", "/blob/v1/crop_"+c.w+"x"+c.h+"+"+c.x+"+"+c.y+".presentation/crop.png")
+                $("#croplink").text("/blob/v1/crop_"+c.w+"x"+c.h+"+"+c.x+"+"+c.y+".presentation/crop.png")
               }, 150);
           };
       </script>
@@ -176,8 +176,8 @@
           <script language="Javascript">
             jQuery(function($) {
               $('#scalebutton').click(function(){
-                $("#scalelink").text("/blob/v1/resize_"+$('#scale').val()+"/presentation/syncview21.png")
-                $("#scaletarget").attr("src", "/blob/v1/resize_"+$('#scale').val()+"/presentation/syncview21.png")
+                $("#scalelink").text("/blob/v1/resize_"+$('#scale').val()+".presentation/syncview21.png")
+                $("#scaletarget").attr("src", "/blob/v1/resize_"+$('#scale').val()+".presentation/syncview21.png")
               });
             });
           </script>

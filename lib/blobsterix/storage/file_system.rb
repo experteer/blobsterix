@@ -1,6 +1,6 @@
 require 'fileutils'
 
-module BlobServer
+module Blobsterix
 	module Storage
 		class FileSystem < Storage
 
@@ -48,7 +48,7 @@ module BlobServer
 				if (not File.directory?(contents(bucket, key))) and bucket_files(bucket).include?(key)
 					metaData(bucket, key)
 				else
-					BlobServer::Storage::BlobMetaData.new
+					Blobsterix::Storage::BlobMetaData.new
 				end
 			end
 
@@ -98,7 +98,7 @@ module BlobServer
 				end
 
 				def metaData(bucket, key)
-					BlobServer::Storage::FileSystemMetaData.new(contents(bucket, key))
+					Blobsterix::Storage::FileSystemMetaData.new(contents(bucket, key))
 				end
 
 				def time_string_of(*file_name)
