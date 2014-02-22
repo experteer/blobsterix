@@ -16,7 +16,6 @@ test/tmp
 test/version_tmp
 tmp
 contents/
-!contents/presentation/*
 cache/
 typescript
 *~
