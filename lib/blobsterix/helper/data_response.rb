@@ -14,6 +14,7 @@ module Blobsterix
 				if not meta.valid
 					Http.NotFound()
 				elsif xfile and etag != meta.etag
+					puts "Use X-Sendfile"
 					[200, meta.header.merge({"X-Sendfile" => meta.path}), ""]
 				elsif etag != meta.etag
 					if env != nil and meta.size > 30000

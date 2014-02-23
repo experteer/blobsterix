@@ -96,6 +96,29 @@ module Blobsterix::Transformations::Impl
 		end
 	end
 
+	class StripImage < Blobsterix::Transformations::Transformation
+		def name()
+			"strip"
+		end
+		def input_type()
+			@input_type ||= Blobsterix::AcceptType.new "image/*"
+		end
+
+		def output_type()
+			@output_type ||= Blobsterix::AcceptType.new "image/*"
+		end
+
+		def is_format?()
+			true
+		end
+
+		def transform(input_path, target_path, value)
+			image = MiniMagick::Image.open(input_path)
+			image.strip
+			image.write target_path
+		end
+	end
+
 	class CropImage < Blobsterix::Transformations::Transformation
 		def name()
 			"crop"
@@ -214,32 +237,6 @@ module Blobsterix::Transformations::Impl
 
 		def transform(input_path, target_path, value)
 			system("cp #{input_path} #{target_path}")
-		end
-	end
-
-	class Text2ImageTransformation < Blobsterix::Transformations::Transformation
-		def name()
-			"text2image"
-		end
-
-		def is_format?()
-			true
-		end
-
-		def output_type()
-			@output_type ||= Blobsterix::AcceptType.new "image/png"
-		end
-
-		def input_type()
-			@input_type ||= Blobsterix::AcceptType.new "text/plain"
-		end
-
-		def transform(input_path, target_path, value)
-			puts "Render webpage: #{File.expand_path(input_path, Dir.pwd)}"
-
-			system("phantomjs rasterice.js 'file://#{File.expand_path(input_path, Dir.pwd)}' '#{File.expand_path(target_path, Dir.pwd)}'")
-
-			puts "Render webpage Done"
 		end
 	end
 
