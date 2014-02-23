@@ -116,6 +116,7 @@ module Blobsterix::Transformations::Impl
 			image = MiniMagick::Image.open(input_path)
 			image.strip
 			image.write target_path
+			# system("convert #{input_path} -strip #{target_path}")
 		end
 	end
 
