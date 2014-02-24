@@ -8,7 +8,13 @@ Gem::Specification.new do |gem|
   gem.summary       = "BlobServer"
   gem.homepage      = "http://experteer.com"
 
-  gem.files         = `git ls-files`.split($\)
+  gem.files         = `git ls-files`.split($\).select{|filename|
+    if filename.match(/^(\"contents).*/)
+      false
+    else
+      true
+    end
+  }
   gem.executables   = ["blobsterix"]#gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.name          = "blobsterix"

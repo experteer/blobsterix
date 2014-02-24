@@ -1,21 +1,28 @@
 #!/usr/bin/env ruby
 #require 'goliath'
-require 'goliath/api'
-require 'goliath/runner'
+require "goliath/api"
+require "goliath/runner"
 
-require 'blobsterix'
+require "blobsterix"
 
 require "fileutils"
 
 BLOBSTERIX_GEM_DIR = File.join(File.dirname(__FILE__), "../")
 BLOBSTERIX_DATA_DIR = Dir.pwd
 
-class Generator
-  def initialize(args)
-    args.each{|command|
+module ArgParser
+  def parse(args)
+    args[1..-1].each{|command|
       @param ||= command if command != "generate" and @type
       @type ||= command if command != "generate"
     }
+  end
+end
+
+class Generator
+  include ArgParser
+  def initialize(args)
+    parse(args)
   end
 
   def run()
@@ -52,6 +59,10 @@ class Generator
   end
 end
 class BlobsterixRunner
+  include ArgParser
+  def initialize(args)
+    parse(args)
+  end
 
   def run_blobsterix()
     require_config()
@@ -97,7 +108,7 @@ if ARGV.length == 0
   exit
 end
 if ARGV[0] == "server"
-  BlobsterixRunner.new.run_blobsterix
+  BlobsterixRunner.new(ARGV).run_blobsterix
 elsif ARGV[0] == "generate"
   Generator.new(ARGV).run
 end
