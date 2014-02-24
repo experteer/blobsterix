@@ -9,11 +9,11 @@ module Blobsterix
 			end
 		end
 		def favicon
-			file.match /favicon/
+			@favicon ||= file.match /favicon/
 		end
 		def bucket
 			host = bucket_matcher(env['HTTP_HOST'])
-			if host
+			@bucket ||= if host
 				env[nil][:bucket] = host[1]
 			elsif  (env[nil] && env[nil][:bucket])
 				env[nil][:bucket]
@@ -28,7 +28,7 @@ module Blobsterix
 			host || env[nil][:bucket] || included_bucket
 		end
 		def format
-			env[nil][:format]
+			@format ||= env[nil][:format]
 		end
 		def included_bucket
 			if env[nil][:bucket_or_file] && env[nil][:bucket_or_file].include?("/")
@@ -40,7 +40,7 @@ module Blobsterix
 			end
 		end
 		def file
-			if format
+			@file ||= if format
 				[env[nil][:file] || env[nil][:bucket_or_file] || "", format].join(".")
 			else
 				env[nil][:file] || env[nil][:bucket_or_file] || ""

@@ -60,13 +60,13 @@ module Blobsterix
 			def upload_data
 				source = cached_upload
 				accept = source.accept_type()
-				trafo = trafo
-				file = file
-				bucket = bucket
-				logger.info "UploadFile => Bucket: #{bucket} - File: #{file} - Accept: #{accept} - Trafo: #{trafo}"
-				data = transformation.run(:source => source, :bucket => bucket, :id => file, :type => accept, :trafo => trafo)
+				trafo_current = trafo
+				file_current = file
+				bucket_current = bucket
+				logger.info "UploadFile => Bucket: #{bucket_current} - File: #{file_current} - Accept: #{accept.type} - Trafo: #{trafo_current}"
+				data = transformation.run(:source => source, :bucket => bucket_current, :id => file_current, :type => accept, :trafo => trafo_current)
 				cached_upload_clear
-				storage.put(bucket, file, data).response(false)
+				storage.put(bucket_current, file_current, data).response(false)
 			end
 
 			def delete_bucket

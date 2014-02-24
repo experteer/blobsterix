@@ -16,7 +16,7 @@ module Blobsterix
 				elsif xfile and etag != meta.etag
 					[200, meta.header.merge({"X-Sendfile" => meta.path}), ""]
 				elsif etag != meta.etag
-					if env != nil and meta.size > 30000
+					if env != nil and meta.size > 10000
 						chunkresponse
 					else
 						[200, meta.header, (with_data ? meta.data : "")]
@@ -36,7 +36,7 @@ module Blobsterix
 				end
 
 				def send_chunk(file)
-					dat = file.read(30000)
+					dat = file.read(10000)
 					again = if dat != nil
 						env.stream_send(dat)
 						true

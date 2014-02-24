@@ -2,7 +2,7 @@ module Blobsterix
 	class AppRouterBase
 
 		attr_reader :logger
-		attr_reader :env
+		attr_accessor :env
 
 		def initialize(env)
 			@env = env

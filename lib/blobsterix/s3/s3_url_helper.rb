@@ -10,7 +10,7 @@ module Blobsterix
 		end
 
 		def favicon
-			file.match /favicon/
+			@favicon ||= file.match /favicon/
 		end
 
 		def cache_upload
@@ -27,16 +27,16 @@ module Blobsterix
 		end
 
 		def cache_upload_key
-			"upload/"+bucket.gsub("/", "_")+"_"+file.gsub("/", "_")
+			@cache_upload_key ||= "upload/"+bucket.gsub("/", "_")+"_"+file.gsub("/", "_")
 		end
 
 		def trafo
-			env["HTTP_X_AMZ_META_TRAFO"] || ""
+			@trafo ||= env["HTTP_X_AMZ_META_TRAFO"] || ""
 		end
 		
 		def bucket
 			host = bucket_matcher(env['HTTP_HOST'])
-			if host
+			@bucket ||= if host
 				host[1]
 			elsif  (env[nil] && env[nil][:bucket])
 				env[nil][:bucket]
@@ -57,7 +57,7 @@ module Blobsterix
 		end
 
 		def format
-			env[nil][:format]
+			@format ||= env[nil][:format]
 		end
 
 		def included_bucket
@@ -71,7 +71,7 @@ module Blobsterix
 		end
 
 		def file
-			if format
+			@file ||= if format
 				[env[nil][:file] || env[nil][:bucket_or_file] || "", format].join(".")
 			else
 				env[nil][:file] || env[nil][:bucket_or_file] || ""
