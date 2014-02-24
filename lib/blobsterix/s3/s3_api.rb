@@ -19,6 +19,10 @@ module Blobsterix
 		delete "/*file.:format", :function => :delete_file
 		delete "/*file", :function => :delete_file
 
+		get "*any", :function => :next_api
+		put "*any", :function => :next_api
+		delete "*any", :function => :next_api
+
 		private
 			def list_buckets
 				Http.OK storage.list(bucket).to_xml, "xml"
