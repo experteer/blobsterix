@@ -65,7 +65,7 @@ module Blobsterix
   end
 
   def self.storage(logger)
-    logger.debug "Doing in #{Dir.pwd}"
+    #logger.debug "Doing in #{Dir.pwd}"
     @@storage ||= Storage::FileSystem.new(logger, Blobsterix.storage_dir(logger))
   end
 

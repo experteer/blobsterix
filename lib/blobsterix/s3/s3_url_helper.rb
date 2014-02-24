@@ -36,7 +36,7 @@ module Blobsterix
 		
 		def bucket
 			host = bucket_matcher(env['HTTP_HOST'])
-			@bucket ||= if host
+			if host
 				host[1]
 			elsif  (env[nil] && env[nil][:bucket])
 				env[nil][:bucket]
@@ -71,7 +71,7 @@ module Blobsterix
 		end
 
 		def file
-			@file ||= if format
+			if format
 				[env[nil][:file] || env[nil][:bucket_or_file] || "", format].join(".")
 			else
 				env[nil][:file] || env[nil][:bucket_or_file] || ""
