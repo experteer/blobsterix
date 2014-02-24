@@ -60,7 +60,7 @@ require 'blobsterix/transformation/image_transformation'
 require 'blobsterix/service'
 
 module Blobsterix
-  def self.storage_dir
+  def self.storage_dir()
     File.join(BLOBSTERIX_DATA_DIR, "contents")
   end
 

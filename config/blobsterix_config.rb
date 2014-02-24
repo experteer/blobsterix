@@ -17,32 +17,32 @@ module Blobsterix
   # end
 
   # Override those methods if you want to change the storage and cache dirs from their default location
-  # def self.storage_dir
+  # def self.storage_dir(logger)
   #   File.join(BLOBSTERIX_DATA_DIR, "contents")
   # end
-  # def self.cache_dir
+  # def self.cache_dir(logger)
   #   File.join(BLOBSTERIX_DATA_DIR, "cache")
   # end
 
   # Override those if you want to change the default storage and cache system.
-  # def self.storage
+  # def self.storage(logger)
   #   @@storage ||= Storage::FileSystem.new(Blobsterix.storage_dir)
   # end
-  # def self.cache
+  # def self.cache(logger)
   #   @@cache ||= Storage::Cache.new(Blobsterix.cache_dir)
   # end
 
 
   # Override this method if you want to use a different transformation manager.
   # normally not needed
-  # def self.transformation
+  # def self.transformation(logger)
   #   @@transformation ||= Blobsterix::Transformations::TransformationManager.new
   # end
 
   # Override this method incase you expect the trafo string in a special format.
   # The return should be in format of: trafoName_value,trafoName_value,....
   # Example: scale_2,rotate_20
-  # def self.decrypt_trafo(trafo_string)
+  # def self.decrypt_trafo(trafo_string,logger)
   #   trafo_string
   # end
 end

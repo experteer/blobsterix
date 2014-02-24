@@ -1,37 +1,57 @@
 module Blobsterix
 	class AppRouterBase
 
-		def self.get(path, controller)
-			path  = Journey::Path::Pattern.new path
-			router.routes.add_route(lambda{|env| call_controller(controller,env)}, path, {:request_method => "GET"}, {})
+		attr_reader :logger
+		attr_reader :env
+
+		def initialize(env)
+			@env = env
+			@logger = env["rack.logger"]
 		end
 
-		def self.post(path, controller)
-			path  = Journey::Path::Pattern.new path
-			router.routes.add_route(lambda{|env| call_controller(controller,env)}, path, {:request_method => "POST"}, {})
+		def storage
+			@storage ||= Blobsterix.storage(logger)
 		end
 
-		def self.put(path, controller)
-			path  = Journey::Path::Pattern.new path
-			router.routes.add_route(lambda{|env| call_controller(controller,env)}, path, {:request_method => "PUT"}, {})
+		def cache
+			@cache ||= Blobsterix.cache(logger)
 		end
 
-		def self.delete(path, controller)
-			path  = Journey::Path::Pattern.new path
-			router.routes.add_route(lambda{|env| call_controller(controller,env)}, path, {:request_method => "DELETE"}, {})
+		def transformation
+			@transformation ||= Blobsterix.transformation(logger)
 		end
 
-		def self.head(path, controller)
+		def self.get(path, controller, function = :call)
 			path  = Journey::Path::Pattern.new path
-			router.routes.add_route(lambda{|env| call_controller(controller,env)}, path, {:request_method => "HEAD"}, {})
+			router.routes.add_route(lambda{|env| call_controller(controller, function, env)}, path, {:request_method => "GET"}, {})
+		end
+
+		def self.post(path, controller, function = :call)
+			path  = Journey::Path::Pattern.new path
+			router.routes.add_route(lambda{|env| call_controller(controller, function, env)}, path, {:request_method => "POST"}, {})
+		end
+
+		def self.put(path, controller, function = :call)
+			path  = Journey::Path::Pattern.new path
+			router.routes.add_route(lambda{|env| call_controller(controller, function, env)}, path, {:request_method => "PUT"}, {})
+		end
+
+		def self.delete(path, controller, function = :call)
+			path  = Journey::Path::Pattern.new path
+			router.routes.add_route(lambda{|env| call_controller(controller, function, env)}, path, {:request_method => "DELETE"}, {})
+		end
+
+		def self.head(path, controller, function = :call)
+			path  = Journey::Path::Pattern.new path
+			router.routes.add_route(lambda{|env| call_controller(controller, function, env)}, path, {:request_method => "HEAD"}, {})
 		end
 
 		def self.call(env)
 			router.call(env)
 		end
 
-		def self.call_controller(controller, env)
-			controller.respond_to?(:call) ? controller.call(env) : controller.new.call(env)
+		def self.call_controller(controller, function, env)
+			controller.respond_to?(function) ? controller.call(env) : controller.new(env).send(function)
 		end
 
 		private

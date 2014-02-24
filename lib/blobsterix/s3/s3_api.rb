@@ -2,6 +2,10 @@ module Blobsterix
 	class S3Api < AppRouterBase
 		extend S3UrlHelper
 
+		# def list_buckets
+		# 	Http.OK storage.list(bucket).to_xml, "xml"
+		# end
+
 		get "/", lambda{|env|
 			Http.OK Blobsterix.storage.list(bucket(env)).to_xml, "xml"
 		}
