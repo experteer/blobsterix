@@ -16,7 +16,7 @@ module Blobsterix
 				elsif xfile and etag != meta.etag
 					[200, meta.header.merge({"X-Sendfile" => meta.path}), ""]
 				elsif etag != meta.etag
-					if env != nil and meta.size > 10000
+					if env != nil and meta.size > 30000
 						chunkresponse
 					else
 						[200, meta.header, (with_data ? meta.data : "")]
