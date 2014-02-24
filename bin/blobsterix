@@ -34,15 +34,7 @@ class Generator
 
   def init(folder)
     puts "Init new Blobsterix Server"
-    FileUtils.mkdir_p(File.join(BLOBSTERIX_DATA_DIR, folder, "config/deploy"))
     FileUtils.mkdir_p(File.join(BLOBSTERIX_DATA_DIR, folder, "transformators"))
-
-    FileUtils.cp(File.join(BLOBSTERIX_GEM_DIR, "config/capistrano/Capfile"), File.join(BLOBSTERIX_DATA_DIR, folder, "Capfile")) if !File.exist?(File.join(BLOBSTERIX_DATA_DIR, folder, "Capfile"))
-    FileUtils.cp(File.join(BLOBSTERIX_GEM_DIR, "config/capistrano/config/deploy.rb"), File.join(BLOBSTERIX_DATA_DIR, folder, "config/deploy.rb")) if !File.exist?(File.join(BLOBSTERIX_DATA_DIR, folder, "config/deploy.rb"))
-    FileUtils.cp(File.join(BLOBSTERIX_GEM_DIR, "config/capistrano/config/deploy/production.rb"), File.join(BLOBSTERIX_DATA_DIR, folder, "config/deploy/production.rb")) if !File.exist?(File.join(BLOBSTERIX_DATA_DIR, folder, "config/deploy/production.rb"))
-    FileUtils.cp(File.join(BLOBSTERIX_GEM_DIR, "config/capistrano/config/deploy/staging.rb"), File.join(BLOBSTERIX_DATA_DIR, folder, "config/deploy/staging.rb")) if !File.exist?(File.join(BLOBSTERIX_DATA_DIR, folder, "config/deploy/staging.rb"))
-
-
 
     FileUtils.cp(File.join(BLOBSTERIX_GEM_DIR, "config/Gemfile"), File.join(BLOBSTERIX_DATA_DIR, folder, "Gemfile")) if !File.exist?(File.join(BLOBSTERIX_DATA_DIR, folder, "Gemfile"))
     FileUtils.cp(File.join(BLOBSTERIX_GEM_DIR, "config/blobsterix_config.rb"), File.join(BLOBSTERIX_DATA_DIR, folder, "config.rb")) if !File.exist?(File.join(BLOBSTERIX_DATA_DIR, folder, "config.rb"))
@@ -102,7 +94,7 @@ puts "Blobsterix #{Blobsterix::VERSION}"
 if ARGV.length == 0
   puts "Usage: "
   puts "\tserver (goliath server options) - \n\t\tStarts blobsterix. When a blobsterix config is present in the executing folder it \n\t\twill be used otherwise blobsterix will run with standard options."
-  puts "\tgenerate generator (param) - Used to generate blobsterix server files"
+  puts "\tgenerate (generator) (param) - Used to generate blobsterix server files"
   puts "\t\t init (foldername) - Creates a new blobsterix project. When a foldername is supplied it will be created in that folder."
   puts "\t\t transformator (TrafoName) - Creates a new blobsterix transformator with the given name or just new as name."
   exit
