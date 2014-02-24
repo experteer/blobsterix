@@ -70,7 +70,7 @@ class BlobsterixRunner
     runner.api = Blobsterix::Service.new
     runner.app = Goliath::Rack::Builder.build(Blobsterix::Service, runner.api)
 
-    puts "Now starting Blobsterix...."
+    puts "Now starting Blobsterix #{Blobsterix::VERSION}...."
     runner.run
   end
 
