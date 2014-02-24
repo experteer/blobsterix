@@ -8,39 +8,34 @@ module Blobsterix
 				str.match(/(\w+)\.\w+\.\w+/)
 			end
 		end
-		def favicon(env)
-			file(env).match /favicon/
+
+		def favicon
+			file.match /favicon/
 		end
-		def cache_upload(env)
-			Blobsterix.cache.put(cache_upload_key(env), env['rack.input'].read)
+
+		def cache_upload
+			cache.put(cache_upload_key, env['rack.input'].read)
 		end
-		def cached_upload(env)
-			cache_upload(env) if not Blobsterix.cache.exists?(cache_upload_key(env))
-			Blobsterix.cache.get(cache_upload_key(env))
+
+		def cached_upload
+			cache_upload if not cache.exists?(cache_upload_key)
+			cache.get(cache_upload_key)
 		end
-		def cached_upload_clear(env)
-			Blobsterix.cache.delete(cache_upload_key(env))
+
+		def cached_upload_clear
+			cache.delete(cache_upload_key)
 		end
-		def cache_upload_key(env)
-			"upload/"+bucket(env).gsub("/", "_")+"_"+file(env).gsub("/", "_")
+
+		def cache_upload_key
+			"upload/"+bucket.gsub("/", "_")+"_"+file.gsub("/", "_")
 		end
-		def trafo(env)
+
+		def trafo
 			env["HTTP_X_AMZ_META_TRAFO"] || ""
 		end
-		def upload_data(env)
-			source = cached_upload(env)
-			accept = source.accept_type()
-			trafo = trafo(env)
-			file = file(env)
-			bucket = bucket(env)
-			puts "Bucket: #{bucket} - File: #{file} - Accept: #{accept} - Trafo: #{trafo}"
-			data = Blobsterix.transformation.run(:source => source, :bucket => bucket, :id => file, :type => accept, :trafo => trafo)
-			cached_upload_clear(env)
-			Blobsterix.storage.put(bucket, file, data).response(false)
-		end
-		def bucket(env)
-			host = bucket_matcher(env['HTTP_HOST'])#.match(HOST_PATH)#/((\w+\.*)+)\.s3\.amazonaws\.com/)
-			#puts "HOST: #{env['HTTP_HOST']}"
+		
+		def bucket
+			host = bucket_matcher(env['HTTP_HOST'])
 			if host
 				host[1]
 			elsif  (env[nil] && env[nil][:bucket])
@@ -55,15 +50,17 @@ module Blobsterix
 				"root"
 			end
 		end
-		def bucket?(env)
-			host = bucket_matcher(env['HTTP_HOST'])#.match(HOST_PATH)#/((\w+\.*)+)\.s3\.amazonaws\.com/)
-			#puts "HOST: #{env['HTTP_HOST']}"
-			host || env[nil][:bucket] || included_bucket(env)
+
+		def bucket?
+			host = bucket_matcher(env['HTTP_HOST'])
+			host || env[nil][:bucket] || included_bucket
 		end
-		def format(env)
+
+		def format
 			env[nil][:format]
 		end
-		def included_bucket(env)
+
+		def included_bucket
 			if env[nil][:bucket_or_file] && env[nil][:bucket_or_file].include?("/")
 				env[nil][:bucket] = env[nil][:bucket_or_file].split("/")[0]
 				env[nil][:bucket_or_file] = env[nil][:bucket_or_file].gsub("#{env[nil][:bucket]}/", "")
@@ -72,9 +69,10 @@ module Blobsterix
 				false
 			end
 		end
-		def file(env)
-			if format(env)
-				[env[nil][:file] || env[nil][:bucket_or_file] || "", format(env)].join(".")
+
+		def file
+			if format
+				[env[nil][:file] || env[nil][:bucket_or_file] || "", format].join(".")
 			else
 				env[nil][:file] || env[nil][:bucket_or_file] || ""
 			end

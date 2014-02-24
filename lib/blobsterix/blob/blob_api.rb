@@ -1,87 +1,48 @@
 module Blobsterix
 	class BlobApi < AppRouterBase
-		extend BlobUrlHelper
+		include BlobUrlHelper
 
-		get "/blob/v1", lambda{|env|
-			Http.NotAllowed "listing blob server not allowed"
-		}
+		get "/blob/v1", :function => :not_allowed
+		get "/blob", :function => :not_allowed
+		put "/blob/v1", :function => :not_allowed
+		put "/blob", :function => :not_allowed
 
-		get "/blob", lambda{|env|
-			Http.NotAllowed "listing blob server not allowed"
-		}
+		get "/blob/v1/(:trafo.)*bucket_or_file.:format", :function => :get_file
+		get "/blob/v1/(:trafo.)*bucket_or_file", :function => :get_file
 
-		put "/blob/v1", lambda{|env|
-			Http.NotAllowed "listing blob server not allowed"
-		}
+		head "/blob/v1/(:trafo.)*bucket_or_file.:format", :function => :get_file_head
+		head "/blob/v1/(:trafo.)*bucket_or_file", :function => :get_file_head
 
-		put "/blob", lambda{|env|
-			Http.NotAllowed "listing blob server not allowed"
-		}
+		get "*any", :function => :next_api
+		put "*any", :function => :next_api
+		delete "*any", :function => :next_api
 
-		get "/blob/v1/(:trafo.)*bucket_or_file.:format", lambda {|env|
-			#env[nil][:trafo] = env["params"]["trafo"]
-			#p "Trafo: #{env[nil][:trafo]}"
-			accept = AcceptType.get(env, format(env))[0]
+		private
+			def not_allowed
+				Http.NotAllowed "listing blob server not allowed"
+			end
 
-			# check trafo encryption
-			trafo_string = Blobsterix.decrypt_trafo(env[nil][:trafo] || "")
-			return Blobsterix::Storage::BlobMetaData.new.response if !trafo_string
+			def get_file
+				accept = AcceptType.get(env, format)[0]
 
-			data = Blobsterix.transformation.run(:bucket => bucket(env), :id => file(env), :type => accept, :trafo => trafo_string)
-			data.response(true, env["HTTP_IF_NONE_MATCH"], env, env["HTTP_X_FILE"] === "yes")
-		}
+				# check trafo encryption
+				trafo_string = Blobsterix.decrypt_trafo(env[nil][:trafo] || "", logger)
+				return Blobsterix::Storage::BlobMetaData.new.response if !trafo_string
 
-		get "/blob/v1/(:trafo.)*bucket_or_file", lambda {|env|
-			#env[nil][:trafo] = env["params"]["trafo"]
-			#p "No Format: #{env[nil][:trafo]}"
-			accept = AcceptType.get(env, nil)[0]
+				data = transformation.run(:bucket => bucket, :id => file, :type => accept, :trafo => trafo_string)
+				data.response(true, env["HTTP_IF_NONE_MATCH"], env, env["HTTP_X_FILE"] === "yes")
+			end
 
-			# check trafo encryption
-			trafo_string = Blobsterix.decrypt_trafo(env[nil][:trafo] || "")
-			return Blobsterix::Storage::BlobMetaData.new.response if !trafo_string
+			def get_file_head
+				logger.debug "Blob head"
+				accept = AcceptType.get(env, format)[0]
 
-			data = Blobsterix.transformation.run(:bucket => bucket(env), :id => file(env), :type => accept, :trafo => trafo_string)
-			data.response(true, env["HTTP_IF_NONE_MATCH"], env, env["HTTP_X_FILE"] === "yes")
-		}
+				# check trafo encryption
+				trafo_string = Blobsterix.decrypt_trafo(env[nil][:trafo] || "", logger)
+				return Blobsterix::Storage::BlobMetaData.new.response if !trafo_string
 
-		head "/blob/v1/(:trafo.)*bucket_or_file.:format", lambda {|env|
-			#env[nil][:trafo] = env["params"]["trafo"]
-			#p "Trafo: #{env[nil][:trafo]}"
-			puts "Blob head"
-			accept = AcceptType.get(env, format(env))[0]
-
-			# check trafo encryption
-			trafo_string = Blobsterix.decrypt_trafo(env[nil][:trafo] || "")
-			return Blobsterix::Storage::BlobMetaData.new.response if !trafo_string
-
-			data = Blobsterix.transformation.run(:bucket => bucket(env), :id => file(env), :type => accept, :trafo => trafo_string)
-			data.response(false)
-		}
-
-		head "/blob/v1/(:trafo.)*bucket_or_file", lambda {|env|
-			#env[nil][:trafo] = env["params"]["trafo"]
-			#p "No Format: #{env[nil][:trafo]}"
-			puts "Blob head"
-			accept = AcceptType.get(env, nil)[0]
-
-			# check trafo encryption
-			trafo_string = Blobsterix.decrypt_trafo(env[nil][:trafo] || "")
-			return Blobsterix::Storage::BlobMetaData.new.response if !trafo_string
-
-			data = Blobsterix.transformation.run(:bucket => bucket(env), :id => file(env), :type => accept, :trafo => trafo_string)
-			data.response(false)
-		}
-
-		get "*any", lambda {|env|
-			Http.NextApi
-		}
-
-		put "*any", lambda {|env|
-			Http.NextApi
-		}
-
-		delete "*any", lambda {|env|
-			Http.NextApi
-		}
+				data = transformation.run(:bucket => bucket, :id => file, :type => accept, :trafo => trafo_string)
+				data.response(false)
+			end
 	end
 end

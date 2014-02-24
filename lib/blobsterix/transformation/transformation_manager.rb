@@ -1,12 +1,21 @@
 module Blobsterix::Transformations
 	class TransformationManager
-		def initialize()
+		attr_reader :logger
+		def initialize(logger)
 			@transformations = []
+			@logger = logger
 			@running_transformations = {}
 			auto_load
 		end
+		def storage
+			@storage ||= Blobsterix.storage(logger)
+		end
+
+		def cache
+			@cache ||= Blobsterix.cache(logger)
+		end
 		def add(trafo)
-			transformation = (trafo.is_a?(String) ? ::Blobsterix::Transformations::Impl::const_get(trafo).new : trafo)
+			transformation = (trafo.is_a?(String) ? ::Blobsterix::Transformations::Impl::const_get(trafo).new(logger) : trafo)
 			@transformations << transformation if @transformations.select{|trafo|trafo.name === transformation.name}.empty?
 			self
 		end
@@ -17,11 +26,11 @@ module Blobsterix::Transformations
 
 			if @running_transformations.has_key?(preferred_key)
 				@running_transformations[preferred_key] << Fiber.current
-				puts "Transformation exists wait for it to finish"
+				logger.info "Transformation exists wait for it to finish"
 				Fiber.yield
 			end
 
-			return Blobsterix.cache.get(preferred_key) if Blobsterix.cache.exists?(preferred_key)
+			return cache.get(preferred_key) if cache.exists?(preferred_key)
 
 			@running_transformations[preferred_key] = [Fiber.current]
 
@@ -32,15 +41,13 @@ module Blobsterix::Transformations
 			})
 
 			Fiber.yield
-
-			#puts "Finish connection: #{Fiber.current.id}"
 			
-			Blobsterix.cache.exists?(preferred_key) ? Blobsterix.cache.get(preferred_key) : Blobsterix::Storage::BlobMetaData.new
+			cache.exists?(preferred_key) ? cache.get(preferred_key) : Blobsterix::Storage::BlobMetaData.new
 		end
 		def cache_key(bucket, id, trafo, accept_type)
-			puts "Calc cache key[#{trafo}]"
+			logger.debug "Calc cache key[#{trafo}]"
 			key = "#{bucket}_#{id.gsub("/","_")}_#{trafo.map {|trafo_pair|"#{trafo_pair[0]}_#{trafo_pair[1]}"}.join(",")}.#{accept_type.subtype}"
-			puts "Done calc cache key"
+			logger.debug "Done calc cache key"
 			key
 		end
 		private
@@ -51,19 +58,19 @@ module Blobsterix::Transformations
 			end
 			def get_original_file(bucket, id)
 				key = [bucket, id.gsub("/", "_")].join("_")
-				if not Blobsterix.cache.exists?(key)
-					metaData = Blobsterix.storage.get(bucket, id)
-					Blobsterix.cache.put(key, metaData.data) if metaData.valid
+				if not cache.exists?(key)
+					metaData = storage.get(bucket, id)
+					cache.put(key, metaData.data) if metaData.valid
 				end
-				Blobsterix.cache.get(key)
+				cache.get(key)
 			end
 			def run_transformation(preferred_key, input)
-				puts "Load: #{input[:bucket]}, #{input[:id]}"
+				logger.info "Load: #{input[:bucket]}, #{input[:id]}"
 
 				metaData = input[:source] || get_original_file(input[:bucket], input[:id])
 
 				if metaData.valid
-					chain = TransformationChain.new(preferred_key, metaData)
+					chain = TransformationChain.new(preferred_key, metaData, logger)
 					input[:trafo].each {|trafo_pair|
 						chain.add(findTransformation(trafo_pair[0], chain.last_type), trafo_pair[1])
 					}
@@ -79,14 +86,11 @@ module Blobsterix::Transformations
 				@running_transformations.delete(preferred_key)
 			end
 			def findTransformation(name, input_type)
-				#puts "find trafo: #{name}, #{input_type.inspect}"
 				trafos = @transformations.select{|trafo| trafo.name === name and trafo.input_type.is?(input_type)}
 				trafos.empty? ? nil : trafos[0]
 			end
 			def findTransformation_out(input_type, output_type)
-				#puts "find trafo: #{input_type.inspect}, #{output_type.inspect}"
-				trafos = @transformations.select{|trafo| 
-					#puts "Check trafo: #{trafo.inspect}"
+				trafos = @transformations.select{|trafo|
 					trafo.input_type.is?(input_type) and trafo.output_type.equal?(output_type)
 				}
 				trafos.empty? ? nil : trafos[0]

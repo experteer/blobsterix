@@ -3,7 +3,6 @@ module Blobsterix
 		class FileSystemMetaData < BlobMetaData
 
 			def initialize(path_)
-				puts "New MetaData for #{path_}"
 				@path = path_
 				@last_modified = ""
 				load_meta_file
@@ -88,7 +87,6 @@ module Blobsterix
 				end
 
 				def get_mime()
-					#puts "mime for #{path}"
 					@mimeclass ||= (MimeMagic.by_magic(File.open(path)) if File.exists?(path) )|| MimeMagic.new("text/plain")
 				end
 				def save_meta_file()

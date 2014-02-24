@@ -4,7 +4,10 @@ module Blobsterix
 	module Storage
 		class FileSystem < Storage
 
-			def initialize(path="../contents")
+			attr_reader :logger
+
+			def initialize(logger, path="../contents")
+				@logger = logger
 				@contents = path
 				FileUtils.mkdir_p(@contents)
 			end
@@ -44,7 +47,7 @@ module Blobsterix
 			end
 
 			def get(bucket, key)
-				puts "GET: #{contents(bucket, key)}"
+				logger.debug "GET: #{contents(bucket, key)}"
 				if (not File.directory?(contents(bucket, key))) and bucket_files(bucket).include?(key)
 					metaData(bucket, key)
 				else
@@ -53,7 +56,7 @@ module Blobsterix
 			end
 
 			def put(bucket, key, value)
-				puts "Write data to #{contents(bucket, key)}"
+				logger.info "Write data to #{contents(bucket, key)}"
 
 				metaData(bucket, key).write() {|f| f.write(value.read) }
 			end
@@ -66,13 +69,13 @@ module Blobsterix
 			end
 
 			def delete(bucket)
-				puts "Delete bucket #{contents(bucket)}"
+				logger.info "Delete bucket #{contents(bucket)}"
 
 				Dir.rmdir(contents(bucket)) if bucket_exist(bucket)
 			end
 
 			def delete_key(bucket, key)
-				puts "Delete File #{contents(bucket, key)}"
+				logger.info "Delete File #{contents(bucket, key)}"
 
 				metaData(bucket, key).delete if bucket_files(bucket).include? key
 			end

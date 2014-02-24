@@ -150,10 +150,3 @@ class Murmur
     parts.join("/")
   end
 end
-
-# hash = Murmur.Hash64B("experteer.p")
-# puts "Hash: #{hash}"
-# puts Murmur.map_filename("experteer.png")
-
-
-#puts 2.to_s(2)

@@ -60,28 +60,28 @@ require 'blobsterix/transformation/image_transformation'
 require 'blobsterix/service'
 
 module Blobsterix
-  def self.storage_dir()
+  def self.storage_dir(logger)
     File.join(BLOBSTERIX_DATA_DIR, "contents")
   end
 
-  def self.storage
-    puts "Doing in #{Dir.pwd}"
-    @@storage ||= Storage::FileSystem.new(Blobsterix.storage_dir)
+  def self.storage(logger)
+    logger.debug "Doing in #{Dir.pwd}"
+    @@storage ||= Storage::FileSystem.new(logger, Blobsterix.storage_dir(logger))
   end
 
-  def self.cache_dir
+  def self.cache_dir(logger)
     File.join(BLOBSTERIX_DATA_DIR, "cache")
   end
 
-  def self.cache
-    @@cache ||= Storage::Cache.new(Blobsterix.cache_dir)
+  def self.cache(logger)
+    @@cache ||= Storage::Cache.new(logger, Blobsterix.cache_dir(logger))
   end
 
-  def self.decrypt_trafo(trafo_string)
+  def self.decrypt_trafo(trafo_string,logger)
     trafo_string
   end
 
-  def self.transformation
-  	@@transformation ||= Blobsterix::Transformations::TransformationManager.new
+  def self.transformation(logger)
+  	@@transformation ||= Blobsterix::Transformations::TransformationManager.new(logger)
   end
 end

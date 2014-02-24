@@ -21,37 +21,45 @@ module Blobsterix
 			@transformation ||= Blobsterix.transformation(logger)
 		end
 
-		def self.get(path, controller, function = :call)
-			path  = Journey::Path::Pattern.new path
-			router.routes.add_route(lambda{|env| call_controller(controller, function, env)}, path, {:request_method => "GET"}, {})
+		def next_api
+			Http.NextApi
 		end
 
-		def self.post(path, controller, function = :call)
-			path  = Journey::Path::Pattern.new path
-			router.routes.add_route(lambda{|env| call_controller(controller, function, env)}, path, {:request_method => "POST"}, {})
+		def self.options(opt)
+			{:controller => self.name, :function => :call}.merge(opt)
 		end
 
-		def self.put(path, controller, function = :call)
+		def self.get(path, opt = {})
 			path  = Journey::Path::Pattern.new path
-			router.routes.add_route(lambda{|env| call_controller(controller, function, env)}, path, {:request_method => "PUT"}, {})
+			router.routes.add_route(lambda{|env| call_controller(options(opt), env)}, path, {:request_method => "GET"}, {})
 		end
 
-		def self.delete(path, controller, function = :call)
+		def self.post(path, opt = {})
 			path  = Journey::Path::Pattern.new path
-			router.routes.add_route(lambda{|env| call_controller(controller, function, env)}, path, {:request_method => "DELETE"}, {})
+			router.routes.add_route(lambda{|env| call_controller(options(opt), env)}, path, {:request_method => "POST"}, {})
 		end
 
-		def self.head(path, controller, function = :call)
+		def self.put(path, opt = {})
 			path  = Journey::Path::Pattern.new path
-			router.routes.add_route(lambda{|env| call_controller(controller, function, env)}, path, {:request_method => "HEAD"}, {})
+			router.routes.add_route(lambda{|env| call_controller(options(opt), env)}, path, {:request_method => "PUT"}, {})
+		end
+
+		def self.delete(path, opt = {})
+			path  = Journey::Path::Pattern.new path
+			router.routes.add_route(lambda{|env| call_controller(options(opt), env)}, path, {:request_method => "DELETE"}, {})
+		end
+
+		def self.head(path, opt = {})
+			path  = Journey::Path::Pattern.new path
+			router.routes.add_route(lambda{|env| call_controller(options(opt), env)}, path, {:request_method => "HEAD"}, {})
 		end
 
 		def self.call(env)
 			router.call(env)
 		end
 
-		def self.call_controller(controller, function, env)
-			controller.respond_to?(function) ? controller.call(env) : controller.new(env).send(function)
+		def self.call_controller(options, env)
+			options[:controller].respond_to?(options[:function]) ? options[:controller].send(options[:function], env) : Blobsterix.const_get(options[:controller]).new(env).send(options[:function])
 		end
 
 		private

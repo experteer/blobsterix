@@ -1,9 +1,15 @@
 module Blobsterix::Transformations
 	class TransformationChain
-		def initialize(key, input_data)
+		attr_reader :logger
+		def initialize(key, input_data, logger)
 			@key = key
 			@input_data = input_data
 			@transformations = []
+			@logger = logger
+		end
+
+		def cache
+			@cache ||= Blobsterix.cache(logger)
 		end
 
 		def cache_key()
@@ -17,7 +23,6 @@ module Blobsterix::Transformations
 
 		def add(transfo, value)
 			return if transfo == nil
-			#puts "added transformation"
 			@transformations << [transfo, value]
 		end
 
@@ -44,14 +49,13 @@ module Blobsterix::Transformations
 
 		def finish(accept_type, trafo)
 			if @transformations.empty? or (not @transformations.last[0].output_type.equal?(accept_type) and not @transformations.last[0].is_format?)
-				#puts "Trafos: #{@transformations}"
 				@transformations << [trafo, nil] if trafo != nil
 			end
 			@transformations << [Transformation.new, nil] if @transformations.empty?
 		end
 
 		def file_path()
-			@file_path ||= Blobsterix.cache.path_prepare(cache_key)
+			@file_path ||= cache.path_prepare(cache_key)
 		end
 	end
 end

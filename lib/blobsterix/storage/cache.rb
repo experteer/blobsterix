@@ -1,9 +1,10 @@
 module Blobsterix
 	module Storage
 		class Cache
-
-			def initialize(path="../cache")
+			attr_reader :logger
+			def initialize(logger, path="../cache")
 				@path = path
+				@logger = logger
 			end
 
 			def path_prepare(key)
