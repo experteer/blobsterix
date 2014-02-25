@@ -18,10 +18,10 @@ module Blobsterix
 
   # Override those methods if you want to change the storage and cache dirs from their default location
   # def self.storage_dir(logger)
-  #   File.join(BLOBSTERIX_DATA_DIR, "contents")
+  #   Blobsterix.root.join("contents")
   # end
   # def self.cache_dir(logger)
-  #   File.join(BLOBSTERIX_DATA_DIR, "cache")
+  #   Blobsterix.root.join("cache")
   # end
 
   # Override those if you want to change the default storage and cache system.

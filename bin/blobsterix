@@ -4,11 +4,9 @@ require "goliath/runner"
 require "fileutils"
 
 BLOBSTERIX_ROOT=Dir.pwd
-require "blobsterix"
-
-
 BLOBSTERIX_GEM_DIR = File.join(File.dirname(__FILE__), "../")
-BLOBSTERIX_DATA_DIR = BLOBSTERIX_ROOT
+
+require "blobsterix"
 
 module ArgParser
   def parse(args)
@@ -34,15 +32,15 @@ class Generator
 
   def init(folder)
     puts "Init new Blobsterix Server"
-    FileUtils.mkdir_p(File.join(BLOBSTERIX_DATA_DIR, folder, "transformators"))
+    FileUtils.mkdir_p(Blobsterix.root.join(folder, "transformators"))
 
-    FileUtils.cp(File.join(BLOBSTERIX_GEM_DIR, "config/Gemfile"), File.join(BLOBSTERIX_DATA_DIR, folder, "Gemfile")) if !File.exist?(File.join(BLOBSTERIX_DATA_DIR, folder, "Gemfile"))
-    FileUtils.cp(File.join(BLOBSTERIX_GEM_DIR, "config/blobsterix_config.rb"), File.join(BLOBSTERIX_DATA_DIR, folder, "config.rb")) if !File.exist?(File.join(BLOBSTERIX_DATA_DIR, folder, "config.rb"))
+    FileUtils.cp(File.join(BLOBSTERIX_GEM_DIR, "config/Gemfile"), Blobsterix.root.join(folder, "Gemfile")) if !File.exist?(Blobsterix.root.join(folder, "Gemfile"))
+    FileUtils.cp(File.join(BLOBSTERIX_GEM_DIR, "config/blobsterix_config.rb"), Blobsterix.root.join(folder, "config.rb")) if !File.exist?(Blobsterix.root.join(folder, "config.rb"))
     
   end
 
   def transformation(name)
-    trafo_dir = File.join(BLOBSTERIX_DATA_DIR, "transformators")
+    trafo_dir = Blobsterix.root.join("transformators")
     FileUtils.mkdir_p(trafo_dir)
     new_transformator = File.read(File.join(BLOBSTERIX_GEM_DIR, "config/transformation_template.rb"))
     new_transformator = new_transformator.gsub("$ClassName", name.capitalize)
@@ -76,11 +74,11 @@ class BlobsterixRunner
 
   private
     def require_config()
-      require File.join(BLOBSTERIX_DATA_DIR, "config.rb") if (File.exist?(File.join(BLOBSTERIX_DATA_DIR, "config.rb")))
+      require Blobsterix.root.join("config.rb") if (File.exist?(Blobsterix.root.join("config.rb")))
     end
 
     def require_transformators()
-      trafo_dir = File.join(BLOBSTERIX_DATA_DIR, "transformators")
+      trafo_dir = Blobsterix.root.join("transformators")
       return if not File.exist?(trafo_dir)
       Dir.entries(trafo_dir).each{|dir|
         if !File.directory? File.join(trafo_dir,dir) and !(dir =='.' || dir == '..')
