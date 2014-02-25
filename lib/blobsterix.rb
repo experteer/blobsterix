@@ -55,6 +55,7 @@ require 'blobsterix/transformation/transformation'
 #implementation
 require 'blobsterix/storage/file_system_meta_data'
 require 'blobsterix/storage/file_system'
+require 'blobsterix/storage/distributor'
 
 require 'blobsterix/transformation/image_transformation'
 
@@ -80,7 +81,7 @@ module Blobsterix
 
   def self.storage
     #logger.debug "Doing in #{Dir.pwd}"
-    @@storage ||= Storage::FileSystem.new(storage_dir)
+    @@storage ||= Storage::Distributor.new(storage_dir)
   end
 
   def self.cache_dir

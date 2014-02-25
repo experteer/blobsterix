@@ -17,6 +17,8 @@ module Blobsterix
   # end
 
   # Override those methods if you want to change the storage and cache dirs from their default location
+  # The storage dir function can also return an array of directories. That way you can have network drives
+  # mounted and they will be used as fallback for the get interface. And uploading is also done to all paths
   # def self.storage_dir(logger)
   #   Blobsterix.root.join("contents")
   # end
@@ -26,7 +28,7 @@ module Blobsterix
 
   # Override those if you want to change the default storage and cache system.
   # def self.storage(logger)
-  #   @@storage ||= Storage::FileSystem.new(Blobsterix.storage_dir)
+  #   @@storage ||= Storage::Distributor.new(Blobsterix.storage_dir)
   # end
   # def self.cache(logger)
   #   @@cache ||= Storage::Cache.new(Blobsterix.cache_dir)
