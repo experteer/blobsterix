@@ -19,3 +19,4 @@ contents/
 cache/
 typescript
 *~
+.idea
