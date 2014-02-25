@@ -3,7 +3,7 @@ module Blobsterix
 		class Cache
       include Blobsterix::Logable
 
-			def initialize(path="../cache")
+			def initialize(path)
 				@path = path
 			end
 

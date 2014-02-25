@@ -1,7 +1,7 @@
 begin
   require "pry"
   require "goliath/api"
-  require "blob_server"
+  require "blobsterix"
   Pry.start
   exit
 rescue LoadError => e

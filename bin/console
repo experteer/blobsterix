@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 begin
   require "pry"
-  require 'goliath'
+  #require 'goliath'
   require "blobsterix"
   Pry.start
   exit
