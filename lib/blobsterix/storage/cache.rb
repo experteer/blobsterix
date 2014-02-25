@@ -1,12 +1,10 @@
 module Blobsterix
 	module Storage
 		class Cache
-      include Blobsterix::Loggable
+      include Blobsterix::Logable
 
-
-			def initialize(logger, path="../cache")
+			def initialize(path="../cache")
 				@path = path
-				@logger = logger
 			end
 
 			def path_prepare(key)

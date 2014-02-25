@@ -1,9 +1,6 @@
 module Blobsterix::Transformations
 	class Transformation
-		attr_reader :logger
-		def initialize(logger)
-			@logger = logger
-		end
+		include Blobsterix::Logable
 
 		def name()
 			""

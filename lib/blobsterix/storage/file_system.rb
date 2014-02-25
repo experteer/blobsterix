@@ -3,11 +3,9 @@ require 'fileutils'
 module Blobsterix
 	module Storage
 		class FileSystem < Storage
+			include Blobsterix::Logable
 
-			attr_reader :logger
-
-			def initialize(logger, path="../contents")
-				@logger = logger
+			def initialize(path="../contents")
 				@contents = path
 				FileUtils.mkdir_p(@contents)
 			end

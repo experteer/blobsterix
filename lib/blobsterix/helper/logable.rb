@@ -1,5 +1,5 @@
 module Blobsterix
-  module Loggable
+  module Logable
     def logger
       @logger ||= Blobsterix.logger
     end

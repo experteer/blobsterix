@@ -27,7 +27,7 @@ require 'blobsterix/helper/http'
 require 'blobsterix/helper/accept_type'
 require 'blobsterix/helper/data_response'
 require 'blobsterix/helper/murmur'
-require 'blobsterix/helper/loggable'
+require 'blobsterix/helper/logable'
 
 #router base
 require 'blobsterix/router/app_router'
@@ -80,7 +80,7 @@ module Blobsterix
 
   def self.storage
     #logger.debug "Doing in #{Dir.pwd}"
-    @@storage ||= Storage::FileSystem.new(logger, storage_dir)
+    @@storage ||= Storage::FileSystem.new(storage_dir)
   end
 
   def self.cache_dir
@@ -88,7 +88,7 @@ module Blobsterix
   end
 
   def self.cache
-    @@cache ||= Storage::Cache.new(logger, cache_dir)
+    @@cache ||= Storage::Cache.new(cache_dir)
   end
 
   def self.decrypt_trafo(trafo_string,logger)
@@ -96,6 +96,6 @@ module Blobsterix
   end
 
   def self.transformation
-  	@@transformation ||= Blobsterix::Transformations::TransformationManager.new(logger)
+    @@transformation ||= Blobsterix::Transformations::TransformationManager.new
   end
 end

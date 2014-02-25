@@ -1,12 +1,13 @@
 module Blobsterix::Transformations
 	class TransformationManager
-		attr_reader :logger
-		def initialize(logger)
+		include Blobsterix::Logable
+
+		def initialize()
 			@transformations = []
-			@logger = logger
 			@running_transformations = {}
 			auto_load
 		end
+
 		def storage
 			@storage ||= Blobsterix.storage
 		end
@@ -14,11 +15,13 @@ module Blobsterix::Transformations
 		def cache
 			@cache ||= Blobsterix.cache
 		end
+
 		def add(trafo)
 			transformation = (trafo.is_a?(String) ? ::Blobsterix::Transformations::Impl::const_get(trafo).new(logger) : trafo)
 			@transformations << transformation if @transformations.select{|trafo|trafo.name === transformation.name}.empty?
 			self
 		end
+
 		def run(input)
 			return Blobsterix::Storage::BlobMetaData.new if not prepare_input(input)
 
@@ -44,18 +47,21 @@ module Blobsterix::Transformations
 			
 			cache.exists?(preferred_key) ? cache.get(preferred_key) : Blobsterix::Storage::BlobMetaData.new
 		end
+
 		def cache_key(bucket, id, trafo, accept_type)
 			logger.debug "Calc cache key[#{trafo}]"
 			key = "#{bucket}_#{id.gsub("/","_")}_#{trafo.map {|trafo_pair|"#{trafo_pair[0]}_#{trafo_pair[1]}"}.join(",")}.#{accept_type.subtype}"
 			logger.debug "Done calc cache key"
 			key
 		end
+
 		private
 			def auto_load()
 				Blobsterix::Transformations::Impl.constants.each{|c|
 					add(c.to_s)
 				}
 			end
+
 			def get_original_file(bucket, id)
 				key = [bucket, id.gsub("/", "_")].join("_")
 				if not cache.exists?(key)
@@ -64,6 +70,7 @@ module Blobsterix::Transformations
 				end
 				cache.get(key)
 			end
+
 			def run_transformation(preferred_key, input)
 				logger.info "Load: #{input[:bucket]}, #{input[:id]}"
 
@@ -79,16 +86,19 @@ module Blobsterix::Transformations
 					chain.do()
 				end
 			end
+
 			def finish_connection(preferred_key)
 				@running_transformations[preferred_key].each{|fiber|
 					fiber.resume
 				}
 				@running_transformations.delete(preferred_key)
 			end
+
 			def findTransformation(name, input_type)
 				trafos = @transformations.select{|trafo| trafo.name === name and trafo.input_type.is?(input_type)}
 				trafos.empty? ? nil : trafos[0]
 			end
+
 			def findTransformation_out(input_type, output_type)
 				trafos = @transformations.select{|trafo|
 					trafo.input_type.is?(input_type) and trafo.output_type.equal?(output_type)
