@@ -10,15 +10,15 @@ module Blobsterix
 		end
 
 		def storage
-			@storage ||= Blobsterix.storage(logger)
+			@storage ||= Blobsterix.storage
 		end
 
 		def cache
-			@cache ||= Blobsterix.cache(logger)
+			@cache ||= Blobsterix.cache
 		end
 
 		def transformation
-			@transformation ||= Blobsterix.transformation(logger)
+			@transformation ||= Blobsterix.transformation
 		end
 
 		def next_api

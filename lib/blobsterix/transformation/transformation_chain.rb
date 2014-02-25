@@ -9,7 +9,7 @@ module Blobsterix::Transformations
 		end
 
 		def cache
-			@cache ||= Blobsterix.cache(logger)
+			@cache ||= Blobsterix.cache
 		end
 
 		def cache_key()

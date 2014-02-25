@@ -8,11 +8,11 @@ module Blobsterix::Transformations
 			auto_load
 		end
 		def storage
-			@storage ||= Blobsterix.storage(logger)
+			@storage ||= Blobsterix.storage
 		end
 
 		def cache
-			@cache ||= Blobsterix.cache(logger)
+			@cache ||= Blobsterix.cache
 		end
 		def add(trafo)
 			transformation = (trafo.is_a?(String) ? ::Blobsterix::Transformations::Impl::const_get(trafo).new(logger) : trafo)

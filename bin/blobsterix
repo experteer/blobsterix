@@ -1,13 +1,14 @@
 #!/usr/bin/env ruby
 require "goliath/api"
 require "goliath/runner"
-
-require "blobsterix"
-
 require "fileutils"
 
+BLOBSTERIX_ROOT=Dir.pwd
+require "blobsterix"
+
+
 BLOBSTERIX_GEM_DIR = File.join(File.dirname(__FILE__), "../")
-BLOBSTERIX_DATA_DIR = Dir.pwd
+BLOBSTERIX_DATA_DIR = BLOBSTERIX_ROOT
 
 module ArgParser
   def parse(args)

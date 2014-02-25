@@ -23,10 +23,11 @@ require 'blobsterix/mimemagic/version'
 require 'blobsterix/mimemagic/magic'
 
 #helper
-require 'blobsterix/helper/http.rb'
-require 'blobsterix/helper/accept_type.rb'
-require 'blobsterix/helper/data_response.rb'
-require 'blobsterix/helper/murmur.rb'
+require 'blobsterix/helper/http'
+require 'blobsterix/helper/accept_type'
+require 'blobsterix/helper/data_response'
+require 'blobsterix/helper/murmur'
+require 'blobsterix/helper/loggable'
 
 #router base
 require 'blobsterix/router/app_router'
@@ -61,6 +62,10 @@ require 'blobsterix/transformation/image_transformation'
 require 'blobsterix/service'
 
 module Blobsterix
+  def self.root
+    @root ||= Pathname.new(BLOBSTERIX_ROOT)
+  end
+
   def self.logger=(obj)
     @logger=logger
   end
@@ -69,28 +74,28 @@ module Blobsterix
     @logger ||= Logger.new(STDOUT)
   end
 
-  def self.storage_dir(logger)
-    File.join(BLOBSTERIX_DATA_DIR, "contents")
+  def self.storage_dir
+    root.join("contents")
   end
 
-  def self.storage(logger)
+  def self.storage
     #logger.debug "Doing in #{Dir.pwd}"
-    @@storage ||= Storage::FileSystem.new(logger, Blobsterix.storage_dir(logger))
+    @@storage ||= Storage::FileSystem.new(logger, storage_dir)
   end
 
-  def self.cache_dir(logger)
-    File.join(BLOBSTERIX_DATA_DIR, "cache")
+  def self.cache_dir
+    root.join("cache")
   end
 
-  def self.cache(logger)
-    @@cache ||= Storage::Cache.new(logger, Blobsterix.cache_dir(logger))
+  def self.cache
+    @@cache ||= Storage::Cache.new(logger, cache_dir)
   end
 
   def self.decrypt_trafo(trafo_string,logger)
     trafo_string
   end
 
-  def self.transformation(logger)
+  def self.transformation
   	@@transformation ||= Blobsterix::Transformations::TransformationManager.new(logger)
   end
 end

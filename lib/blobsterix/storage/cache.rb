@@ -1,7 +1,9 @@
 module Blobsterix
 	module Storage
 		class Cache
-			attr_reader :logger
+      include Blobsterix::Loggable
+
+
 			def initialize(logger, path="../cache")
 				@path = path
 				@logger = logger
