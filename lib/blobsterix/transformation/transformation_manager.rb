@@ -17,7 +17,7 @@ module Blobsterix::Transformations
 		end
 
 		def add(trafo)
-			transformation = (trafo.is_a?(String) ? ::Blobsterix::Transformations::Impl::const_get(trafo).new(logger) : trafo)
+			transformation = (trafo.is_a?(String) ? ::Blobsterix::Transformations::Impl::const_get(trafo).new : trafo)
 			@transformations << transformation if @transformations.select{|trafo|trafo.name === transformation.name}.empty?
 			self
 		end

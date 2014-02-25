@@ -51,7 +51,7 @@ module Blobsterix::Transformations
 			if @transformations.empty? or (not @transformations.last[0].output_type.equal?(accept_type) and not @transformations.last[0].is_format?)
 				@transformations << [trafo, nil] if trafo != nil
 			end
-			@transformations << [Transformation.new(logger), nil] if @transformations.empty?
+			@transformations << [Transformation.new, nil] if @transformations.empty?
 		end
 
 		def file_path()

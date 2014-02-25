@@ -67,7 +67,7 @@ module Blobsterix
   end
 
   def self.logger=(obj)
-    @logger=logger
+    @logger=obj
   end
 
   def self.logger
