@@ -61,4 +61,5 @@ module Blobsterix
           storage != @local_storage
         end
     end
+  end
 end
