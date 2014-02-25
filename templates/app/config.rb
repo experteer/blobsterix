@@ -46,3 +46,5 @@ module Blobsterix
   #   trafo_string
   # end
 end
+
+require Blobsterix.root.join('config','environments',"#{Blobsterix.env}.rb")

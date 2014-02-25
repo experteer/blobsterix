@@ -32,17 +32,30 @@ class Generator
 
   def init(folder)
     puts "Init new Blobsterix Server"
-    FileUtils.mkdir_p(Blobsterix.root.join(folder, "transformators"))
 
-    FileUtils.cp(File.join(BLOBSTERIX_GEM_DIR, "config/Gemfile"), Blobsterix.root.join(folder, "Gemfile")) if !File.exist?(Blobsterix.root.join(folder, "Gemfile"))
-    FileUtils.cp(File.join(BLOBSTERIX_GEM_DIR, "config/blobsterix_config.rb"), Blobsterix.root.join(folder, "config.rb")) if !File.exist?(Blobsterix.root.join(folder, "config.rb"))
-    
+    files_to_write = Dir.glob(File.join(BLOBSTERIX_GEM_DIR, "templates/app/**/*"))
+    check_files = files_to_write.map{|file|file.gsub(File.join(BLOBSTERIX_GEM_DIR, "templates/app/"), "")}
+
+    check_files.each_with_index {|file, index|
+      if !Dir.exist?(File.dirname(Blobsterix.root.join(folder, file)))
+        puts "Create folder: #{File.dirname(Blobsterix.root.join(folder, file))}"
+        FileUtils.mkdir_p(File.dirname(Blobsterix.root.join(folder, file)))
+      end
+      if !File.directory?(files_to_write[index]) && !File.exist?(Blobsterix.root.join(folder, file))
+        puts "Create file: #{Blobsterix.root.join(folder, file)}"
+        FileUtils.cp(files_to_write[index], Blobsterix.root.join(folder, file))
+      end
+    }
   end
 
   def transformation(name)
     trafo_dir = Blobsterix.root.join("transformators")
+    if File.exist?(File.join(trafo_dir, "#{name.downcase}_transformation.rb"))
+      puts "Transformator #{name} at #{File.join(trafo_dir, "#{name.downcase}_transformation.rb")} already exists. cancel"
+      return
+    end
     FileUtils.mkdir_p(trafo_dir)
-    new_transformator = File.read(File.join(BLOBSTERIX_GEM_DIR, "config/transformation_template.rb"))
+    new_transformator = File.read(File.join(BLOBSTERIX_GEM_DIR, "templates/transformation_template.rb"))
     new_transformator = new_transformator.gsub("$ClassName", name.capitalize)
     new_transformator = new_transformator.gsub("$url_name", name.downcase)
     File.write(File.join(trafo_dir, "#{name.downcase}_transformation.rb"), new_transformator)
