@@ -6,7 +6,7 @@ module Blobsterix
       include Blobsterix::Logable
 
       def initialize(*paths)
-        @storages = paths.map{|path| FileSystem.new(path) }
+        @storages = paths.flatten.map{|path| FileSystem.new(path) }
         @local_storage = @storages[0]
       end
 
