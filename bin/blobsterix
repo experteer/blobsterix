@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-#require 'goliath'
 require "goliath/api"
 require "goliath/runner"
 
@@ -61,7 +60,7 @@ class BlobsterixRunner
     require_transformators()
 
     runner = Goliath::Runner.new(ARGV, nil)
-
+    runner.logger=Blobsterix.logger
     runner.port = Blobsterix.port if Blobsterix.respond_to?(:port)
     runner.address = Blobsterix.address if Blobsterix.respond_to?(:address)
 

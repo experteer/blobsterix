@@ -15,6 +15,7 @@ require 'mini_magick'
 #require 'grape'
 #require 'evma_httpserver'
 require 'json'
+require 'logger'
 
 #utility
 require 'blobsterix/mimemagic/tables'
@@ -60,6 +61,14 @@ require 'blobsterix/transformation/image_transformation'
 require 'blobsterix/service'
 
 module Blobsterix
+  def self.logger=(obj)
+    @logger=logger
+  end
+
+  def self.logger
+    @logger ||= Logger.new(STDOUT)
+  end
+
   def self.storage_dir(logger)
     File.join(BLOBSTERIX_DATA_DIR, "contents")
   end
