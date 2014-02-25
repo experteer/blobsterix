@@ -2,7 +2,7 @@
 require File.expand_path('../lib/blobsterix/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.authors       = ["dsudmann"]
+  gem.authors       = ["Daniel Sudmann"]
   gem.email         = ["suddani@googlemail.com"]
   gem.description   = "BlobServer"
   gem.summary       = "BlobServer"
