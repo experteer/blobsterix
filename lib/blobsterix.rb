@@ -100,8 +100,12 @@ module Blobsterix
     @@transformation ||= Blobsterix::Transformations::TransformationManager.new
   end
 
+  def self.cache_checker=(obj)
+     @@cache_checker=obj
+  end
+
   def self.cache_checker
-     @@cache_checker=lambda{ |blob_access, last_accessed_at, created_at|
+     @@cache_checker||=lambda{ |blob_access, last_accessed_at, created_at|
         false
      }
   end
