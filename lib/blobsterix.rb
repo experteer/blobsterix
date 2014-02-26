@@ -105,8 +105,48 @@ module Blobsterix
   end
 
   def self.cache_checker
-     @@cache_checker||=lambda{ |blob_access, last_accessed_at, created_at|
+     @@cache_checker||=lambda{|blob_access, last_accessed_at, created_at|
         false
      }
+  end
+
+  def self.storage_event_listener=(obj)
+    @storage_event_listener=obj
+  end
+
+  def self.storage_event_listener
+    @storage_event_listener||=lambda{|target, blob_access|
+      nil
+    }
+  end
+
+  def self.cache_miss(blob_access)
+    logger.info("Cache: miss #{blob_access}")
+    storage_event_listener.call("cache.miss",blob_access)
+  end
+
+  def self.cache_hit(blob_access)
+    logger.info("Cache: hit #{blob_access}")
+    storage_event_listener.call("cache.hit",blob_access)
+  end
+
+  def self.storage_read(blob_access)
+    logger.info("Storage: read #{blob_access}")
+    storage_event_listener.call("storage.read",blob_access)
+  end
+
+  def self.storage_read_fail(blob_access)
+    logger.info("Storage: read fail #{blob_access}")
+    storage_event_listener.call("storage.read_fail",blob_access)
+  end
+
+  def self.storage_write(blob_access)
+    logger.info("Storage: write #{blob_access}")
+    storage_event_listener.call("storage.write",blob_access)
+  end
+
+  def self.storage_delete(blob_access)
+    logger.info("Storage: delete #{blob_access}")
+    storage_event_listener.call("storage.delete",blob_access)
   end
 end

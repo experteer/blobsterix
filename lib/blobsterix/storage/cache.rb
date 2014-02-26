@@ -17,7 +17,7 @@ module Blobsterix
 
 			def get(blob_access)
 				meta = FileSystemMetaData.new(cache_path(blob_access))
-        meta.valid ? logger.info("Cache: hit #{blob_access}") : logger.info("Cache: miss #{blob_access}")
+        meta.valid ? Blobsterix.cache_hit(blob_access) : Blobsterix.cache_miss(blob_access)
         meta
 			end
 
@@ -35,7 +35,7 @@ module Blobsterix
 
 			def exists?(blob_access)
 				valid = File.exist?(cache_path(blob_access))
-        valid ? logger.info("Cache: hit #{blob_access}") : logger.info("Cache: miss #{blob_access}")
+        valid ? Blobsterix.cache_hit(blob_access) : Blobsterix.cache_miss(blob_access)
         valid
 			end
 

@@ -46,16 +46,17 @@ module Blobsterix
 			end
 
 			def get(bucket, key)
-				logger.info "Storage: read file #{contents(bucket, key)}"
 				if (not File.directory?(contents(bucket, key))) and bucket_files(bucket).include?(key)
+					Blobsterix.storage_read(BlobAccess.new(:bucket => bucket, :id => key))
 					metaData(bucket, key)
 				else
+					Blobsterix.storage_read_fail(BlobAccess.new(:bucket => bucket, :id => key))
 					Blobsterix::Storage::BlobMetaData.new
 				end
 			end
 
 			def put(bucket, key, value)
-				logger.info "Storage: write file #{contents(bucket, key)}"
+				Blobsterix.storage_write(BlobAccess.new(:bucket => bucket, :id => key))
 
 				metaData(bucket, key).write() {|f| f.write(value.read) }
 			end
@@ -75,7 +76,7 @@ module Blobsterix
 			end
 
 			def delete_key(bucket, key)
-				logger.info "Storage: delete file #{contents(bucket, key)}"
+				Blobsterix.storage_delete(BlobAccess.new(:bucket => bucket, :id => key))
 
 				metaData(bucket, key).delete if bucket_files(bucket).include? key
 			end
