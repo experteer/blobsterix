@@ -3,36 +3,49 @@ module Blobsterix
 		class Cache
       include Blobsterix::Logable
 
+      def invalidation
+      	each_meta_file do |meta_file|
+      		blob_access=meta_to_blob_access(meta_file)
+      		if Blobsterix.cache_checker.call blob_access,accessed_at,created_at
+             invalidate(blob_access)
+      		end
+      	end
+      end
 			def initialize(path)
 				@path = path
 			end
 
-			def path_prepare(key)
-				p = path(key)
-				FileUtils.mkdir_p(File.dirname(p))
-				p
+			def get(blob_access)
+				logger.debug "Cache: get #{blob_access} from #{cache_path(blob_access)}"
+				FileSystemMetaData.new(cache_path(blob_access))
 			end
 
-			def path(key=nil)
-				key ? File.join(@path, Murmur.map_filename(key)) : @path
-			end
+			def put(blob_access, data)
+				invalidate(blob_access,true)
 
-			def get(key)
-				FileSystemMetaData.new(path(key))
-			end
-
-			def put(key, data)
-				FileSystemMetaData.new(path(key)).write() {|f|
+				logger.debug "Cache: write #{blob_access} to #{cache_path(blob_access)}"
+				FileSystemMetaData.new(cache_path(blob_access),:bucket => blob_access.bucket, :id => blob_access.id, :trafo => blob_access.trafo, :accept_type => "#{blob_access.accept_type}").write() {|f|
 					f.write(data)
 				}
 			end
 
-			def delete(key)
-				FileSystemMetaData.new(path(key)).delete if exists?(key)
+			def delete(blob_access)
+				invalidate(blob_access,true)
+				FileSystemMetaData.new(cache_path(blob_access)).delete if exists?(blob_access)
 			end
 
-			def exists?(key)
-				File.exist?(path(key))
+			def exists?(blob_access)
+				File.exist?(cache_path(blob_access))
+			end
+
+			private
+
+      def cache_path(blob_access)
+        File.join(@path, Murmur.hash_filename("#{blob_access.bucket}_#{blob_access.id.gsub("/","_")}"), blob_access.identifier) 
+      end
+
+      #invalidates all!!! formats of a blob_access
+			def invalidate(blob_access, all=false)
 			end
 		end
 	end

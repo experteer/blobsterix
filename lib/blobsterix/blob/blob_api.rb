@@ -25,11 +25,14 @@ module Blobsterix
 			def get_file
 				accept = AcceptType.get(env, format)[0]
 
-				# check trafo encryption
+        # check trafo encryption
 				trafo_string = Blobsterix.decrypt_trafo(env[nil][:trafo] || "", logger)
 				return Blobsterix::Storage::BlobMetaData.new.response if !trafo_string
 
-				data = transformation.run(:bucket => bucket, :id => file, :type => accept, :trafo => trafo_string)
+        
+        blob_access=BlobAccess.new(:bucket => bucket, :id => file, :accept_type => accept, :trafo => trafo(trafo_string))
+
+				data = transformation.run(blob_access)
 				data.response(true, env["HTTP_IF_NONE_MATCH"], env, env["HTTP_X_FILE"] === "yes")
 			end
 
@@ -41,7 +44,9 @@ module Blobsterix
 				trafo_string = Blobsterix.decrypt_trafo(env[nil][:trafo] || "", logger)
 				return Blobsterix::Storage::BlobMetaData.new.response if !trafo_string
 
-				data = transformation.run(:bucket => bucket, :id => file, :type => accept, :trafo => trafo_string)
+				blob_access=BlobAccess.new(:bucket => bucket, :id => file, :accept_type => accept, :trafo => trafo(trafo_string))
+				
+				data = transformation.run(blob_access)
 				data.response(false)
 			end
 	end

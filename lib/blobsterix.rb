@@ -28,6 +28,7 @@ require 'blobsterix/helper/accept_type'
 require 'blobsterix/helper/data_response'
 require 'blobsterix/helper/murmur'
 require 'blobsterix/helper/logable'
+require 'blobsterix/helper/blob_access'
 
 #router base
 require 'blobsterix/router/app_router'
@@ -98,5 +99,11 @@ module Blobsterix
 
   def self.transformation
     @@transformation ||= Blobsterix::Transformations::TransformationManager.new
+  end
+
+  def self.cache_checker
+     @@cache_checker=lambda{ |blob_access, last_accessed_at, created_at|
+        false
+     }
   end
 end

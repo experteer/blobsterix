@@ -27,11 +27,23 @@ module Blobsterix
 		end
 
 		def cache_upload_key
-			@cache_upload_key ||= "upload/"+bucket.gsub("/", "_")+"_"+file.gsub("/", "_")
+			#@cache_upload_key ||= "upload/"+bucket.gsub("/", "_")+"_"+file.gsub("/", "_")
+			@cache_upload_key ||= Blobsterix::BlobAccess.new(:bucket => bucket, :id => "upload_#{file.gsub("/", "_")}")
 		end
 
-		def trafo
+		def trafo_string
 			@trafo ||= env["HTTP_X_AMZ_META_TRAFO"] || ""
+		end
+
+		#TransformationCommand
+		def trafo(trafo_s='')
+			trafo_a = []
+			trafo_s.split(",").each{|command|
+				parts = command.split("_")
+				key = parts.delete_at(0)
+				trafo_a << [key, parts.join("_")]
+			}
+      trafo_a
 		end
 		
 		def bucket

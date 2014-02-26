@@ -2,10 +2,15 @@ module Blobsterix
 	module Storage
 		class FileSystemMetaData < BlobMetaData
 
-			def initialize(path_)
+			def initialize(path_, payload={})
+				@payload=payload
 				@path = path_
 				@last_modified = ""
 				load_meta_file
+			end
+
+			def to_s()
+				@path
 			end
 
 			def check(key)
@@ -65,6 +70,7 @@ module Blobsterix
 					yield f
 					f.close
 				end
+				save_meta_file
 				self
 			end
 
@@ -78,7 +84,7 @@ module Blobsterix
 	    end
 
 	    def as_json
-	    	{'mimetype' => mimetype, 'mediatype' => mediatype, 'etag' => etag, 'size' => size}
+	    	{'mimetype' => mimetype, 'mediatype' => mediatype, 'etag' => etag, 'size' => size,'payload' => @payload.to_json}
 	    end
 
 			private

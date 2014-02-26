@@ -46,5 +46,16 @@ module Blobsterix
 				env[nil][:file] || env[nil][:bucket_or_file] || ""
 			end
 		end
+
+    #TransformationCommand
+		def trafo(trafo_s='')
+			trafo_a = []
+			trafo_s.split(",").each{|command|
+				parts = command.split("_")
+				key = parts.delete_at(0)
+				trafo_a << [key, parts.join("_")]
+			}
+      trafo_a
+		end
 	end
 end

@@ -64,11 +64,12 @@ module Blobsterix
 			def upload_data
 				source = cached_upload
 				accept = source.accept_type()
-				trafo_current = trafo
+				trafo_current = trafo(trafo_string)
 				file_current = file
 				bucket_current = bucket
 				logger.info "UploadFile => Bucket: #{bucket_current} - File: #{file_current} - Accept: #{accept.type} - Trafo: #{trafo_current}"
-				data = transformation.run(:source => source, :bucket => bucket_current, :id => file_current, :type => accept, :trafo => trafo_current)
+				blob_access=BlobAccess.new(:source => source, :bucket => bucket_current, :id => file_current, :accept_type => accept, :trafo => trafo_current)
+				data = transformation.run(blob_access)
 				cached_upload_clear
 				storage.put(bucket_current, file_current, data).response(false)
 			end

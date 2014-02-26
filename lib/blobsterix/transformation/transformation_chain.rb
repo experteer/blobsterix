@@ -1,19 +1,11 @@
 module Blobsterix::Transformations
 	class TransformationChain
 		attr_reader :logger
-		def initialize(key, input_data, logger)
-			@key = key
+		def initialize(blob_access, input_data, logger)
+			@blob_access=blob_access
 			@input_data = input_data
 			@transformations = []
 			@logger = logger
-		end
-
-		def cache
-			@cache ||= Blobsterix.cache
-		end
-
-		def cache_key()
-			@key
 		end
 
 		def last_type()
@@ -26,14 +18,14 @@ module Blobsterix::Transformations
 			@transformations << [transfo, value]
 		end
 
-		def do()
-			tmpFiles = (@transformations.size-1).times.map{|index|
-				Tempfile.new("#{cache_key}_#{index}")
+#TODO: Tempfiles with blocks
+		def do(cache)
+			tmpFiles = @transformations.size.times.map{|index|
+				Tempfile.new("#{@blob_access.identifier}_#{index}")
 			}
 			keys = tmpFiles.map{|f| f.path }
-			keys <<  file_path
-			last_key = "#{@input_data.path}"
 
+			last_key = "#{@input_data.path}"
 
 			@transformations.each{|trafo|
 				new_key = keys.delete_at(0)
@@ -41,10 +33,13 @@ module Blobsterix::Transformations
 				last_key = new_key
 			}
 
+      cache.put(@blob_access,Blobsterix::Storage::FileSystemMetaData.new(last_key).read)
+
 			tmpFiles.each { |f|
 				f.close
 				f.unlink
 			}
+
 		end
 
 		def finish(accept_type, trafo)
@@ -52,10 +47,6 @@ module Blobsterix::Transformations
 				@transformations << [trafo, nil] if trafo != nil
 			end
 			@transformations << [Transformation.new, nil] if @transformations.empty?
-		end
-
-		def file_path()
-			@file_path ||= cache.path_prepare(cache_key)
 		end
 	end
 end

@@ -20,6 +20,10 @@ module Blobsterix
 			score
 		end
 
+		def to_s()
+			@mimetype.to_s
+		end
+
 		def type()
 			@mimetype
 		end
