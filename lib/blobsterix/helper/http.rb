@@ -6,6 +6,9 @@ module Blobsterix
 		def self.NotFound(data="Not Found", content_type="txt")
 			[404, {"Content-Type" => MimeMagic.by_extension(content_type).type}, data]
 		end
+		def self.ServerError(data="Server Error", content_type="txt")
+			[500, {"Content-Type" => MimeMagic.by_extension(content_type).type}, data]
+		end
 		def self.NotAllowed(data="Not Found", content_type="txt")
 			[403, {"Content-Type" => MimeMagic.by_extension(content_type).type}, data]
 		end

@@ -32,8 +32,13 @@ module Blobsterix
         
         blob_access=BlobAccess.new(:bucket => bucket, :id => file, :accept_type => accept, :trafo => trafo(trafo_string))
 
-				data = transformation.run(blob_access)
-				data.response(true, env["HTTP_IF_NONE_MATCH"], env, env["HTTP_X_FILE"] === "yes")
+        begin
+					data = transformation.run(blob_access)
+					data.response(true, env["HTTP_IF_NONE_MATCH"], env, env["HTTP_X_FILE"] === "yes")
+				rescue Errno::ENOENT => e
+					logger.error "Cache deleted: #{blob_access}"
+					Http.ServerError
+				end
 			end
 
 			def get_file_head
@@ -46,8 +51,13 @@ module Blobsterix
 
 				blob_access=BlobAccess.new(:bucket => bucket, :id => file, :accept_type => accept, :trafo => trafo(trafo_string))
 				
-				data = transformation.run(blob_access)
-				data.response(false)
+				begin
+					data = transformation.run(blob_access)
+					data.response(false)
+				rescue Errno::ENOENT => e
+					logger.error "Cache deleted: #{blob_access}"
+					Http.ServerError
+				end
 			end
 	end
 end
