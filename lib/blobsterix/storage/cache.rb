@@ -16,11 +16,6 @@ module Blobsterix
 			end
 
 			def get(blob_access)
-        begin
-          raise StandardError.new
-        rescue StandardError => e
-          puts e.backtrace
-        end
 				meta = FileSystemMetaData.new(cache_path(blob_access))
         meta.valid ? logger.info("Cache: hit #{blob_access}") : logger.info("Cache: miss #{blob_access}")
         meta

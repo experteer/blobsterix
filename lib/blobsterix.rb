@@ -81,7 +81,7 @@ module Blobsterix
 
   def self.storage
     #logger.debug "Doing in #{Dir.pwd}"
-    @@storage ||= Storage::Distributor.new(storage_dir)
+    @@storage ||= Storage::FileSystem.new(storage_dir)
   end
 
   def self.cache_dir
