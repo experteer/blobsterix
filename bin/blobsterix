@@ -28,6 +28,7 @@ class Generator
 
     init(@param||"") if @type == "init"
     transformation(@param||"NewTrafo") if @type == "transformator"
+    storage(@param||"Special") if @type == "storage"
   end
 
   def init(folder)
@@ -46,6 +47,19 @@ class Generator
         FileUtils.cp(files_to_write[index], Blobsterix.root.join(folder, file))
       end
     }
+  end
+
+  def storage(name)
+    storages_dir = Blobsterix.root.join("storages")
+    if File.exist?(File.join(storages_dir, "#{name.downcase}_transformation.rb"))
+      puts "Storage #{name} at #{File.join(storages_dir, "#{name.downcase}_transformation.rb")} already exists. cancel"
+      return
+    end
+    FileUtils.mkdir_p(storages_dir)
+    new_transformator = File.read(File.join(BLOBSTERIX_GEM_DIR, "templates/storage_template.rb"))
+    new_transformator = new_transformator.gsub("$ClassName", name.capitalize)
+    new_transformator = new_transformator.gsub("$url_name", name.downcase)
+    File.write(File.join(storages_dir, "#{name.downcase}_storage.rb"), new_transformator)
   end
 
   def transformation(name)
@@ -68,8 +82,9 @@ class BlobsterixRunner
   end
 
   def run_blobsterix()
-    require_config()
-    require_transformators()
+    require_storages
+    require_config
+    require_transformators
 
     runner = Goliath::Runner.new(ARGV, nil)
     runner.logger=Blobsterix.logger
@@ -96,6 +111,16 @@ class BlobsterixRunner
       Dir.entries(trafo_dir).each{|dir|
         if !File.directory? File.join(trafo_dir,dir) and !(dir =='.' || dir == '..')
           require "#{File.join(trafo_dir,dir)}"
+        end
+      }
+    end
+
+    def require_storages()
+      storages_dir = Blobsterix.root.join("storages")
+      return if not File.exist?(storages_dir)
+      Dir.entries(storages_dir).each{|dir|
+        if !File.directory? File.join(storages_dir,dir) and !(dir =='.' || dir == '..')
+          require "#{File.join(storages_dir,dir)}"
         end
       }
     end

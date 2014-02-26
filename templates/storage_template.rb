@@ -1,7 +1,7 @@
 module Blobsterix
-	module Storage
-		class Storage
-			def list(bucket="root")
+  module Storage
+    class $ClassNameStorage < Storage
+      def list(bucket="root")
         Nokogiri::XML::Builder.new do |xml|
           xml.Error "no such bucket"
         end
@@ -25,6 +25,6 @@ module Blobsterix
       def delete_key(bucket, key)
         nil
       end
-		end
-	end
+    end
+  end
 end
