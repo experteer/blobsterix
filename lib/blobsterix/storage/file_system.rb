@@ -46,7 +46,7 @@ module Blobsterix
 			end
 
 			def get(bucket, key)
-				logger.debug "GET: #{contents(bucket, key)}"
+				logger.info "Storage: read file #{contents(bucket, key)}"
 				if (not File.directory?(contents(bucket, key))) and bucket_files(bucket).include?(key)
 					metaData(bucket, key)
 				else
@@ -55,12 +55,13 @@ module Blobsterix
 			end
 
 			def put(bucket, key, value)
-				logger.info "Write data to #{contents(bucket, key)}"
+				logger.info "Storage: write file #{contents(bucket, key)}"
 
 				metaData(bucket, key).write() {|f| f.write(value.read) }
 			end
 
 			def create(bucket)
+				logger.info "Storage: create bucket #{contents(bucket)}"
 				FileUtils.mkdir_p(contents(bucket)) if not File.exist?(contents(bucket))
 
 				Nokogiri::XML::Builder.new do |xml|
@@ -68,13 +69,13 @@ module Blobsterix
 			end
 
 			def delete(bucket)
-				logger.info "Delete bucket #{contents(bucket)}"
+				logger.info "Storage: delete bucket #{contents(bucket)}"
 
 				Dir.rmdir(contents(bucket)) if bucket_exist(bucket)
 			end
 
 			def delete_key(bucket, key)
-				logger.info "Delete File #{contents(bucket, key)}"
+				logger.info "Storage: delete file #{contents(bucket, key)}"
 
 				metaData(bucket, key).delete if bucket_files(bucket).include? key
 			end

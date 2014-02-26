@@ -16,14 +16,13 @@ module Blobsterix
 			end
 
 			def get(blob_access)
-				logger.debug "Cache: get #{blob_access} from #{cache_path(blob_access)}"
-				FileSystemMetaData.new(cache_path(blob_access))
+				meta = FileSystemMetaData.new(cache_path(blob_access))
+        meta.valid ? logger.info "Cache: hit #{blob_access}" : logger.info "Cache: miss #{blob_access}"
+        meta
 			end
 
 			def put(blob_access, data)
 				invalidate(blob_access,true)
-
-				logger.debug "Cache: write #{blob_access} to #{cache_path(blob_access)}"
 				FileSystemMetaData.new(cache_path(blob_access),:bucket => blob_access.bucket, :id => blob_access.id, :trafo => blob_access.trafo, :accept_type => "#{blob_access.accept_type}").write() {|f|
 					f.write(data)
 				}
