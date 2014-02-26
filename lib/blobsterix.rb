@@ -56,7 +56,6 @@ require 'blobsterix/transformation/transformation'
 #implementation
 require 'blobsterix/storage/file_system_meta_data'
 require 'blobsterix/storage/file_system'
-require 'blobsterix/storage/distributor'
 
 require 'blobsterix/transformation/image_transformation'
 
