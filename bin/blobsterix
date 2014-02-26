@@ -51,7 +51,7 @@ class Generator
 
   def storage(name)
     storages_dir = Blobsterix.root.join("storages")
-    if File.exist?(File.join(storages_dir, "#{name.downcase}_transformation.rb"))
+    if File.exist?(File.join(storages_dir, "#{name.downcase}_storage.rb"))
       puts "Storage #{name} at #{File.join(storages_dir, "#{name.downcase}_transformation.rb")} already exists. cancel"
       return
     end
