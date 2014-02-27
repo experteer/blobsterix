@@ -58,7 +58,10 @@ module Blobsterix
       def put(bucket, key, value)
         Blobsterix.storage_write(BlobAccess.new(:bucket => bucket, :id => key))
 
-        metaData(bucket, key).write() {|f| f.write(value.read) }
+        meta = metaData(bucket, key).write() {|f| f.write(value.read) }
+
+        Blobsterix.cache.invalidate(Blobsterix::BlobAccess.new(:bucket => bucket, :id => key))
+        meta
       end
 
       def create(bucket)
@@ -77,6 +80,7 @@ module Blobsterix
 
       def delete_key(bucket, key)
         Blobsterix.storage_delete(BlobAccess.new(:bucket => bucket, :id => key))
+        Blobsterix.cache.invalidate(Blobsterix::BlobAccess.new(:bucket => bucket, :id => key))
 
         metaData(bucket, key).delete if bucket_files(bucket).include? key
       end
@@ -84,8 +88,7 @@ module Blobsterix
       private
         def contents(bucket=nil, key=nil)
           if bucket
-            File.join(@contents, bucket)
-            File.join(@contents, bucket, map_filename(key.gsub("/", "\\"))) if key
+            key ? File.join(@contents, bucket, map_filename(key.gsub("/", "\\"))) : File.join(@contents, bucket)
           else
             @contents
           end

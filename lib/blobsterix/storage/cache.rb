@@ -35,6 +35,15 @@ module Blobsterix
         valid
 			end
 
+      #invalidates all!!! formats of a blob_access
+      def invalidate(blob_access, all=false)
+        cache_path(blob_access).entries.each {|cache_file|
+          unless cache_file.to_s.match(/\.meta$/) || cache_file.directory?
+            FileSystemMetaData.new(cache_path(blob_access).join(cache_file)).delete if cache_file.to_s.match(blob_access.identifier)
+          end
+        }
+      end
+
 			private
 
       def cache_file_path(blob_access)
@@ -44,11 +53,6 @@ module Blobsterix
       def cache_path(blob_access)
         @path.join(hash_filename("#{blob_access.bucket}_#{blob_access.id.gsub("/","_")}"))
       end
-
-      #invalidates all!!! formats of a blob_access
-			def invalidate(blob_access, all=false)
-
-			end
 
       def hash_filename(filename)
         hash = Murmur.Hash64B(filename)
