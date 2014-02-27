@@ -12,39 +12,42 @@ module Blobsterix
       	end
       end
 			def initialize(path)
-				@path = path
+				@path = Pathname.new(path)
 			end
 
 			def get(blob_access)
-        FileSystemMetaData.new(cache_path(blob_access))
+        FileSystemMetaData.new(cache_file_path(blob_access))
 			end
 
 			def put(blob_access, data)
-				invalidate(blob_access,true)
-				FileSystemMetaData.new(cache_path(blob_access),:bucket => blob_access.bucket, :id => blob_access.id, :trafo => blob_access.trafo, :accept_type => "#{blob_access.accept_type}").write() {|f|
+				FileSystemMetaData.new(cache_file_path(blob_access),:bucket => blob_access.bucket, :id => blob_access.id, :trafo => blob_access.trafo, :accept_type => "#{blob_access.accept_type}").write() {|f|
 					f.write(data)
 				}
 			end
 
 			def delete(blob_access)
-				invalidate(blob_access,true)
-				FileSystemMetaData.new(cache_path(blob_access)).delete if exists?(blob_access)
+				FileSystemMetaData.new(cache_file_path(blob_access)).delete if exists?(blob_access)
 			end
 
 			def exists?(blob_access)
-				valid = File.exist?(cache_path(blob_access))
+				valid = File.exist?(cache_file_path(blob_access))
         valid ? Blobsterix.cache_hit(blob_access) : Blobsterix.cache_miss(blob_access)
         valid
 			end
 
 			private
 
+      def cache_file_path(blob_access)
+        cache_path(blob_access).join(blob_access.identifier)
+      end
+
       def cache_path(blob_access)
-        File.join(@path, hash_filename("#{blob_access.bucket}_#{blob_access.id.gsub("/","_")}"), blob_access.identifier) 
+        @path.join(hash_filename("#{blob_access.bucket}_#{blob_access.id.gsub("/","_")}"))
       end
 
       #invalidates all!!! formats of a blob_access
 			def invalidate(blob_access, all=false)
+
 			end
 
       def hash_filename(filename)
