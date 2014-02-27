@@ -37,6 +37,7 @@ module Blobsterix
 					data.response(true, env["HTTP_IF_NONE_MATCH"], env, env["HTTP_X_FILE"] === "yes")
 				rescue Errno::ENOENT => e
 					logger.error "Cache deleted: #{blob_access}"
+					Blobsterix.cache_fatal_error(blob_access)
 					Http.ServerError
 				end
 			end
@@ -56,6 +57,7 @@ module Blobsterix
 					data.response(false)
 				rescue Errno::ENOENT => e
 					logger.error "Cache deleted: #{blob_access}"
+					Blobsterix.cache_fatal_error(blob_access)
 					Http.ServerError
 				end
 			end

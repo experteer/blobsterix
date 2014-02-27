@@ -125,6 +125,11 @@ module Blobsterix
     storage_event_listener.call("cache.miss",blob_access)
   end
 
+  def self.cache_fatal_error(blob_access)
+    logger.info("Cache: fatal_error #{blob_access}")
+    storage_event_listener.call("cache.fatal_error",blob_access)
+  end
+
   def self.cache_hit(blob_access)
     logger.info("Cache: hit #{blob_access}")
     storage_event_listener.call("cache.hit",blob_access)
