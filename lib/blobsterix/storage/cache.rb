@@ -16,9 +16,7 @@ module Blobsterix
 			end
 
 			def get(blob_access)
-				meta = FileSystemMetaData.new(cache_path(blob_access))
-        meta.valid ? Blobsterix.cache_hit(blob_access) : Blobsterix.cache_miss(blob_access)
-        meta
+        FileSystemMetaData.new(cache_path(blob_access))
 			end
 
 			def put(blob_access, data)
@@ -42,12 +40,25 @@ module Blobsterix
 			private
 
       def cache_path(blob_access)
-        File.join(@path, Murmur.hash_filename("#{blob_access.bucket}_#{blob_access.id.gsub("/","_")}"), blob_access.identifier) 
+        File.join(@path, hash_filename("#{blob_access.bucket}_#{blob_access.id.gsub("/","_")}"), blob_access.identifier) 
       end
 
       #invalidates all!!! formats of a blob_access
 			def invalidate(blob_access, all=false)
 			end
+
+      def hash_filename(filename)
+        hash = Murmur.Hash64B(filename)
+        bits =  hash.to_s(2)
+        parts = []
+        6.times { |index|
+          len = 11
+          len = bits.length if len >= bits.length
+          value = bits.slice!(0, len).to_i(2).to_s(16).rjust(3,"0")
+          parts.push(value)
+        }
+        parts.join("/")
+      end
 		end
 	end
 end
