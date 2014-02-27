@@ -28,12 +28,12 @@ module Blobsterix
 				Http.OK storage.list(bucket).to_xml, "xml"
 			end
 
-			def get_file
+			def get_file(send_with_data=true)
 				return Http.NotFound if favicon
 
 				if bucket?
 					if meta = storage.get(bucket, file)
-						meta.response
+						meta.response(send_with_data)
 					else
 						Http.NotFound
 					end
@@ -43,18 +43,7 @@ module Blobsterix
 			end
 
 			def get_file_head
-				return Http.NotFound if favicon
-				logger.debug "S3 head"
-
-				if bucket?
-					if meta = storage.get(bucket, file)
-						meta.response(false)
-					else
-						Http.NotFound
-					end
-				else
-					Http.OK storage.list(bucket).to_xml, "xml"
-				end
+				get_file(false)
 			end
 
 			def create_bucket

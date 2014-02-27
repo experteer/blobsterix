@@ -22,7 +22,7 @@ module Blobsterix
 				Http.NotAllowed "listing blob server not allowed"
 			end
 
-			def get_file
+			def get_file(send_with_data=true)
 				accept = AcceptType.get(env, format)[0]
 
         # check trafo encryption
@@ -34,7 +34,7 @@ module Blobsterix
 
         begin
 					data = transformation.run(blob_access)
-					data.response(true, env["HTTP_IF_NONE_MATCH"], env, env["HTTP_X_FILE"] === "yes")
+					send_with_data ? data.response(true, env["HTTP_IF_NONE_MATCH"], env, env["HTTP_X_FILE"] === "yes") : data.response(false)
 				rescue Errno::ENOENT => e
 					logger.error "Cache deleted: #{blob_access}"
 					Blobsterix.cache_fatal_error(blob_access)
@@ -43,23 +43,7 @@ module Blobsterix
 			end
 
 			def get_file_head
-				logger.debug "Blob head"
-				accept = AcceptType.get(env, format)[0]
-
-				# check trafo encryption
-				trafo_string = Blobsterix.decrypt_trafo(env[nil][:trafo] || "", logger)
-				return Blobsterix::Storage::BlobMetaData.new.response if !trafo_string
-
-				blob_access=BlobAccess.new(:bucket => bucket, :id => file, :accept_type => accept, :trafo => trafo(trafo_string))
-				
-				begin
-					data = transformation.run(blob_access)
-					data.response(false)
-				rescue Errno::ENOENT => e
-					logger.error "Cache deleted: #{blob_access}"
-					Blobsterix.cache_fatal_error(blob_access)
-					Http.ServerError
-				end
+				get_file(false)
 			end
 	end
 end
