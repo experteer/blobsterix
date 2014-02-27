@@ -62,6 +62,10 @@ module Blobsterix
 				File.exists?(path)
 			end
 
+			def payload()
+				@payload
+			end
+
 			def write()
 				if block_given?
 					FileUtils.mkdir_p(File.dirname(path))
@@ -111,6 +115,7 @@ module Blobsterix
 						@mediatype = data["mediatype"]
 						@etag = data["etag"]
 						@size = data["size"]
+						@payload = JSON.load(data["payload"]) || {}
 						@mimeclass = MimeMagic.new(@mimetype)
 					end
 				end

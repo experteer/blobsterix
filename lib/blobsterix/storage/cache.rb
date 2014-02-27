@@ -36,12 +36,26 @@ module Blobsterix
 			end
 
       #invalidates all!!! formats of a blob_access
-      def invalidate(blob_access, all=false)
+      def invalidate(blob_access)
         cache_path(blob_access).entries.each {|cache_file|
           unless cache_file.to_s.match(/\.meta$/) || cache_file.directory?
             FileSystemMetaData.new(cache_path(blob_access).join(cache_file)).delete if cache_file.to_s.match(blob_access.identifier)
           end
         }
+      end
+
+      def each_meta_file
+        Dir.glob(@path.join("**/*")).each {|file|
+          cache_file = Pathname.new file
+          if block_given? && !cache_file.to_s.match(/\.meta$/) && !cache_file.directory?
+            yield FileSystemMetaData.new(cache_file)
+            cache_file
+          end
+        }
+      end
+
+      def meta_to_blob_access(meta_file)
+        BlobAccess.new(:bucket => meta_file.payload["bucket"], :id => meta_file.payload["id"], :trafo => meta_file.payload["trafo"], :accept_type => AcceptType.new(meta_file.payload["accept_type"]||""))
       end
 
 			private
