@@ -44,6 +44,8 @@ module Blobsterix
         }
       end
 
+      private
+
       def each_meta_file
         Dir.glob(@path.join("**/*")).each {|file|
           cache_file = Pathname.new file
@@ -57,8 +59,6 @@ module Blobsterix
       def meta_to_blob_access(meta_file)
         BlobAccess.new(:bucket => meta_file.payload["bucket"], :id => meta_file.payload["id"], :trafo => meta_file.payload["trafo"], :accept_type => AcceptType.new(meta_file.payload["accept_type"]||""))
       end
-
-			private
 
       def cache_file_path(blob_access)
         cache_path(blob_access).join(blob_access.identifier)
