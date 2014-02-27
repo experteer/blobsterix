@@ -145,9 +145,11 @@ puts "Blobsterix #{Blobsterix::VERSION}"
 if ARGV.length == 0
   puts "Usage: "
   puts "\tserver (goliath server options) - \n\t\tStarts blobsterix. When a blobsterix config is present in the executing folder it \n\t\twill be used otherwise blobsterix will run with standard options."
+  puts "\tconsole - \n\t\tStarts blobsterix console and loads app config"
   puts "\tgenerate (generator) (param) - Used to generate blobsterix server files"
   puts "\t\t init (foldername) - Creates a new blobsterix project. When a foldername is supplied it will be created in that folder."
   puts "\t\t transformator (TrafoName) - Creates a new blobsterix transformator with the given name or just new as name."
+  puts "\t\t storage (StorageName) - Creates a new blobsterix storage with the given name or just new as name."
   exit
 end
 if ARGV[0] == "server"
