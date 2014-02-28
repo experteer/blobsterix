@@ -53,6 +53,7 @@ module Blobsterix
 			def upload_data
 				source = cached_upload
 				accept = source.accept_type()
+
 				trafo_current = trafo(trafo_string)
 				file_current = file
 				bucket_current = bucket

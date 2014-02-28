@@ -120,6 +120,11 @@ module Blobsterix
     }
   end
 
+  def self.encryption_error(blob_access)
+    logger.info("Encryption: error #{blob_access}")
+    storage_event_listener.call("encryption.error",blob_access)
+  end
+
   def self.cache_miss(blob_access)
     logger.info("Cache: miss #{blob_access}")
     storage_event_listener.call("cache.miss",blob_access)

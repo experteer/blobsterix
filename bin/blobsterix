@@ -81,6 +81,21 @@ class BlobsterixRunner
     parse(args)
   end
 
+  def run_command()
+    begin
+      require "pry"
+
+      require_storages
+      require_config
+      require_transformators
+
+      Kernel.eval(@type)
+      exit
+    rescue LoadError => e
+      warn "=> Unable to load pry: #{e}"
+    end
+  end
+
   def run_console()
     begin
       require "pry"
@@ -156,6 +171,8 @@ if ARGV[0] == "server"
   BlobsterixRunner.new(ARGV).run_blobsterix
 elsif ARGV[0] == "console"
   BlobsterixRunner.new(ARGV).run_console
+elsif ARGV[0] == "run"
+  BlobsterixRunner.new(ARGV).run_command
 elsif ARGV[0] == "generate"
   Generator.new(ARGV).run
 end

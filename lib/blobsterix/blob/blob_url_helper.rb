@@ -57,5 +57,9 @@ module Blobsterix
 			}
       trafo_a
 		end
+
+		def transformation_string()
+			env["params"]["trafo"] || env[nil][:trafo] || ""
+		end
 	end
 end

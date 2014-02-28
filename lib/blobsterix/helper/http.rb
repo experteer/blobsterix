@@ -9,8 +9,11 @@ module Blobsterix
 		def self.ServerError(data="Server Error", content_type="txt")
 			[500, {"Content-Type" => MimeMagic.by_extension(content_type).type}, data]
 		end
-		def self.NotAllowed(data="Not Found", content_type="txt")
+		def self.NotAllowed(data="Not Allowed", content_type="txt")
 			[403, {"Content-Type" => MimeMagic.by_extension(content_type).type}, data]
+		end
+		def self.NotAuthorized(data="Not Authorized", content_type="txt")
+			[401, {"Content-Type" => MimeMagic.by_extension(content_type).type}, data]
 		end
 		def self.OK(data="", content_type="txt")
 			[200, {"Content-Type" => MimeMagic.by_extension(content_type).type}, data]
