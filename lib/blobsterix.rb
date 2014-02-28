@@ -92,8 +92,16 @@ module Blobsterix
     @@cache ||= Storage::Cache.new(cache_dir)
   end
 
+  def self.decrypt_trafo=(obj)
+    @decrypt_trafo=obj
+  end
+
   def self.decrypt_trafo(trafo_string,logger)
-    trafo_string
+    @decrypt_trafo||=lambda{|t,l|t}
+    if !trafo_string
+      return @decrypt_trafo
+    end
+    @decrypt_trafo.call(trafo_string, logger)
   end
 
   def self.transformation
