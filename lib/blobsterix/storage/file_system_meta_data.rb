@@ -47,7 +47,11 @@ module Blobsterix
 			end
 
 			def last_modified()
-				File.ctime(path).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+				File.ctime(path)#.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+			end
+
+			def last_accessed()
+				File.atime(path)#.strftime("%Y-%m-%dT%H:%M:%S.000Z")
 			end
 
 			def accept_type()
@@ -55,7 +59,7 @@ module Blobsterix
 			end
 
 			def header()
-				{"Etag" => etag, "Content-Type" => mimetype, "Last-Modified" => last_modified, "Cache-Control" => "max-age=#{60*60*24}", "Expires" => (Time.new+(60*60*24)).strftime("%Y-%m-%dT%H:%M:%S.000Z")}
+				{"Etag" => etag, "Content-Type" => mimetype, "Last-Modified" => last_modified.strftime("%Y-%m-%dT%H:%M:%S.000Z"), "Cache-Control" => "max-age=#{60*60*24}", "Expires" => (Time.new+(60*60*24)).strftime("%Y-%m-%dT%H:%M:%S.000Z")}
 			end
 
 			def valid()

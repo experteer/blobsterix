@@ -6,7 +6,7 @@ module Blobsterix
       def invalidation
       	each_meta_file do |meta_file|
       		blob_access=meta_to_blob_access(meta_file)
-      		if Blobsterix.cache_checker.call blob_access,accessed_at,created_at
+          if Blobsterix.cache_checker.call blob_access,meta_file.last_accessed,meta_file.last_modified
              invalidate(blob_access)
       		end
       	end

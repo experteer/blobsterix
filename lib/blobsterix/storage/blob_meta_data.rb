@@ -18,6 +18,8 @@ module Blobsterix
 			end
 			def last_modified()
 			end
+			def last_accessed()
+			end
 			def payload()
 				{}
 			end

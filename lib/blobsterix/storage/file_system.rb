@@ -29,7 +29,7 @@ module Blobsterix
             bucket_files(bucket).each do |file|
               b.contents << BucketEntry.new(file) do |entry|
                 meta = metaData(bucket, file)
-                entry.last_modified =  meta.last_modified
+                entry.last_modified =  meta.last_modified.strftime("%Y-%m-%dT%H:%M:%S.000Z")
                 entry.etag =  meta.etag
                 entry.size =  meta.size
                 entry.mimetype = meta.mimetype

@@ -43,7 +43,7 @@ module Blobsterix
 
     def render(template_name, status_code=200, bind=nil)
       begin
-        Http.Response(status_code, renderer.render(template_name, bind), "html")
+        Http.Response(status_code, renderer.render(template_name, bind||binding), "html")
       rescue Errno::ENOENT => e
         Http.NotFound
       end
