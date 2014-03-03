@@ -6,8 +6,8 @@ module Blobsterix
       def invalidation
       	each_meta_file do |meta_file|
       		blob_access=meta_to_blob_access(meta_file)
-          if Blobsterix.cache_checker.call blob_access,meta_file.last_accessed,meta_file.last_modified
-             invalidate(blob_access)
+          if Blobsterix.cache_checker.call(blob_access,meta_file.last_accessed,meta_file.last_modified)
+             invalidate(blob_access, true)
       		end
       	end
       end
@@ -36,12 +36,16 @@ module Blobsterix
 			end
 
       #invalidates all!!! formats of a blob_access
-      def invalidate(blob_access)
-        cache_path(blob_access).entries.each {|cache_file|
-          unless cache_file.to_s.match(/\.meta$/) || cache_file.directory?
-            FileSystemMetaData.new(cache_path(blob_access).join(cache_file)).delete if cache_file.to_s.match(blob_access.identifier)
-          end
-        }
+      def invalidate(blob_access, delete_single=false)
+        if delete_single
+          FileSystemMetaData.new(cache_file_path(blob_access)).delete
+        else
+          cache_path(blob_access).entries.each {|cache_file|
+            unless cache_file.to_s.match(/\.meta$/) || cache_file.directory?
+              FileSystemMetaData.new(cache_path(blob_access).join(cache_file)).delete if cache_file.to_s.match(blob_access.identifier)
+            end
+          }
+        end
       end
 
       private
