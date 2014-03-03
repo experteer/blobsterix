@@ -51,10 +51,10 @@ module Blobsterix
     def render_json(obj=nil)
       Http.OK (obj||self).to_json, "json"
     end
-    
+
     def to_json
       stuff = Hash.new
-      json_vars.each{|var_name|
+      self.class.json_vars.each{|var_name|
         stuff[var_name.to_sym]=send(var_name) if respond_to?(var_name)
       }
       stuff.to_json
