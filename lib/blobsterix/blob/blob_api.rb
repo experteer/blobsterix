@@ -16,6 +16,8 @@ module Blobsterix
 		get "*any", :function => :next_api
 		put "*any", :function => :next_api
 		delete "*any", :function => :next_api
+    head "*any", :function => :next_api
+    post "*any", :function => :next_api
 
 		private
 			def not_allowed

@@ -278,6 +278,8 @@ class MimeMagic
     'jpr' => 'application/x-jbuilder-project',
     'jpx' => 'application/x-jbuilder-project',
     'js' => 'application/javascript',
+    'json' => 'application/json',
+    'jsonp' => 'text/javascript',
     'k25' => 'image/x-kodak-k25',
     'kar' => 'audio/midi',
     'karbon' => 'application/x-karbon',

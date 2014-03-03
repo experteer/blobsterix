@@ -16,6 +16,7 @@ require 'mini_magick'
 #require 'evma_httpserver'
 require 'json'
 require 'logger'
+require 'erb'
 
 #utility
 require 'blobsterix/mimemagic/tables'
@@ -29,6 +30,8 @@ require 'blobsterix/helper/data_response'
 require 'blobsterix/helper/murmur'
 require 'blobsterix/helper/logable'
 require 'blobsterix/helper/blob_access'
+require 'blobsterix/helper/status_info'
+require 'blobsterix/helper/template_renderer'
 
 #router base
 require 'blobsterix/router/app_router'
@@ -36,10 +39,12 @@ require 'blobsterix/router/app_router'
 #helper
 require 'blobsterix/s3/s3_url_helper'
 require 'blobsterix/blob/blob_url_helper'
+require 'blobsterix/status/status_url_helper'
 
 #apis
 require 'blobsterix/s3/s3_api'
 require 'blobsterix/blob/blob_api'
+require 'blobsterix/status/status_api'
 
 #interfaces
 require 'blobsterix/storage/blob_meta_data'
@@ -65,6 +70,10 @@ require 'blobsterix/service'
 module Blobsterix
   def self.root
     @root ||= Pathname.new(BLOBSTERIX_ROOT)
+  end
+
+  def self.root_gem
+    @root_gem ||= Pathname.new(BLOBSTERIX_GEM_DIR)
   end
 
   def self.logger=(obj)
@@ -135,16 +144,22 @@ module Blobsterix
 
   def self.cache_miss(blob_access)
     logger.info("Cache: miss #{blob_access}")
+    StatusInfo.cache_miss+=1
+    StatusInfo.cache_access+=1
     storage_event_listener.call("cache.miss",blob_access)
   end
 
   def self.cache_fatal_error(blob_access)
     logger.info("Cache: fatal_error #{blob_access}")
+    StatusInfo.cache_error+=1
+    StatusInfo.cache_access+=1
     storage_event_listener.call("cache.fatal_error",blob_access)
   end
 
   def self.cache_hit(blob_access)
     logger.info("Cache: hit #{blob_access}")
+    StatusInfo.cache_hit+=1
+    StatusInfo.cache_access+=1
     storage_event_listener.call("cache.hit",blob_access)
   end
 

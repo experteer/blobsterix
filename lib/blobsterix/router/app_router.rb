@@ -1,5 +1,16 @@
 module Blobsterix
+	module Jsonizer
+		def json_var(*var_names)
+			@json_vars = (@json_vars||[])+var_names.flatten
+		end
+
+		def json_vars
+			@json_vars||= []
+		end
+	end
 	class AppRouterBase
+
+		extend Jsonizer
 
 		attr_reader :logger
 		attr_accessor :env
@@ -23,6 +34,30 @@ module Blobsterix
 
 		def next_api
 			Http.NextApi
+		end
+
+		def renderer
+			@renderer||=TemplateRenderer.new(binding)
+		end
+
+		def render(template_name)
+			begin
+				Http.OK renderer.render(template_name), "html"
+			rescue Errno::ENOENT => e
+				Http.NotFound
+			end
+		end
+
+		def to_json
+			stuff = Hash.new
+			self.class.json_vars.each{|var_name|
+				stuff[var_name.to_sym]=send(var_name) if respond_to?(var_name)
+			}
+			stuff.to_json
+		end
+
+		def render_json(obj=nil)
+			Http.OK (obj||self).to_json, "json"
 		end
 
 		def self.options(opt)
@@ -55,7 +90,10 @@ module Blobsterix
 		end
 
 		def self.call(env)
-			router.call(env)
+			Blobsterix::StatusInfo.connections+=1
+			result=router.call(env)
+			Blobsterix::StatusInfo.connections-=1
+			result
 		end
 
 		def self.call_controller(options, env)
