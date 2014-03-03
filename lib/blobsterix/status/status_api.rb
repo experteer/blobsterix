@@ -15,7 +15,7 @@ module Blobsterix
     def status
       case format
       when :json
-        render_json# :me => @me
+        render_json
       else
         cache_hits
         cache_misses

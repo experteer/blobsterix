@@ -8,9 +8,19 @@ module Blobsterix
 			@json_vars||= []
 		end
 	end
+	module Jsonizer2Json
+		def to_json
+			stuff = Hash.new
+			self.class.json_vars.each{|var_name|
+				stuff[var_name.to_sym]=send(var_name) if respond_to?(var_name)
+			}
+			stuff.to_json
+		end
+	end
 	class AppRouterBase
 
 		extend Jsonizer
+		include Jsonizer2Json
 
 		attr_reader :logger
 		attr_accessor :env
@@ -46,14 +56,6 @@ module Blobsterix
 			rescue Errno::ENOENT => e
 				Http.NotFound
 			end
-		end
-
-		def to_json
-			stuff = Hash.new
-			self.class.json_vars.each{|var_name|
-				stuff[var_name.to_sym]=send(var_name) if respond_to?(var_name)
-			}
-			stuff.to_json
 		end
 
 		def render_json(obj=nil)

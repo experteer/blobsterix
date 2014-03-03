@@ -1,3 +1,26 @@
 <html>
-<h1>Hey whats up <%=@me%></h1>
+  <head>
+    <title>Blobsterix Status Page</title>
+    <style type="text/css">
+    .content {
+      width: 80%;
+      margin: auto;
+      text-align: center;
+    }
+    </style>
+  </head>
+  <body>
+    <h1 align="center">Blobsterix Status</h1>
+
+    <div class="content">
+      <div>Cache-Hit-Rate: <%=cache_hit_rate%></div>
+      <hr/>
+      <div>Cache-Hits: <%=cache_hits%></div>
+      <div>Cache-Misses: <%=cache_misses%></div>
+      <div>Cache-Accesses: <%=cache_accesses%></div>
+      <div>Cache-Cache-Errors: <%=cache_errors%></div>
+      <hr/>
+      <div>Current Connections: <%=connections%></div>
+    </div>
+  </body>
 </html>
