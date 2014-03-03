@@ -8,6 +8,7 @@ module Blobsterix
       @json_vars||= []
     end
   end
+
   class AppRouterBase
 
     extend Jsonizer
@@ -37,12 +38,12 @@ module Blobsterix
     end
 
     def renderer
-      @renderer||=TemplateRenderer.new(binding)
+      @@renderer||=(Blobsterix.respond_to?(:env) && Blobsterix.env == :production) ? TemplateRenderer.new(binding) : ReloadTemplateRenderer.new(binding)
     end
 
-    def render(template_name)
+    def render(template_name, status_code=200, bind=nil)
       begin
-        Http.OK renderer.render(template_name), "html"
+        Http.Response(status_code, renderer.render(template_name, bind), "html")
       rescue Errno::ENOENT => e
         Http.NotFound
       end
@@ -53,6 +54,9 @@ module Blobsterix
     end
 
     def render_xml(obj=nil)
+      obj = Nokogiri::XML::Builder.new do |xml|
+        yield xml
+      end if block_given?
       Http.OK (obj||self).to_xml, "xml"
     end
 
