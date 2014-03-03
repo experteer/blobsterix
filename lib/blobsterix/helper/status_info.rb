@@ -1,5 +1,13 @@
 module Blobsterix
   module StatusInfo
+    def self.boot_up
+      @start_time=Time.now
+    end
+    boot_up
+    
+    def self.uptime
+      Time.now-@start_time
+    end
     def self.cache_hit
       @cache_hit||=0
     end

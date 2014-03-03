@@ -10,20 +10,25 @@ module Blobsterix
     head "*any", :function => :next_api
     post "*any", :function => :next_api
 
-    json_var :cache_hits, :cache_misses, :cache_errors, :cache_accesses, :connections, :cache_hit_rate
+    json_var :cache_hits, :cache_misses, :cache_errors, :cache_accesses, :connections, :cache_hit_rate, :ram_usage, :uptime
 
     def status
       case format
       when :json
         render_json
+      when :xml
+        render_xml
       else
-        cache_hits
-        cache_misses
-        cache_errors
-        cache_accesses
-        connections
         render "status_page"
       end
+    end
+
+    def ram_usage
+      `pmap #{Process.pid} | tail -1`[10,40].strip
+    end
+
+    def uptime
+      @uptime||=StatusInfo.uptime
     end
 
     def cache_hits
