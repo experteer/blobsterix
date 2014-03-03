@@ -9,7 +9,11 @@ module Blobsterix
     end
 
     def template(template_name)
-      templates[template_name]||=::ERB.new(File.read(Blobsterix.root_gem.join("templates/views", "#{template_name}.erb")))
+      begin
+        templates[template_name]||=::ERB.new(File.read(Blobsterix.root.join("views", "#{template_name}.erb")))
+      rescue Errno::ENOENT => e
+        templates[template_name]||=::ERB.new(File.read(Blobsterix.root_gem.join("templates/views", "#{template_name}.erb")))
+      end
     end
 
     def render(template_name)
