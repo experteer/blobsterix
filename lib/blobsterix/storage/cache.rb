@@ -45,7 +45,7 @@ module Blobsterix
             unless cache_file.to_s.match(/\.meta$/) || cache_file.directory?
               FileSystemMetaData.new(cache_path(blob_access).join(cache_file)).delete if cache_file.to_s.match(blob_access.identifier)
             end
-          }
+          } if Dir.exist?(cache_path(blob_access))
         end
       end
 
