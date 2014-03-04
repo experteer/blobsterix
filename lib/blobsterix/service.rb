@@ -17,7 +17,7 @@ module Blobsterix
 		end
 =end
 		def response(env)
-			call_stack(env, StatusApi, BlobApi, S3Api)
+			call_stack(env, BlobApi, StatusApi, S3Api)
 		end
 
 		def call_stack(env, *apis)
