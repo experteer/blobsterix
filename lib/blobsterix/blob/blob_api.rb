@@ -2,22 +2,22 @@ module Blobsterix
 	class BlobApi < AppRouterBase
 		include BlobUrlHelper
 
-		get "/blob/v1", :function => :not_allowed
-		get "/blob", :function => :not_allowed
-		put "/blob/v1", :function => :not_allowed
-		put "/blob", :function => :not_allowed
+		get "/blob/v1", :not_allowed
+		get "/blob", :not_allowed
+		put "/blob/v1", :not_allowed
+		put "/blob", :not_allowed
 
-		get "/blob/v1/(:trafo.)*bucket_or_file.:format", :function => :get_file
-		get "/blob/v1/(:trafo.)*bucket_or_file", :function => :get_file
+		get "/blob/v1/(:trafo.)*bucket_or_file.:format", :get_file
+		get "/blob/v1/(:trafo.)*bucket_or_file", :get_file
 
-		head "/blob/v1/(:trafo.)*bucket_or_file.:format", :function => :get_file_head
-		head "/blob/v1/(:trafo.)*bucket_or_file", :function => :get_file_head
+		head "/blob/v1/(:trafo.)*bucket_or_file.:format", :get_file_head
+		head "/blob/v1/(:trafo.)*bucket_or_file", :get_file_head
 
-		get "*any", :function => :next_api
-		put "*any", :function => :next_api
-		delete "*any", :function => :next_api
-    head "*any", :function => :next_api
-    post "*any", :function => :next_api
+		get "*any", :next_api
+		put "*any", :next_api
+		delete "*any", :next_api
+    head "*any", :next_api
+    post "*any", :next_api
 
 		private
 			def not_allowed

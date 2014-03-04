@@ -2,13 +2,13 @@ module Blobsterix
   class StatusApi < AppRouterBase
     include StatusUrlHelper
 
-    get "/status(.:format)", :function => :status
+    get "/status(.:format)", :status
 
-    get "*any", :function => :next_api
-    put "*any", :function => :next_api
-    delete "*any", :function => :next_api
-    head "*any", :function => :next_api
-    post "*any", :function => :next_api
+    get "*any", :next_api
+    put "*any", :next_api
+    delete "*any", :next_api
+    head "*any", :next_api
+    post "*any", :next_api
 
     json_var :cache_hits, :cache_misses, :cache_errors, :cache_accesses, :connections, :cache_hit_rate, :ram_usage, :uptime
 

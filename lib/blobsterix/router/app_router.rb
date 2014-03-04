@@ -81,6 +81,7 @@ module Blobsterix
     end
 
     def self.options(opt)
+      opt = {:function => opt.to_sym} if opt.class != Hash
       {:controller => self.name, :function => :call}.merge(opt)
     end
 

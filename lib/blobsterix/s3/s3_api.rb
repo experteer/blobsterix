@@ -2,28 +2,28 @@ module Blobsterix
 	class S3Api < AppRouterBase
 		include S3UrlHelper
 
-		get "/", :function => :list_buckets
+		get "/", :list_buckets
 
-		get "/*bucket_or_file.:format", :function => :get_file
-		get "/*bucket_or_file", :function => :get_file
+		get "/*bucket_or_file.:format", :get_file
+		get "/*bucket_or_file", :get_file
 
-		head "/*bucket_or_file.:format", :function => :get_file_head
-		head "/*bucket_or_file", :function => :get_file_head
+		head "/*bucket_or_file.:format", :get_file_head
+		head "/*bucket_or_file", :get_file_head
 
-		put "/", :function => :create_bucket
+		put "/", :create_bucket
 
-		put "/*file.:format", :function => :upload_data
-		put "/*file", :function => :upload_data
+		put "/*file.:format", :upload_data
+		put "/*file", :upload_data
 
-		delete "/", :function => :delete_bucket
-		delete "/*file.:format", :function => :delete_file
-		delete "/*file", :function => :delete_file
+		delete "/", :delete_bucket
+		delete "/*file.:format", :delete_file
+		delete "/*file", :delete_file
 
-		get "*any", :function => :next_api
-		put "*any", :function => :next_api
-		delete "*any", :function => :next_api
-    head "*any", :function => :next_api
-    post "*any", :function => :next_api
+		get "*any", :next_api
+		put "*any", :next_api
+		delete "*any", :next_api
+    head "*any", :next_api
+    post "*any", :next_api
 
 		private
 			def list_buckets
