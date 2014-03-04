@@ -13,6 +13,7 @@ module Blobsterix
       end
 			def initialize(path)
 				@path = Pathname.new(path)
+        FileUtils.mkdir_p(@path) if !Dir.exist?(@path)
 			end
 
 			def get(blob_access)
