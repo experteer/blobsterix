@@ -85,20 +85,35 @@ module Blobsterix
   end
 
   def self.storage_dir
-    root.join("contents")
+    @storage_dir||=root.join("contents")
+  end
+
+  def self.storage_dir=(obj)
+    @storage_dir=obj
   end
 
   def self.storage
-    #logger.debug "Doing in #{Dir.pwd}"
-    @@storage ||= Storage::FileSystem.new(storage_dir)
+    @storage ||= Storage::FileSystem.new(storage_dir)
+  end
+
+  def self.storage=(obj)
+    @storage = obj
   end
 
   def self.cache_dir
-    root.join("cache")
+    @cache_dir||=root.join("cache")
+  end
+
+  def self.cache_dir=(obj)
+    @cache_dir=obj
   end
 
   def self.cache
-    @@cache ||= Storage::Cache.new(cache_dir)
+    @cache ||= Storage::Cache.new(cache_dir)
+  end
+
+  def self.cache=(obj)
+    @cache = obj
   end
 
   def self.decrypt_trafo=(obj)
