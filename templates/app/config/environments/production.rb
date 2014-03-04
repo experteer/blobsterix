@@ -1,28 +1,28 @@
-# Use a different logger
+# # Use a different logger
 # Blobsterix.logger=Logger.new(STDOUT)
 
-# Set different dirs
+# # Set different dirs
 # Blobsterix.storage_dir=Blobsterix.root.join("contents")
 # Blobsterix.cache_dir=Blobsterix.root.join("cache")
 
-# Set different cache or storage handler
+# # Set different cache or storage handler
 # Blobsterix.storage=Blobsterix::Storage::FileSystem.new(Blobsterix.storage_dir)
 # Blobsterix.cache=Blobsterix::Storage::Cache.new(cache_dir)
 
-# Set different transformation manager
+# # Set different transformation manager
 # Blobsterix.transformation=Blobsterix::Transformations::TransformationManager.new
 
-# Use a specific transformation decrypter
+# # Use a specific transformation decrypter
 # Blobsterix.decrypt_trafo= lambda { |trafo_string, logger|
 #   trafo_string # this has to return a string in format of: trafoName_value,trafoName_value,....
 # }
 
-# Use a specific cache checker for invalidation
+# # Use a specific cache checker for invalidation
 # Blobsterix.cache_checker= lambda { |blob_access, last_accessed_at, created_at|
 #   false # return true to invalidate the cache entry
 # }
 
-# Use a specific storage and cache event listener
+# # Use a specific storage and cache event listener
 # Blobsterix.storage_event_listener= lambda { |target, blob_access|
 #   # target is what happend where
 # 	#	Possible events are: 
