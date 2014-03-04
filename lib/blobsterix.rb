@@ -129,7 +129,11 @@ module Blobsterix
   end
 
   def self.transformation
-    @@transformation ||= Blobsterix::Transformations::TransformationManager.new
+    @transformation ||= Blobsterix::Transformations::TransformationManager.new
+  end
+
+  def self.transformation=(obj)
+    @transformation=obj
   end
 
   def self.cache_checker=(obj)
