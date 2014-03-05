@@ -17,6 +17,7 @@ require 'mini_magick'
 require 'json'
 require 'logger'
 require 'erb'
+require 'goliath/api'
 
 #utility
 require 'blobsterix/mimemagic/tables'
@@ -32,6 +33,7 @@ require 'blobsterix/helper/logable'
 require 'blobsterix/helper/blob_access'
 require 'blobsterix/helper/status_info'
 require 'blobsterix/helper/template_renderer'
+require 'blobsterix/helper/config_loader'
 
 #router base
 require 'blobsterix/router/app_router'
@@ -66,6 +68,9 @@ require 'blobsterix/transformation/image_transformation'
 
 #service base
 require 'blobsterix/service'
+
+BLOBSTERIX_ROOT=Dir.pwd
+BLOBSTERIX_GEM_DIR = File.join(File.dirname(__FILE__), "../")
 
 module Blobsterix
   def self.root
