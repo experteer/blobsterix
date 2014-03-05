@@ -1,0 +1,7 @@
+desc "Invalidate the cache"
+task :invalidate_cache do
+  require "blobsterix"
+  include Blobsterix::ConfigLoader
+  load_blobsterix_config
+  puts Blobsterix.cache.invalidation
+end
