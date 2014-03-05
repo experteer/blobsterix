@@ -14,7 +14,7 @@ module Blobsterix
 		def initialize(*data)
 			data = ["*/*"] if data.empty?
 			@mimetype = data.flatten[0]
-			set_q_factor_string(data[1] || "q=1.0")
+			set_q_factor_string(data.flatten[1] || "q=0.0")
 			mediatype
 			subtype
 			score
