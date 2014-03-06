@@ -32,17 +32,17 @@ module Blobsterix
 					EM.next_tick do
 						send_chunk(f)
 					end
-					[200, meta.header, (with_data ? Goliath::Response::STREAMING : "")]
+					[200, meta.header.merge(Goliath::Response::CHUNKED_STREAM_HEADERS), (with_data ? Goliath::Response::STREAMING : "")]
 				end
 
 				def send_chunk(file)
 					dat = file.read(10000)
 					again = if dat != nil
-						env.stream_send(dat)
+						env.chunked_stream_send(dat)
 						true
 					else
 						file.close
-						env.stream_close
+						env.chunked_stream_close
 						false
 					end
 					EM.next_tick do
