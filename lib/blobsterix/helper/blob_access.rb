@@ -6,6 +6,7 @@ module Blobsterix
     def initialize(atts={})
       @trafo = []
       atts.each do |key,value| send("#{key}=",value) end
+      identifier
     end
 
     def identifier

@@ -3,6 +3,9 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in blob_server.gemspec
 gemspec
 
+gem 'simplecov', :require => false, :group => :test
+gem 'rack-test', :group => :test
+
 group :development do 
 	gem "capistrano", "2.15.4"
 	gem "capistrano-ext", "1.2.1"

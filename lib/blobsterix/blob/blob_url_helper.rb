@@ -59,7 +59,7 @@ module Blobsterix
 		end
 
 		def transformation_string()
-			env["params"]["trafo"] || env[nil][:trafo] || ""
+			(env["params"] && env["params"]["trafo"]) || env[nil][:trafo] || ""
 		end
 	end
 end
