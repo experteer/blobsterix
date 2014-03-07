@@ -9,10 +9,12 @@ Bundler.setup
 Bundler.require
 
 require 'rack/test'
+require 'goliath/test_helper'
 
 Blobsterix.storage_dir=Blobsterix.root.join("tmp/contents")
 Blobsterix.cache_dir=Blobsterix.root.join("tmp/cache")
 Blobsterix.storage_event_listener=lambda{|a,b|}
+Blobsterix.logger=Logger.new(nil)
 
 module Blobsterix
   module SpecHelper
@@ -112,8 +114,8 @@ end
 
 
 
-# RSpec.configure do |c|
-#   c.include Goliath::TestHelper, :example_group => {
-#     :file_path => /spec\/integration/
-#   }
-# end
+RSpec.configure do |c|
+  c.include Goliath::TestHelper, :example_group => {
+    :file_path => /spec\/integration/
+  }
+end

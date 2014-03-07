@@ -19,7 +19,7 @@ module Blobsterix::Transformations
 		end
 
 		def transform(input_path, target_path, value)
-			p "run transformation!!!!!"
+			logger.debug "run transformation!!!!!"
 			system("cp #{input_path} #{target_path}")
 		end
 	end

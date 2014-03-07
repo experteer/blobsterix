@@ -12,13 +12,14 @@ module Blobsterix
   class AppRouterBase
 
     extend Jsonizer
+    include Logable
 
-    attr_reader :logger
+    #attr_reader :logger
     attr_accessor :env
 
     def initialize(env)
       @env = env
-      @logger = env["rack.logger"]
+      #@logger = env["rack.logger"]
     end
 
     def storage

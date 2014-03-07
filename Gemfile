@@ -5,6 +5,7 @@ gemspec
 
 gem 'simplecov', :require => false, :group => :test
 gem 'rack-test', :group => :test
+gem 'em-http-request', :group => :test
 
 group :development do 
 	gem "capistrano", "2.15.4"

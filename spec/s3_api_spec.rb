@@ -6,8 +6,31 @@ describe Blobsterix::S3Api do
   def app
     Blobsterix::S3Api
   end
-  describe 'listing all buckets' do
-    context "with no data" do
+
+  let(:data) {"Hi my name is Test"}
+  let(:key) {"test.txt"}
+  let(:bucket) {"test"}
+
+  describe "create a bucket" do
+    it "should have bucket after creation" do
+      get "/#{bucket}"
+      expect(last_response.status).to eql(200)
+      response = Hash.from_xml last_response.body
+      expect(response).to have_key(:Error)
+      expect(response[:Error]).to eql("no such bucket")
+
+      put "/", "", "HOST" => "#{bucket}.s3.blah.de"
+
+      get "/#{bucket}"
+      expect(last_response.status).to eql(200)
+      response = Hash.from_xml last_response.body
+      expect(response).to have_key(:Error)
+      expect(response[:Error]).to eql("no such bucket")
+    end
+  end
+  context "with no data" do
+
+    describe 'listing all buckets' do
       it 'should return an empty set' do
         get "/"
         expect(last_response.status).to eql(200)
@@ -18,16 +41,35 @@ describe Blobsterix::S3Api do
       end
     end
 
-    context "with data" do
-      let(:data) {"Hi my name is Test"}
-      let(:key) {"test.txt"}
-      let(:bucket) {"test"}
-      before :each do
-        Blobsterix.storage.put(bucket, key, StringIO.new(data, "r"))
+    describe 'list bucket' do
+      it 'should say no such bucket' do
+        get "/#{bucket}"
+        expect(last_response.status).to eql(200)
+        response = Hash.from_xml last_response.body
+        expect(response).to have_key(:Error)
+        expect(response[:Error]).to eql("no such bucket")
       end
-      after :each do
-        clear_storage
+    end
+
+    describe 'get file' do
+      it 'should return a 404 ' do
+        get "/#{bucket}/#{key}"
+        expect(last_response.status).to eql(404)
       end
+    end
+  end
+
+  context "with data" do
+
+    before :each do
+      Blobsterix.storage.put(bucket, key, StringIO.new(data, "r"))
+    end
+
+    after :each do
+      clear_storage
+    end
+
+    describe 'listing all buckets' do
       it 'should return one bucket in the list' do
         get "/"
         expect(last_response.status).to eql(200)
@@ -36,7 +78,10 @@ describe Blobsterix::S3Api do
         expect(response[:ListAllMyBucketsResult]).to have_key(:Buckets)
         expect(response[:ListAllMyBucketsResult][:Buckets]).to_not be_empty
       end
-      it 'should return a file for the bucket' do
+    end
+
+    describe 'list bucket' do
+      it 'should return all files for the bucket' do
         get "/#{bucket}"
         expect(last_response.status).to eql(200)
         response = Hash.from_xml last_response.body
