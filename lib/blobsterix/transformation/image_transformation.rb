@@ -379,6 +379,25 @@ module Blobsterix::Transformations::Impl
 		end
 	end
 
+	class RenderTextTransformation < Blobsterix::Transformations::Transformation
+		def name()
+			"text"
+		end
+
+		def input_type()
+			@input_type ||= Blobsterix::AcceptType.new "image/*"
+		end
+
+		def output_type()
+			@output_type ||= Blobsterix::AcceptType.new "image/*"
+		end
+
+		def transform(input_path, target_path, value)
+			puts "Render text"
+			system("convert #{input_path} -pointsize 20 -draw \"gravity center fill white text 0,12 '#{value.gsub("_", " ").gsub("\"", "'")}'\" #{target_path}")
+		end
+	end
+
 	class SleepTransformation < Blobsterix::Transformations::Transformation
 		def name()
 			"sleep"
