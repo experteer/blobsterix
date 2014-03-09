@@ -12,7 +12,7 @@ module Blobsterix
 			@favicon ||= file.match /favicon/
 		end
 		def bucket
-			host = bucket_matcher(env['HTTP_HOST'])
+			host = nil#bucket_matcher(env['HTTP_HOST'])
 			if host
 				env[nil][:bucket] = host[1]
 			elsif  (env[nil] && env[nil][:bucket])
@@ -24,7 +24,7 @@ module Blobsterix
 			end
 		end
 		def bucket?
-			host = bucket_matcher(env['HTTP_HOST'])
+			host = nil#bucket_matcher(env['HTTP_HOST'])
 			host || env[nil][:bucket] || included_bucket
 		end
 		def format
