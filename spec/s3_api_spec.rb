@@ -13,6 +13,7 @@ describe Blobsterix::S3Api do
 
   describe "create a bucket" do
     it "should have bucket after creation" do
+      pending "temporarily disabled"
       get "/#{bucket}"
       expect(last_response.status).to eql(200)
       response = Hash.from_xml last_response.body
