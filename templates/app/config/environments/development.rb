@@ -13,7 +13,7 @@
 # Blobsterix.transformation=Blobsterix::Transformations::TransformationManager.new
 
 # # Use a specific transformation decrypter
-# Blobsterix.decrypt_trafo= lambda { |trafo_string, logger|
+# Blobsterix.decrypt_trafo= lambda { |blob_access, trafo_string, logger|
 #   trafo_string # this has to return a string in format of: trafoName_value,trafoName_value,....
 # }
 
