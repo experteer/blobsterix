@@ -28,7 +28,7 @@ module Blobsterix
 				accept = AcceptType.get(env, format)[0]
 
         # check trafo encryption
-				trafo_string = Blobsterix.decrypt_trafo(transformation_string, logger)
+				trafo_string = Blobsterix.decrypt_trafo(BlobAccess.new(:bucket => bucket, :id => file), transformation_string, logger)
 				if !trafo_string
 					Blobsterix.encryption_error(BlobAccess.new(:bucket => bucket, :id => file))
 					return Http.NotAuthorized

@@ -125,12 +125,12 @@ module Blobsterix
     @decrypt_trafo=obj
   end
 
-  def self.decrypt_trafo(trafo_string,logger)
-    @decrypt_trafo||=lambda{|t,l|t}
+  def self.decrypt_trafo(blob_access,trafo_string,logger)
+    @decrypt_trafo||=lambda{|b,t,l|t}
     if !trafo_string
       return @decrypt_trafo
     end
-    @decrypt_trafo.call(trafo_string, logger)
+    @decrypt_trafo.call(blob_access, trafo_string, logger)
   end
 
   def self.transformation
