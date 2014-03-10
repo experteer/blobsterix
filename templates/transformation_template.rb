@@ -27,7 +27,7 @@ module Blobsterix::Transformations::Impl
        # this function should return a Blobsterix::AcceptType that tells the transformator
       # which format is produced by this transformation
       # its normal mimetype
-      @output_type ||= Blobsterix::AcceptType.new "text/plain"
+      @output_type ||= Blobsterix::AcceptType.new "*/*"
     end
 
     def transform(input_path, target_path, value)

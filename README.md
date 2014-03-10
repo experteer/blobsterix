@@ -29,10 +29,16 @@ Blobsterix is a s3 compliant content server that supports on the fly transformat
 # Usage
 
 To install blobsterix simply do a:
+
   * gem install blobsterix
+
 This will install blobsterix with all its dependencies. After that you have to install the binary dependecies which are written above. Those are needed for the transformation pipeline not for the server itself. If you have your own transformations you might not need thoose.
 
-Now the server is basicly ready to run with "blobsterix server". This will run the server in the current directory which will create a contents and a cache folder uppon the first request that needs them. If this is enough you are basicly done and you can use the server. When you need more control over the server you will have to create a server configuration. For this process there are generators shipped with blobsterix.
+Now the server is basicly ready to run with 
+
+  * blobsterix server
+
+This will run the server in the current directory which will create a contents and a cache folder uppon the first request that needs them. If this is enough you are basicly done and you can use the server. When you need more control over the server you will have to create a server configuration. For this process there are generators shipped with blobsterix.
 
 # Config setup
 
@@ -41,4 +47,24 @@ To setup a special server change into and empty directory:
   * mkdir special-blobsterix
   * blobsterix generate init special-blobsterix
 
-This will copy a base template into special-blobsterix
+This will copy a base template into special-blobsterix. Now you can checkout the generated config files for documentation on how to change things.
+
+# Custom Transformation
+
+The biggest strength of the system is it supports custom transformations without much coding required. To use a custom transformation you first have to setup a configuration as explained in the step before. Then you can use transformation generator to create a new transformation with
+
+  * blobsterix generate transformator CropToFace
+
+This will generate a new transforamtion in the transformators subdirectory of your server configuration. The transformation has standard parameters set which already make the transformation work. There are five functions:
+
+  * name
+  * is_format?
+  * input_type
+  * output_type
+  * transform
+
+The name function is used to match a parameter in the transformation string to a specific transformator. If it can not a transformator with the given name a dummy transformator is used which does nothing. The is_format? function tells the transformation manager if this transformator is an output format which should override a requested format send by the browser. For example images requested by a chrome browser are requested as webp and if in the transformation chain is no transformator with is_format? == true then in the end the transformation manager will try to find a transformation which will convert the image to webp. Now the input_type and output_type function do what they say. They tell the system what kind of file the transformator accepts and what kind of file it produces. With this information the transformation chain is build. So incase those function return wrong values the transformation might fail horribly. The last function is the one with all the magic. It transforms an input file to an output file. Now those files are passed as paths and are saved in the tmp folder or where ever ruby decides to save TempFiles. Those are outmaticly cleaned up after the transformation finishes. The value parameter is the second part of the transformation: resize_50
+Now the 50 would be passed as value with type string. The transformation has to take care of parsing the parameter and ensuring its not doing any harm to the system. Another thing to keep in mind is that the transform functions are called in a different thread than the rest of the server.
+
+# Custom Storage
+
