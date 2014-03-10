@@ -22,9 +22,6 @@ Blobsterix is a s3 compliant content server that supports on the fly transformat
 
 * Setup ruby
   - bundle install
-# Run
-* set the content and cache folders in lib/blob_server.rb
-* run the server with: bundle exec bin/blob
 
 # Usage
 
