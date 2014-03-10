@@ -40,6 +40,51 @@ Now the server is basicly ready to run with
 
 This will run the server in the current directory which will create a contents and a cache folder uppon the first request that needs them. If this is enough you are basicly done and you can use the server. When you need more control over the server you will have to create a server configuration. For this process there are generators shipped with blobsterix.
 
+# HTTP interface
+
+Now the server has two http interface and a status page.
+
+## Status Page
+
+The status page can be retrived via 
+
+  * GET /status
+  * GET /status.json
+  * GET /status.xml
+
+The first returns a "beautifull" html page. The other two return the status data as json or xml as expected.
+
+## S3 interface
+
+The s3 interface works like the aws system but without the encryption and security parameters. Because of this you shouldn't route GET, PUT, POST requests to the outside.
+Check the amazon s3 specs for more information. It only supports the REST api with the following actions:
+
+  * list buckets
+  * list bucket entries
+  * get file
+  * head file
+  * create bucket
+  * delete bucket
+  * put file into bucket
+  * delete file from bucket
+
+## Blob interface
+
+The blob interface is reachable at 
+
+  * GET /blob/v1/
+
+It only supports GET and HEAD requests and the url is constructed as this:
+
+  * /blob/v1/$trafo.$bucket/$file
+
+The transformation is expected in the following format:
+
+  * $trafoname_$value,$trafoname_$value,...
+
+The trafo is optional the bucket and file are not. The blob interface does not allow listing of buckets or files inside buckets.
+
+
 # Config setup
 
 To setup a special server change into and empty directory:
@@ -68,3 +113,8 @@ Now the 50 would be passed as value with type string. The transformation has to 
 
 # Custom Storage
 
+Blobsterix also supports different kinds of backend storages. For this purpose you can again use a generator to create template storage system with:
+
+  * blobsterix generate storage MyBackend
+
+This will again generate a working empty storage that doesn't allow saving or retriving of data. To see a working storage implementation checkout the FileSystem storage in the source code. Now you will see that all data there is returned as a BlobMetaData or better in the FileSystem storage as a FileSystemMetaData. As long as your implementation supports the interface everything should work like expected.
