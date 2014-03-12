@@ -77,6 +77,25 @@ module Blobsterix::Transformations::Impl
 		end
 	end
 
+	class MaxsizeImage < Blobsterix::Transformations::Transformation
+		def name()
+			"maxsize"
+		end
+		def input_type()
+			@input_type ||= Blobsterix::AcceptType.new "image/*"
+		end
+
+		def output_type()
+			@output_type ||= Blobsterix::AcceptType.new "image/*"
+		end
+
+		def transform(input_path, target_path, value)
+			image = MiniMagick::Image.open(input_path)
+			image.resize "#{value}>"
+			image.write target_path
+		end
+	end
+
 	class ShrinkImage < Blobsterix::Transformations::Transformation
 		def name()
 			"shrink"
