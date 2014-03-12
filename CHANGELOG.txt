@@ -1,2 +1,5 @@
-* 0.0.4
-  The first rc
+= 0.0.5
+ * adding maxsize
+= 0.0.4
+ * The first rc
+
