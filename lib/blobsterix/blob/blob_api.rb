@@ -36,6 +36,7 @@ module Blobsterix
 
         
         blob_access=BlobAccess.new(:bucket => bucket, :id => file, :accept_type => accept, :trafo => trafo(trafo_string))
+        Blobsterix.storage_event_listener.call("blob_api.get", :trafo_string => trafo_string, :blob_access => blob_access)
 
         begin
 					data = transformation.run(blob_access)

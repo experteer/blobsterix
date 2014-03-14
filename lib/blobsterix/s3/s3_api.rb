@@ -27,6 +27,7 @@ module Blobsterix
 
 		private
 			def list_buckets
+			   Blobsterix.event("s3_api.list_bucket",:bucket => bucket)
 				Http.OK storage.list(bucket).to_xml, "xml"
 			end
 
@@ -45,10 +46,12 @@ module Blobsterix
 			end
 
 			def get_file_head
+                           #TODO: add event?
 				get_file(false)
 			end
 
 			def create_bucket
+			        Blobsterix.event("s3_api.upload",:bucket => bucket)
 				Http.OK storage.create(bucket), "xml"
 			end
 
@@ -59,7 +62,8 @@ module Blobsterix
 				trafo_current = trafo(trafo_string)
 				file_current = file
 				bucket_current = bucket
-				logger.info "UploadFile => Bucket: #{bucket_current} - File: #{file_current} - Accept: #{accept.type} - Trafo: #{trafo_current.inspect}"
+				Blobsterix.event("s3_api.upload", :bucket => bucket_current, 
+				                                      :file => file_current, :accept_type => accept.type, :trafo => trafo_current)
 				blob_access=BlobAccess.new(:source => source, :bucket => bucket_current, :id => file_current, :accept_type => accept, :trafo => trafo_current)
 				data = transformation.run(blob_access)
 				cached_upload_clear
@@ -67,6 +71,8 @@ module Blobsterix
 			end
 
 			def delete_bucket
+			  Blobsterix.event("s3_api.delete_bucket", :bucket => bucket)
+
 				if bucket?
 					Http.OK_no_data storage.delete(bucket), "xml"
 				else
@@ -75,6 +81,7 @@ module Blobsterix
 			end
 
 			def delete_file
+			   Blobsterix.event("s3_api.delete_file", :bucket => bucket,:file => file)
 				if bucket?
 					Http.OK_no_data storage.delete_key(bucket, file), "xml"
 				else

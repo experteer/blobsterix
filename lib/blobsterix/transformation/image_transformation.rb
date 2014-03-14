@@ -79,7 +79,7 @@ module Blobsterix::Transformations::Impl
 
 	class MaxsizeImage < Blobsterix::Transformations::Transformation
 		def name()
-			"maxsize"
+			"resizemax"
 		end
 		def input_type()
 			@input_type ||= Blobsterix::AcceptType.new "image/*"

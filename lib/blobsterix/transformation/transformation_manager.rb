@@ -79,7 +79,7 @@ module Blobsterix::Transformations
 			end
 
 			def run_transformation(blob_access)
-				logger.debug "Transforamtion: load #{blob_access}"
+				logger.debug "Transformation: load #{blob_access}"
 
 				metaData = blob_access.source || get_original_file(blob_access)
 

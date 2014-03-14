@@ -156,46 +156,50 @@ module Blobsterix
   end
 
   def self.storage_event_listener
-    @storage_event_listener||=lambda{|target, blob_access|
-      logger.info("#{target}: #{blob_access}")
+    @storage_event_listener||=lambda{|target, hash|
+      logger.info("#{target}: #{hash.inspect}")
     }
   end
 
+  def self.event(name,hash)
+    storage_event_listener.call(name,hash)
+  end
+  
   def self.encryption_error(blob_access)
-    storage_event_listener.call("encryption.error",blob_access)
+    event("encryption.error",:blob_access => blob_access)
   end
 
   def self.cache_miss(blob_access)
     StatusInfo.cache_miss+=1
     StatusInfo.cache_access+=1
-    storage_event_listener.call("cache.miss",blob_access)
+    event("cache.miss", :blob_access => blob_access)
   end
 
   def self.cache_fatal_error(blob_access)
     StatusInfo.cache_error+=1
     StatusInfo.cache_access+=1
-    storage_event_listener.call("cache.fatal_error",blob_access)
+    event("cache.fatal_error", :blob_access => blob_access)
   end
 
   def self.cache_hit(blob_access)
     StatusInfo.cache_hit+=1
     StatusInfo.cache_access+=1
-    storage_event_listener.call("cache.hit",blob_access)
+    event("cache.hit",:blob_access => blob_access)
   end
 
   def self.storage_read(blob_access)
-    storage_event_listener.call("storage.read",blob_access)
+    event("storage.read",:blob_access => blob_access)
   end
 
   def self.storage_read_fail(blob_access)
-    storage_event_listener.call("storage.read_fail",blob_access)
+    event("storage.read_fail",:blob_access => blob_access)
   end
 
   def self.storage_write(blob_access)
-    storage_event_listener.call("storage.write",blob_access)
+    event("storage.write",:blob_access => blob_access)
   end
 
   def self.storage_delete(blob_access)
-    storage_event_listener.call("storage.delete",blob_access)
+    event("storage.delete",:blob_access => blob_access)
   end
 end

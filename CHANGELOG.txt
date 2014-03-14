@@ -1,3 +1,8 @@
+= 0.0.6
+ * renaming maxsize to resizemax
+ * event listener now accepts hashes
+ * adding events for API calls
+ * adding Blobsterix.event hook
 = 0.0.5
  * adding maxsize
 = 0.0.4
