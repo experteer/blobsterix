@@ -11,22 +11,22 @@ describe Blobsterix::S3Api do
   let(:key) {"test.txt"}
   let(:bucket) {"test"}
 
+  after :each do
+      clear_data
+  end
+
   describe "create a bucket" do
     it "should have bucket after creation" do
       pending "temporarily disabled"
-      get "/#{bucket}"
-      expect(last_response.status).to eql(200)
-      response = Hash.from_xml last_response.body
-      expect(response).to have_key(:Error)
-      expect(response[:Error]).to eql("no such bucket")
-
-      put "/", "", "HOST" => "#{bucket}.s3.blah.de"
+      
+      run_em do 
+        put "/", "", "HTTP_HOST" => "#{bucket}.s3.blah.de"
+      end
 
       get "/#{bucket}"
       expect(last_response.status).to eql(200)
       response = Hash.from_xml last_response.body
-      expect(response).to have_key(:Error)
-      expect(response[:Error]).to eql("no such bucket")
+      expect(response).to_not have_key(:Error)
     end
   end
   context "with no data" do

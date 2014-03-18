@@ -256,7 +256,7 @@ module Blobsterix::Transformations::Impl
 		end
 
 		def transform(input_path, target_path, value)
-			system("cp #{input_path} #{target_path}")
+			system("cp \"#{input_path}\" \"#{target_path}\"")
 		end
 	end
 
@@ -278,7 +278,7 @@ module Blobsterix::Transformations::Impl
 		end
 
 		def transform(input_path, target_path, value)
-			system("convert #{input_path} jpg:- | jp2a --width=#{value and value.size > 0 ? value : 100} - > #{target_path}")
+			system("convert \"#{input_path}\" jpg:- | jp2a --width=#{value and value.size > 0 ? value : 100} - > \"#{target_path}\"")
 		end
 	end
 
@@ -303,7 +303,7 @@ module Blobsterix::Transformations::Impl
 			parts = value.split("x")[0]
 			lines = parts[0]
 			em = parts.length > 1 ? parts[1].to_i : 1
-			system("convert #{input_path} jpg:- | jp2a --width=#{lines and lines.to_i > 0 ? value : 100} - > #{target_path}")
+			system("convert \"#{input_path}\" jpg:- | jp2a --width=#{lines and lines.to_i > 0 ? value : 100} - > \"#{target_path}\"")
 			text = File.read(target_path)
 			File.write(target_path, "<html><body style='font-size: #{em}em'><pre>#{text.gsub("\n", "<br>")}</pre></body></html>")
 		end
@@ -327,7 +327,7 @@ module Blobsterix::Transformations::Impl
 		end
 
 		def transform(input_path, target_path, value)
-			system("convert #{input_path} png:#{target_path}")
+			system("convert \"#{input_path}\" png:\"#{target_path}\"")
 		end
 	end
 
@@ -349,7 +349,7 @@ module Blobsterix::Transformations::Impl
 		end
 
 		def transform(input_path, target_path, value)
-			system("convert #{input_path} jpg:#{target_path}")
+			system("convert \"#{input_path}\" jpg:\"#{target_path}\"")
 		end
 	end
 
@@ -371,7 +371,7 @@ module Blobsterix::Transformations::Impl
 		end
 
 		def transform(input_path, target_path, value)
-			system("convert #{input_path} gif:#{target_path}")
+			system("convert \"#{input_path}\" gif:\"#{target_path}\"")
 		end
 	end
 
@@ -393,7 +393,7 @@ module Blobsterix::Transformations::Impl
 		end
 
 		def transform(input_path, target_path, value)
-			system("cwebp #{input_path} -o #{target_path}")
+			system("cwebp \"#{input_path}\" -o \"#{target_path}\"")
 			#system("cp #{input_path} #{target_path}")
 		end
 	end
@@ -413,7 +413,7 @@ module Blobsterix::Transformations::Impl
 
 		def transform(input_path, target_path, value)
 			puts "Render text"
-			system("convert #{input_path} -pointsize 20 -draw \"gravity center fill white text 0,12 '#{value.gsub("_", " ").gsub("\"", "'")}'\" #{target_path}")
+			system("convert \"#{input_path}\" -pointsize 20 -draw \"gravity center fill white text 0,12 '#{value.gsub("_", " ").gsub("\"", "'")}'\" \"#{target_path}\"")
 		end
 	end
 
@@ -433,7 +433,7 @@ module Blobsterix::Transformations::Impl
 		def transform(input_path, target_path, value)
 			p "SLEEEP"
 			sleep(value.to_i)
-			system("cp #{input_path} #{target_path}")
+			system("cp \"#{input_path}\" \"#{target_path}\"")
 		end
 	end
 end

@@ -113,6 +113,14 @@ module Blobsterix
     @cache_dir=obj
   end
 
+  def self.cache_original?
+    @cache_original||=false
+  end
+
+  def self.cache_original=(obj)
+    @cache_original=obj
+  end
+
   def self.cache
     @cache ||= Storage::Cache.new(cache_dir)
   end
