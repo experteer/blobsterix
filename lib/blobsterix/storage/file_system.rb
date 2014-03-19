@@ -69,7 +69,7 @@ module Blobsterix
         FileUtils.mkdir_p(contents(bucket)) if not File.exist?(contents(bucket))
 
         Nokogiri::XML::Builder.new do |xml|
-        end
+        end.to_s
       end
 
       def delete(bucket)
