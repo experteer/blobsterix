@@ -37,7 +37,7 @@ module Blobsterix
 		end
 
 		def score
-			@score ||= @q_factor+(mediatype != "*" ? 1.0: 0.0)+(subtype != "*" ? 1.0: 0.0)
+			@score ||= factor+(mediatype != "*" ? 1.0: 0.0)+(subtype != "*" ? 1.0: 0.0)
 		end
 
 		def factor

@@ -37,6 +37,15 @@ describe Blobsterix::BlobApi do
         expect(last_response.body).to eql(data)
       end
 
+      it "should return the file head" do
+        expect(Blobsterix.transformation).to receive(:cue_transformation).once.and_call_original
+        run_em do 
+          head "/blob/v1/tes1.test/test.txt"
+        end
+        expect(last_response.status).to eql(200)
+        expect(last_response.body).to eql("")
+      end
+
       it "should return the file and wait for previous trafos to finish" do
         expect(Blobsterix.transformation).to receive(:cue_transformation).once.and_call_original
         expect(Blobsterix.transformation).to receive(:wait_for_transformation).once.and_call_original

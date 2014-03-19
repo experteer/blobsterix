@@ -9,6 +9,54 @@ describe Blobsterix::Storage::Cache do
 
   let(:blob_access) {Blobsterix::BlobAccess.new(:bucket => bucket, :id => key)}
   let(:blob_access_1) {Blobsterix::BlobAccess.new(:bucket => bucket, :id => key, :trafo => [["test", ""]])}
+  let(:blob_access_2) {Blobsterix::BlobAccess.new(:bucket => bucket, :id => key, :trafo => [["dummy", ""]])}
+  let(:blob_access_3) {Blobsterix::BlobAccess.new(:bucket => bucket, :id => key, :trafo => [["test", ""],["dummy", ""]])}
+
+  describe "invalidation" do
+    before :each do
+      Blobsterix.cache.put(blob_access, data)
+      Blobsterix.cache.put(blob_access_1, data)
+      Blobsterix.cache.put(blob_access_2, data)
+      Blobsterix.cache.put(blob_access_3, data)
+    end
+
+    after :each do
+      clear_cache
+      Blobsterix.cache_checker=lambda{|blob_access, last_accessed_at, created_at|
+        false
+      }
+    end
+
+    it "should follow invalidation structure" do
+      Blobsterix.cache_checker=lambda{|blob_access_, last_accessed_at, created_at|
+        blob_access_1.equals?(blob_access_) || blob_access_3.equals?(blob_access_)
+      }
+      Blobsterix.cache.invalidation
+      expect(blob_access.get().valid).to eql(true)
+      expect(blob_access_1.get().valid).to eql(false)
+      expect(blob_access_2.get().valid).to eql(true)
+      expect(blob_access_3.get().valid).to eql(false)
+    end
+
+    it "should invalidate all" do
+      Blobsterix.cache_checker=lambda{|blob_access_, last_accessed_at, created_at|
+        true
+      }
+      Blobsterix.cache.invalidation
+      expect(blob_access.get().valid).to eql(false)
+      expect(blob_access_1.get().valid).to eql(false)
+      expect(blob_access_2.get().valid).to eql(false)
+      expect(blob_access_3.get().valid).to eql(false)
+    end
+
+    it "should invalidate none" do
+      Blobsterix.cache.invalidation
+      expect(blob_access.get().valid).to eql(true)
+      expect(blob_access_1.get().valid).to eql(true)
+      expect(blob_access_2.get().valid).to eql(true)
+      expect(blob_access_3.get().valid).to eql(true)
+    end
+  end
 
   describe "cache" do
     after :each do

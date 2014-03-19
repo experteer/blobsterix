@@ -14,7 +14,7 @@ require 'goliath/test_helper'
 Blobsterix.storage_dir=Blobsterix.root.join("tmp/contents")
 Blobsterix.cache_dir=Blobsterix.root.join("tmp/cache")
 Blobsterix.storage_event_listener=lambda{|a,b|}
-Blobsterix.logger=Logger.new(nil)
+Blobsterix.logger=Logger.new(Blobsterix.root.join("spec.log"))
 
 module Blobsterix
   module SpecHelper
@@ -34,6 +34,24 @@ module Blobsterix
         f.resume
         EM.stop
       }
+    end
+    class DummyTrafo < Blobsterix::Transformations::Transformation
+      def name()
+        "dummy"
+      end
+      def input_type()
+        @input_type ||= Blobsterix::AcceptType.new "text/plain"
+      end
+
+      def output_type()
+        @output_type ||= Blobsterix::AcceptType.new "text/plain"
+      end
+
+      def transform(input_path, target_path, value)
+        File.open(target_path, "w+") {|file|
+          file.write("#{value||"dummy"}")
+        }
+      end
     end
   end
 end

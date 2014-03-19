@@ -21,6 +21,14 @@ module Blobsterix
       @meta||=find_blob
     end
 
+    def equals?(blob_access)
+      bucket == blob_access.bucket && id == blob_access.id && trafo.to_s == blob_access.trafo.to_s && accept_type.to_s == blob_access.accept_type.to_s
+    end
+
+    def copy
+      BlobAccess.new(:bucket => bucket, :id => id, :trafo => trafo, :accept_type => accept_type, :source => source, :target => target)
+    end
+
     private
 
     def find_blob
