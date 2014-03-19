@@ -17,7 +17,6 @@ describe Blobsterix::S3Api do
 
   describe "create a bucket" do
     it "should have bucket after creation" do
-      pending "temporarily disabled"
       
       run_em do 
         put "/", "", "HTTP_HOST" => "#{bucket}.s3.blah.de"
