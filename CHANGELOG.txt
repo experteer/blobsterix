@@ -1,3 +1,6 @@
+= 0.0.7
+ * now uses blobaccess to access all data in the transformation manager
+   cache and storage are now hidden and are used in the background accordingly. allows the system to prevent unneeded caching
 = 0.0.6
  * renaming maxsize to resizemax
  * event listener now accepts hashes

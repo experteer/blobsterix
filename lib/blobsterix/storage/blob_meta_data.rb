@@ -4,50 +4,53 @@ module Blobsterix
 			def check(key)
 				false
 			end
-			def etag()
+			def etag
 				""
 			end
-			def read()
+			def read
 				data()
 			end
-			def data()
+			def data
 				""
 			end
-			def path()
+			def path
 				""
 			end
-			def last_modified()
+			def last_modified
 			end
-			def last_accessed()
+			def last_accessed
 			end
-			def payload()
+			def payload
 				{}
 			end
-			def header()
+			def header
 				{}
 			end
-			def mimetype()
+			def mimetype
 				"*/*"
 			end
-			def mediatype()
+			def mediatype
 				"*"
 			end
-			def size()
+			def size
 				0
 			end
-			def accept_type()
+			def accept_type
 				AcceptType.new
 			end
-			def valid()
+			def valid
 				false
 			end
-			def write()
+			def valid?
+				valid
+			end
+			def write
 				if block_given?
 					#should yield file
 				end
 				self
 			end
-			def delete()
+			def delete
 			end
 			def response(with_data=true, _etag=nil, env = nil, xfile = false, allow_chunks=true)
 				Blobsterix::Http::DataResponse.new(self, with_data, _etag, env).call(xfile, allow_chunks)

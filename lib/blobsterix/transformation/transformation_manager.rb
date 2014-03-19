@@ -23,21 +23,21 @@ module Blobsterix::Transformations
 
 		def run(blob_access)
 
-			wait_for_transformation(blob_access) if transformation_in_progress?(blob_access)
+			blob_access = wait_for_transformation(blob_access) if transformation_in_progress?(blob_access)
 
-			return cache.get(blob_access) if cache.exists?(blob_access)
+			return blob_access.get if blob_access.get.valid
 
 			cue_transformation(blob_access)
 
 			EM.defer(Proc.new {
 				run_transformation(blob_access)
-			}, Proc.new {
-				finish_connection(blob_access.identifier)
+			}, Proc.new {|result|
+				finish_connection(result, blob_access.identifier)
 			})
 
-			Fiber.yield
-			
-			cache.exists?(blob_access) ? cache.get(blob_access) : Blobsterix::Storage::BlobMetaData.new
+			blob_access = Fiber.yield
+
+			blob_access.get.valid ? blob_access.get : Blobsterix::Storage::BlobMetaData.new
 		end
 
 		private
@@ -60,7 +60,8 @@ module Blobsterix::Transformations
 			end
 
 			def transformation_in_progress?(blob_access)
-				running_transformations.has_key?(blob_access.identifier)
+				running = running_transformations.has_key?(blob_access.identifier)
+				running
 			end
 
 			def auto_load()
@@ -69,19 +70,19 @@ module Blobsterix::Transformations
 				}
 			end
 
-			def get_original_file(blob_access)
-				blob_access_original=Blobsterix::BlobAccess.new(:bucket => blob_access.bucket,:id => blob_access.id)
-				unless cache.exists?(blob_access_original)
-					metaData = storage.get(blob_access.bucket, blob_access.id)
-					cache.put(blob_access_original, metaData.data) if metaData.valid
-				end
-				cache.get(blob_access_original)
-			end
+			# def get_original_file(blob_access)
+			# 	blob_access_original=Blobsterix::BlobAccess.new(:bucket => blob_access.bucket,:id => blob_access.id)
+			# 	unless cache.exists?(blob_access_original)
+			# 		metaData = storage.get(blob_access.bucket, blob_access.id)
+			# 		cache.put(blob_access_original, metaData.data) if metaData.valid
+			# 	end
+			# 	cache.get(blob_access_original)
+			# end
 
 			def run_transformation(blob_access)
 				logger.debug "Transformation: load #{blob_access}"
 
-				metaData = blob_access.source || get_original_file(blob_access)
+				metaData = blob_access.source || Blobsterix::BlobAccess.new(:bucket => blob_access.bucket,:id => blob_access.id).get#get_original_file(blob_access)
 
 				if metaData.valid
 					chain = TransformationChain.new(blob_access, metaData, logger)
@@ -91,12 +92,14 @@ module Blobsterix::Transformations
 					chain.finish(blob_access.accept_type, findTransformation_out(chain.last_type, blob_access.accept_type))
 
 					chain.do(cache)
+				else
+					blob_access
 				end
 			end
 
-			def finish_connection(preferred_key)
+			def finish_connection(result, preferred_key)
 				running_transformations[preferred_key].each{|fiber|
-					fiber.resume
+					fiber.resume(result)
 				}
 				running_transformations.delete(preferred_key)
 			end

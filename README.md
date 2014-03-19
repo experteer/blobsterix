@@ -1,5 +1,10 @@
 # Blobsterix
 
+
+# IMPORTANT
+Use at least ruby-2.0.0-p451 to ensure thread safety (reference: https://github.com/eventmachine/eventmachine/issues/457)
+
+
 Blobsterix is a s3 compliant content server that supports on the fly transformations for its data. Images for example can be scaled, rotated and so on before delivered to the client. The system also supports encryption and transformation signing for the non s3 interface functions. The s3 interface itself is unsecured and should not be visible to the outside.
 
 # Install
