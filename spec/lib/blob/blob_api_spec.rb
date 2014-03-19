@@ -17,8 +17,17 @@ describe Blobsterix::BlobApi do
 
     context "with data" do
       let(:data) {"Hi my name is Test"}
+      let(:data_transformed) {"Hi_my_name_is_Test_Transformed"}
       let(:key) {"test.txt"}
       let(:bucket) {"test"}
+
+      before :all do
+        Blobsterix.transformation.add Blobsterix::SpecHelper::DummyTrafo.new
+      end
+
+      after :all do
+        Blobsterix.transformation=Blobsterix::Transformations::TransformationManager.new
+      end
 
       before :each do
         Blobsterix.storage.put(bucket, key, StringIO.new(data, "r"))
@@ -31,16 +40,16 @@ describe Blobsterix::BlobApi do
       it "should return the file" do
         expect(Blobsterix.transformation).to receive(:cue_transformation).once.and_call_original
         run_em do 
-          get "/blob/v1/tes1.test/test.txt"
+          get "/blob/v1/dummy_#{data_transformed}.test/test.txt"
         end
         expect(last_response.status).to eql(200)
-        expect(last_response.body).to eql(data)
+        expect(last_response.body).to eql(data_transformed)
       end
 
       it "should return the file head" do
         expect(Blobsterix.transformation).to receive(:cue_transformation).once.and_call_original
         run_em do 
-          head "/blob/v1/tes1.test/test.txt"
+          head "/blob/v1/dummy.test/test.txt"
         end
         expect(last_response.status).to eql(200)
         expect(last_response.body).to eql("")
@@ -50,22 +59,22 @@ describe Blobsterix::BlobApi do
         expect(Blobsterix.transformation).to receive(:cue_transformation).once.and_call_original
         expect(Blobsterix.transformation).to receive(:wait_for_transformation).once.and_call_original
         run_em do 
-          get "/blob/v1/tes1.test/test.txt"
-          get "/blob/v1/tes1.test/test.txt"
+          get "/blob/v1/dummy_#{data_transformed}.test/test.txt"
+          get "/blob/v1/dummy_#{data_transformed}.test/test.txt"
         end
         expect(last_response.status).to eql(200)
-        expect(last_response.body).to eql(data)
+        expect(last_response.body).to eql(data_transformed)
       end
 
       it "should return the file and not wait for different trafos to finish" do
         expect(Blobsterix.transformation).to receive(:cue_transformation).twice.and_call_original
         expect(Blobsterix.transformation).to receive(:wait_for_transformation).never.and_call_original
         run_em do 
-          get "/blob/v1/tes1.test/test.txt"
-          get "/blob/v1/tes2.test/test.txt"
+          get "/blob/v1/dummy_#{data_transformed},dummy_#{data_transformed}.test/test.txt"
+          get "/blob/v1/dummy_#{data_transformed}.test/test.txt"
         end
         expect(last_response.status).to eql(200)
-        expect(last_response.body).to eql(data)
+        expect(last_response.body).to eql(data_transformed)
       end
     end
   end
