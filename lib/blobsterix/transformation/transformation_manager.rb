@@ -21,13 +21,7 @@ module Blobsterix::Transformations
 
       cue_transformation(blob_access)
 
-      EM.defer(Proc.new {
-        run_transformation(blob_access)
-      }, Proc.new {|result|
-        finish_connection(result, blob_access.identifier)
-      })
-
-      blob_access = Fiber.yield
+      blob_access = run_transformation(blob_access)
 
       blob_access.get.valid ? blob_access.get : Blobsterix::Storage::BlobMetaData.new
     end
@@ -51,6 +45,10 @@ module Blobsterix::Transformations
         running_transformations[blob_access.identifier] = [Fiber.current]
       end
 
+      def uncue_transformation(blob_access)
+        running_transformations.delete(blob_access.identifier)
+      end
+
       def transformation_in_progress?(blob_access)
         running = running_transformations.has_key?(blob_access.identifier)
         running
@@ -63,28 +61,41 @@ module Blobsterix::Transformations
       end
 
       def run_transformation(blob_access)
-        logger.debug "Transformation: load #{blob_access}"
+        logger.debug "Transformation: build #{blob_access}"
 
-        metaData = blob_access.source || Blobsterix::BlobAccess.new(:bucket => blob_access.bucket,:id => blob_access.id).get#get_original_file(blob_access)
+        metaData = blob_access.source || Blobsterix::BlobAccess.new(:bucket => blob_access.bucket,:id => blob_access.id).get
 
-        if metaData.valid
-          chain = TransformationChain.new(blob_access, metaData, logger)
-          blob_access.trafo.each {|trafo_pair|
-            chain.add(findTransformation(trafo_pair[0], chain.last_type), trafo_pair[1])
-          }
-          chain.finish(blob_access.accept_type, findTransformation_out(chain.last_type, blob_access.accept_type))
+        return blob_access unless metaData.valid
 
-          chain.do()
+        chain = TransformationChain.new(blob_access, metaData, logger)
+
+        blob_access.trafo.each {|trafo_pair|
+          chain.add(findTransformation(trafo_pair[0], chain.last_type), trafo_pair[1])
+        }
+
+        chain.finish(blob_access.accept_type, findTransformation_out(chain.last_type, blob_access.accept_type))
+
+        if chain.target_blob_access.get.valid
+          uncue_transformation(blob_access)
+          chain.target_blob_access
         else
-          blob_access
+          logger.debug "Transformation: run #{blob_access}"
+          EM.defer(Proc.new {
+            chain.do()
+          }, Proc.new {|result|
+            finish_connection(result, blob_access)
+          })
+
+          Fiber.yield
         end
       end
 
-      def finish_connection(result, preferred_key)
-        running_transformations[preferred_key].each{|fiber|
+      def finish_connection(result, blob_access)
+        logger.debug "Transformation: done #{blob_access} finish connections"
+        running_transformations[blob_access.identifier].each{|fiber|
           fiber.resume(result)
         }
-        running_transformations.delete(preferred_key)
+        uncue_transformation(blob_access)
       end
 
       def findTransformation(name, input_type)

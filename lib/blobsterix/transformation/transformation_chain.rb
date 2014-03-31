@@ -1,6 +1,7 @@
 module Blobsterix::Transformations
   class TransformationChain
-    attr_reader :logger
+    attr_reader :logger, :target_blob_access
+
     def initialize(blob_access, input_data, logger)
       @blob_access=blob_access
       @target_blob_access=nil
@@ -28,14 +29,23 @@ module Blobsterix::Transformations
       with_tempfiles do |keys|
         last_key = "#{@input_data.path}"
 
-        @transformations.each{|trafo|
-          new_key = keys.delete_at(0)
-          trafo[0].transform(last_key, new_key, trafo[1])
-          last_key = new_key
-        }
+        begin
+          current_transformation = nil
+          @transformations.each{|trafo|
+
+            current_transformation = trafo
+
+            new_key = keys.delete_at(0)
+            trafo[0].transform(last_key, new_key, trafo[1])
+            last_key = new_key
+          }
+        rescue StandardError => e
+          logger.error "Transformation: #{current_transformation} failed with #{e.message}"
+          break
+        end
 
         cache.put(@target_blob_access,Blobsterix::Storage::FileSystemMetaData.new(last_key).read)
-        @target_blob_access.reset
+        @target_blob_access.reset!
       end unless @target_blob_access.get.valid
 
       @target_blob_access

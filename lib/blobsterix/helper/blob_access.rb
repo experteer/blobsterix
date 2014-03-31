@@ -29,7 +29,7 @@ module Blobsterix
       BlobAccess.new(:bucket => bucket, :id => id, :trafo => trafo, :accept_type => accept_type, :source => source, :target => target)
     end
 
-    def reset
+    def reset!
       @meta = nil
       self
     end

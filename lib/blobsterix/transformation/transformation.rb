@@ -2,19 +2,23 @@ module Blobsterix::Transformations
   class Transformation
     include Blobsterix::Logable
 
-    def name()
+    def name
       ""
     end
 
-    def is_format?()
+    def to_s
+      name
+    end
+
+    def is_format?
       false
     end
 
-    def input_type()
+    def input_type
       Blobsterix::AcceptType.new
     end
 
-    def output_type()
+    def output_type
       Blobsterix::AcceptType.new
     end
 
