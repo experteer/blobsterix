@@ -1,40 +1,40 @@
 module Blobsterix
-	module Storage
-		class Cache
+  module Storage
+    class Cache
       include Blobsterix::Logable
 
       def invalidation
-      	each_meta_file do |meta_file|
-      		blob_access=meta_to_blob_access(meta_file)
+        each_meta_file do |meta_file|
+          blob_access=meta_to_blob_access(meta_file)
           if Blobsterix.cache_checker.call(blob_access,meta_file.last_accessed,meta_file.last_modified)
             invalidate(blob_access, true)
-      		end
-      	end
+          end
+        end
       end
-			def initialize(path)
-				@path = Pathname.new(path)
+      def initialize(path)
+        @path = Pathname.new(path)
         FileUtils.mkdir_p(@path) if !Dir.exist?(@path)
-			end
+      end
 
-			def get(blob_access)
+      def get(blob_access)
         FileSystemMetaData.new(cache_file_path(blob_access))
-			end
+      end
 
-			def put(blob_access, data)
-				FileSystemMetaData.new(cache_file_path(blob_access),:bucket => blob_access.bucket, :id => blob_access.id, :trafo => blob_access.trafo, :accept_type => "#{blob_access.accept_type}").write() {|f|
-					f.write(data)
-				}
-			end
+      def put(blob_access, data)
+        FileSystemMetaData.new(cache_file_path(blob_access),:bucket => blob_access.bucket, :id => blob_access.id, :trafo => blob_access.trafo, :accept_type => "#{blob_access.accept_type}").write() {|f|
+          f.write(data)
+        }
+      end
 
-			def delete(blob_access)
-				FileSystemMetaData.new(cache_file_path(blob_access)).delete if exists?(blob_access)
-			end
+      def delete(blob_access)
+        FileSystemMetaData.new(cache_file_path(blob_access)).delete if exists?(blob_access)
+      end
 
-			def exists?(blob_access)
-				valid = File.exist?(cache_file_path(blob_access))
+      def exists?(blob_access)
+        valid = File.exist?(cache_file_path(blob_access))
         valid ? Blobsterix.cache_hit(blob_access) : Blobsterix.cache_miss(blob_access)
         valid
-			end
+      end
 
       #invalidates all!!! formats of a blob_access
       def invalidate(blob_access, delete_single=false)
@@ -85,6 +85,6 @@ module Blobsterix
         }
         parts.join("/")
       end
-		end
-	end
+    end
+  end
 end
