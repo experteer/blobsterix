@@ -9,6 +9,10 @@ module Blobsterix::Transformations
       @logger = logger
     end
 
+    def cache
+      @cache||=Blobsterix.cache
+    end
+
     def last_type()
       return Blobsterix::AcceptType.new(@input_data.mimetype) if @transformations.empty?
       @transformations.last[0].output_type
@@ -19,7 +23,7 @@ module Blobsterix::Transformations
       @transformations << [transfo, value]
     end
 
-    def do(cache)
+    def do()
 
       with_tempfiles do |keys|
         last_key = "#{@input_data.path}"
@@ -31,9 +35,10 @@ module Blobsterix::Transformations
         }
 
         cache.put(@target_blob_access,Blobsterix::Storage::FileSystemMetaData.new(last_key).read)
-      end if !@target_blob_access.get.valid
+        @target_blob_access.reset
+      end unless @target_blob_access.get.valid
 
-      @target_blob_access.copy
+      @target_blob_access
     end
 
     def finish(accept_type, trafo)

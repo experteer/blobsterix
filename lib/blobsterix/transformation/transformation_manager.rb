@@ -7,14 +7,6 @@ module Blobsterix::Transformations
 			auto_load
 		end
 
-		def storage
-			@storage ||= Blobsterix.storage
-		end
-
-		def cache
-			@cache ||= Blobsterix.cache
-		end
-
 		def add(trafo)
 			transformation = (trafo.is_a?(String) ? ::Blobsterix::Transformations::Impl::const_get(trafo).new : trafo)
 			transformations << transformation if transformations.select{|trafo|trafo.name === transformation.name}.empty?
@@ -70,15 +62,6 @@ module Blobsterix::Transformations
 				}
 			end
 
-			# def get_original_file(blob_access)
-			# 	blob_access_original=Blobsterix::BlobAccess.new(:bucket => blob_access.bucket,:id => blob_access.id)
-			# 	unless cache.exists?(blob_access_original)
-			# 		metaData = storage.get(blob_access.bucket, blob_access.id)
-			# 		cache.put(blob_access_original, metaData.data) if metaData.valid
-			# 	end
-			# 	cache.get(blob_access_original)
-			# end
-
 			def run_transformation(blob_access)
 				logger.debug "Transformation: load #{blob_access}"
 
@@ -91,7 +74,7 @@ module Blobsterix::Transformations
 					}
 					chain.finish(blob_access.accept_type, findTransformation_out(chain.last_type, blob_access.accept_type))
 
-					chain.do(cache)
+					chain.do()
 				else
 					blob_access
 				end

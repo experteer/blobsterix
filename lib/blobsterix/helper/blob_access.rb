@@ -22,11 +22,16 @@ module Blobsterix
     end
 
     def equals?(blob_access)
-      bucket == blob_access.bucket && id == blob_access.id && trafo.to_s == blob_access.trafo.to_s && accept_type.to_s == blob_access.accept_type.to_s
+      identifier == blob_access.identifier
     end
 
     def copy
       BlobAccess.new(:bucket => bucket, :id => id, :trafo => trafo, :accept_type => accept_type, :source => source, :target => target)
+    end
+
+    def reset
+      @meta = nil
+      self
     end
 
     private
@@ -52,10 +57,6 @@ module Blobsterix
 
     def raw_trafo?
       @raw_trafo||=(trafo.length == 1 && trafo[0][0]=="raw")
-      # unless @raw_trafo
-      #   puts "Trafo is: #{trafo}"
-      # end
-      # @raw_trafo
     end
 
     def raw_accept_type?(other)
