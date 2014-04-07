@@ -43,10 +43,12 @@ module Blobsterix::Transformations
 
       def cue_transformation(blob_access)
         running_transformations[blob_access.identifier] = [Fiber.current]
+        blob_access
       end
 
       def uncue_transformation(blob_access)
         running_transformations.delete(blob_access.identifier)
+        blob_access
       end
 
       def transformation_in_progress?(blob_access)
@@ -65,7 +67,7 @@ module Blobsterix::Transformations
 
         metaData = blob_access.source || Blobsterix::BlobAccess.new(:bucket => blob_access.bucket,:id => blob_access.id).get
 
-        return blob_access unless metaData.valid
+        return uncue_transformation(blob_access) unless metaData.valid
 
         chain = TransformationChain.new(blob_access, metaData, logger)
 
