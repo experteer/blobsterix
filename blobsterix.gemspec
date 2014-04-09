@@ -2,11 +2,13 @@
 require File.expand_path('../lib/blobsterix/version', __FILE__)
 
 Gem::Specification.new do |gem|
+  gem.required_ruby_version = '>= 2.0.0.p451'
   gem.authors       = ["Daniel Sudmann"]
   gem.email         = ["suddani@googlemail.com"]
   gem.description   = "BlobServer"
   gem.summary       = "BlobServer"
   gem.homepage      = "http://experteer.com"
+  gem.license       = "MIT License"
 
   gem.files         = `git ls-files`.split($\).select{|filename|
     if filename.match(/^(\"contents).*/)
