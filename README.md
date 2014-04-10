@@ -43,7 +43,7 @@ Some binary dependencies are needed for the transformation pipeline not for the 
 
 Now the server is basicly ready to run with 
 
-  * blobsterix server
+    blobsterix server
 
 This will run the server in the current directory which will create a contents and a cache folder uppon the first request that needs them. If this is enough you are basicly done and you can use the server. When you need more control over the server you will have to create a server configuration. For this process there are generators shipped with blobsterix.
 
@@ -98,8 +98,8 @@ The trafo is optional the bucket and file are not. The blob interface does not a
 
 To setup a special server change into and empty directory:
 
-  * mkdir special-blobsterix
-  * blobsterix generate init special-blobsterix
+    mkdir special-blobsterix
+    blobsterix generate init special-blobsterix
 
 This will copy a base template into special-blobsterix. Now you can checkout the generated config files for documentation on how to change things.
 
@@ -107,7 +107,7 @@ This will copy a base template into special-blobsterix. Now you can checkout the
 
 The biggest strength of the system is it supports custom transformations without much coding required. To use a custom transformation you first have to setup a configuration as explained in the step before. Then you can use transformation generator to create a new transformation with
 
-  * blobsterix generate transformator CropToFace
+    blobsterix generate transformator CropToFace
 
 This will generate a new transforamtion in the transformators subdirectory of your server configuration. The transformation has standard parameters set which already make the transformation work. There are five functions:
 
@@ -124,6 +124,6 @@ Now the 50 would be passed as value with type string. The transformation has to 
 
 Blobsterix also supports different kinds of backend storages. For this purpose you can again use a generator to create template storage system with:
 
-  * blobsterix generate storage MyBackend
+    blobsterix generate storage MyBackend
 
 This will again generate a working empty storage that doesn't allow saving or retriving of data. To see a working storage implementation checkout the FileSystem storage in the source code. Now you will see that all data there is returned as a BlobMetaData or better in the FileSystem storage as a FileSystemMetaData. As long as your implementation supports the interface everything should work like expected.
