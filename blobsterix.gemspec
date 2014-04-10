@@ -2,11 +2,10 @@
 require File.expand_path('../lib/blobsterix/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.required_ruby_version = '>= 2.0.0.p451'
   gem.authors       = ["Daniel Sudmann"]
   gem.email         = ["suddani@googlemail.com"]
-  gem.description   = "BlobServer"
-  gem.summary       = "BlobServer"
+  gem.description   = "Blobsterix is a transcoding, caching, storage server that can transform your blobs (images, pdf, ...) at request time."
+  gem.summary       = "Blobsterix is a transcoding, caching, storage server."
   gem.homepage      = "https://github.com/experteer/blobsterix"
   gem.license       = "MIT License"
 
