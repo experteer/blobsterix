@@ -1,15 +1,29 @@
 # Blobsterix
 
 
-# IMPORTANT
-Use at least ruby-2.0.0-p451 to ensure thread safety (reference: https://github.com/eventmachine/eventmachine/issues/457)
+# What's this?
 
+Blobsterix is a s3 compliant content server that supports on the fly transformations for its data. 
+Images for example can be scaled, rotated and so on before delivered to the client just by url modification. 
+The system also supports encryption of urls (so nobody can mess with the transformations) and transformation signing for the non s3 interface functions. 
 
-Blobsterix is a s3 compliant content server that supports on the fly transformations for its data. Images for example can be scaled, rotated and so on before delivered to the client. The system also supports encryption and transformation signing for the non s3 interface functions. The s3 interface itself is unsecured and should not be visible to the outside.
+So if you are tired of:
+ * days of migration just to introduce a new size of an image
+ * high bills for amazon's s3 as you also pay for the storage of all the versions of the transformed original
+ * lots of dependencies to modify binary files in your main app
+
+and if you want:
+ * content negotiation for your images (webp or not to webp)
+ * on the fly transformation for your images and other binary formats with caching
+
+Blobsterix might be your friend.
 
 # Install
 
-* Checkout the repository
+Simply run
+  gem install blobsterix
+This will install blobsterix with all its dependencies. IT requires at least ruby version 2.0.0-p451 (reference: https://github.com/eventmachine/eventmachine/issues/457).
+Some binary dependencies are needed for the transformation pipeline not for the server itself. If you have your own transformations you might not need these:
 
 * Setup binary dependencies
   * Webp
@@ -18,23 +32,12 @@ Blobsterix is a s3 compliant content server that supports on the fly transformat
     - OR make sure you have a cwbep script that behaves the right way
   * MiniMagick
     sudo apt-get install imagemagick
-  * VIPS(deprecated)
-    sudo apt-get install libjpeg-dev libpng-dev libtiff-dev libvips-dev
   * lightpd config(not needed): 
     sudo apt-get install libpcre3-dev libbz2-dev libglib2.0-dev
   * ASCII Art (optional)
     sudo apt-get install jp2a
 
-* Setup ruby
-  - bundle install
-
 # Usage
-
-To install blobsterix simply do a:
-
-  * gem install blobsterix
-
-This will install blobsterix with all its dependencies. After that you have to install the binary dependecies which are written above. Those are needed for the transformation pipeline not for the server itself. If you have your own transformations you might not need thoose.
 
 Now the server is basicly ready to run with 
 
@@ -69,6 +72,8 @@ Check the amazon s3 specs for more information. It only supports the REST api wi
   * delete bucket
   * put file into bucket
   * delete file from bucket
+
+The s3 interface itself is unsecured and should not be visible to the outside.
 
 ## Blob interface
 
