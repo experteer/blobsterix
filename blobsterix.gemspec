@@ -7,7 +7,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["suddani@googlemail.com"]
   gem.description   = "BlobServer"
   gem.summary       = "BlobServer"
-  gem.homepage      = "http://experteer.com"
+  gem.homepage      = "https://github.com/experteer/blobsterix"
   gem.license       = "MIT License"
 
   gem.files         = `git ls-files`.split($\).select{|filename|
@@ -22,7 +22,8 @@ Gem::Specification.new do |gem|
   gem.name          = "blobsterix"
   gem.require_paths = ["lib"]
   gem.version       = Blobsterix::VERSION
-
+  gem.required_ruby_version = ">= 2.0.0.451"
+  
 
   gem.add_dependency "json",        "~> 1.8.1"
   gem.add_dependency "goliath",     "~> 1.0.3"
