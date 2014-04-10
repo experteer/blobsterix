@@ -21,7 +21,9 @@ Blobsterix might be your friend.
 # Install
 
 Simply run
-  gem install blobsterix
+
+    gem install blobsterix
+
 This will install blobsterix with all its dependencies. IT requires at least ruby version 2.0.0-p451 (reference: https://github.com/eventmachine/eventmachine/issues/457).
 Some binary dependencies are needed for the transformation pipeline not for the server itself. If you have your own transformations you might not need these:
 
