@@ -1,3 +1,7 @@
+= 0.0.10
+  * Adding ruby dependency to gemfile
+= 0.0.9
+= 0.0.8
 = 0.0.7
  * now uses blobaccess to access all data in the transformation manager
    cache and storage are now hidden and are used in the background accordingly. allows the system to prevent unneeded caching
