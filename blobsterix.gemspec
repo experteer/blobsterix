@@ -31,9 +31,11 @@ Gem::Specification.new do |gem|
   gem.add_dependency "ruby-webp",   "~> 0.1.0"
   gem.add_dependency "mini_magick", "~> 3.5.0"
 
-  gem.add_development_dependency "rspec"
+  gem.add_development_dependency "rake","~> 0.9.6"
+  gem.add_development_dependency "rspec", "~> 2.14.0"
   gem.add_development_dependency "rspec-core"
   gem.add_development_dependency "rspec-expectations"
   gem.add_development_dependency "rspec-mocks"
   gem.add_development_dependency "pry"
 end
+
