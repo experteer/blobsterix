@@ -1,5 +1,6 @@
 # Blobsterix
 
+[![Gem Version](https://badge.fury.io/rb/blobsterix.png)](http://badge.fury.io/rb/blobsterix)
 
 # What's this?
 
