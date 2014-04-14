@@ -1,5 +1,6 @@
 #!/usr/bin/env rake
 require "bundler/gem_tasks"
+require 'rspec/core/rake_task'
 
 
 desc "Simple cov"
@@ -10,4 +11,10 @@ task :simplecov do
   end
   require "blobsterix"
   `rspec`
+end
+
+
+
+RSpec::Core::RakeTask.new do |t|
+
 end
