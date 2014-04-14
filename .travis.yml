@@ -1,0 +1,12 @@
+language: ruby
+script: "bundle exec rake spec"
+rvm:
+  - 2.0.0.451
+  - 2.1.1
+notifications:
+  recipients:
+    - peter.schrammel@experteer.com
+branches:
+  only:
+    - master
+
