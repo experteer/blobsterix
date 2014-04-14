@@ -2,6 +2,7 @@
 
 [![Gem Version](https://badge.fury.io/rb/blobsterix.png)](http://badge.fury.io/rb/blobsterix)
 [![Build Status](https://travis-ci.org/experteer/blobsterix.svg?branch=master)](https://travis-ci.org/experteer/blobsterix)
+[![Code Climate](https://codeclimate.com/github/experteer/blobsterix.png)](https://codeclimate.com/github/experteer/blobsterix)
 
 # What's this?
 
