@@ -63,7 +63,7 @@ module Blobsterix::Transformations
 
     def with_tempfiles
       tmpFiles = @transformations.size.times.map{|index|
-        Tempfile.new("#{@blob_access.identifier}_#{index}")
+        Tempfile.new("blobsterix_#{Thread.current.object_id}_#{index}")
       }
       keys = tmpFiles.map{|f| f.path }
 
