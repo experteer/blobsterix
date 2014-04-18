@@ -2,9 +2,9 @@ module Blobsterix
 
   # # If this function is uncommented it should return an environment
   # # this env will override the one supplied from the command line
-  # def self.env()
-  #   :development or :production or :test
-  # end
+  def self.env()
+    :development # or :production or :test
+  end
 
   # # Use this method to set the port. (standard is 9000)
   # def self.port()
@@ -46,7 +46,7 @@ module Blobsterix
   # # For a different way check the environments files
   # # The return should be in format of: trafoName_value,trafoName_value,....
   # # Example: scale_2,rotate_20
-  # def self.decrypt_trafo(trafo_string,logger)
+  # def self.decrypt_trafo(blobaccess, trafo_string, logger)
   #   trafo_string
   # end
 
