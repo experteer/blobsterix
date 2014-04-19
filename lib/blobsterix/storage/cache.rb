@@ -75,11 +75,11 @@ module Blobsterix
       end
 
       def cache_file_base(blob_access)
-        [blob_access.bucket, blob_access.id].join("_")
+        "#{blob_access.bucket}_#{blob_access.id.gsub("/","_")}"
       end
 
       def cache_path(blob_access)
-        @path.join(hash_filename("#{blob_access.bucket}_#{blob_access.id.gsub("/","_")}"))
+        @path.join(hash_filename(cache_file_base(blob_access)))
       end
 
       def hash_filename(filename)
