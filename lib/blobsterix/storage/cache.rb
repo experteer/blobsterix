@@ -43,7 +43,8 @@ module Blobsterix
         else
           cache_path(blob_access).entries.each {|cache_file|
             unless cache_file.to_s.match(/\.meta$/) || cache_file.directory?
-              FileSystemMetaData.new(cache_path(blob_access).join(cache_file)).delete if cache_file.to_s.match(cache_file_name(blob_access))
+              base_name = cache_file.to_s.split("_")[0..1].join("_")
+              FileSystemMetaData.new(cache_path(blob_access).join(cache_file)).delete if base_name.match(cache_file_base(blob_access))
             end
           } if Dir.exist?(cache_path(blob_access))
         end
@@ -70,7 +71,11 @@ module Blobsterix
       end
 
       def cache_file_name(blob_access)
-        Murmur.Hash64B(blob_access.identifier)
+        [cache_file_base(blob_access), Murmur.Hash64B(blob_access.identifier).to_s()].join("_")
+      end
+
+      def cache_file_base(blob_access)
+        [blob_access.bucket, blob_access.id].join("_")
       end
 
       def cache_path(blob_access)
