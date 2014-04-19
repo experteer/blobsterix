@@ -45,10 +45,12 @@ module Blobsterix
     end
 
     def is? other_type
+      return false unless other_type
       mediatype === other_type.mediatype || mediatype === "*" || other_type.mediatype === "*"
     end
 
     def equal? other_type
+      return false unless other_type
       mediatype === other_type.mediatype and subtype === other_type.subtype# and factor == other_type.factor
     end
 
