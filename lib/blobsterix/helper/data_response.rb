@@ -14,7 +14,7 @@ module Blobsterix
         if not meta.valid
           Http.NotFound()
         elsif xfile and etag != meta.etag
-          [200, meta.header.merge({"X-Sendfile" => meta.path}), ""]
+          [200, meta.header.merge({"X-Sendfile" => meta.path.to_s}), ""]
         elsif etag != meta.etag
           if env != nil && meta.size > 30000 && allow_chunks
             chunkresponse
