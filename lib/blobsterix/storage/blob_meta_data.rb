@@ -52,8 +52,8 @@ module Blobsterix
       end
       def delete
       end
-      def response(with_data=true, _etag=nil, env = nil, xfile = false, allow_chunks=true)
-        Blobsterix::Http::DataResponse.new(self, with_data, _etag, env).call(xfile, allow_chunks)
+      def response(with_data=true, _etag=nil, env = nil)
+        Blobsterix::Http::DataResponse.new(self, with_data, _etag, env).call()
       end
     end
   end

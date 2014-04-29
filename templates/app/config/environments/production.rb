@@ -5,6 +5,12 @@
 # Blobsterix.storage_dir=Blobsterix.root.join("contents")
 # Blobsterix.cache_dir=Blobsterix.root.join("cache")
 
+# # Use X-Sendfile(standard: false)
+# Blobsterix.use_x_send_file=true
+
+# # Allow chunked streaming(standard: true)
+# Blobsterix.allow_chunked_stream=true
+
 # # Set different cache or storage handler
 # Blobsterix.storage=Blobsterix::Storage::FileSystem.new(Blobsterix.storage_dir)
 # Blobsterix.cache=Blobsterix::Storage::Cache.new(cache_dir)

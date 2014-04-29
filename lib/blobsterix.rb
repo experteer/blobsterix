@@ -129,6 +129,22 @@ module Blobsterix
     @cache = obj
   end
 
+  def self.use_x_send_file
+    @use_x_send_file||=false
+  end
+
+  def self.use_x_send_file=(obj)
+    @use_x_send_file=obj
+  end
+
+  def self.allow_chunked_stream
+    @allow_chunked_stream||=true
+  end
+
+  def self.allow_chunked_stream=(obj)
+    @allow_chunked_stream=obj
+  end
+
   def self.decrypt_trafo=(obj)
     @decrypt_trafo=obj
   end

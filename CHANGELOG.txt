@@ -1,3 +1,6 @@
+= 0.0.12
+  * added global config option to activate X-Sendfile via config. Now it can not be activated anymore by a reverse proxy
+  * added global config option to activate or deactivate chunked streaming of files
 = 0.0.11
   * changed naming schemas of cached files and tmp files
   * fixing x-send file

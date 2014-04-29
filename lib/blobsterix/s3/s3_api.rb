@@ -36,7 +36,7 @@ module Blobsterix
 
         if bucket?
           if meta = storage.get(bucket, file)
-            send_with_data ? meta.response(true, env["HTTP_IF_NONE_MATCH"], env, env["HTTP_X_FILE"] === "yes", false) : meta.response(false)
+            send_with_data ? meta.response(true, env["HTTP_IF_NONE_MATCH"], env) : meta.response(false)
           else
             Http.NotFound
           end

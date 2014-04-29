@@ -10,13 +10,13 @@ module Blobsterix
         @env = _env
       end
 
-      def call(xfile=false, allow_chunks=true)
+      def call()
         if not meta.valid
           Http.NotFound()
-        elsif xfile and etag != meta.etag
+        elsif Blobsterix.use_x_send_file and etag != meta.etag
           [200, meta.header.merge({"X-Sendfile" => meta.path.to_s}), ""]
         elsif etag != meta.etag
-          if env != nil && meta.size > 30000 && allow_chunks
+          if env != nil && meta.size > 30000 && Blobsterix.allow_chunked_stream
             chunkresponse
           else
             [200, meta.header, (with_data ? meta.data : "")]
