@@ -30,9 +30,11 @@ module Blobsterix
     end
     def run_em(&block)
       EM.run {
-        f = Fiber.new(&block)
+        f = Fiber.new{
+          yield block
+          EM.stop
+        }
         f.resume
-        EM.stop
       }
     end
     class DummyTrafo < Blobsterix::Transformations::Transformation
