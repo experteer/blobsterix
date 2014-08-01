@@ -113,7 +113,9 @@ module Blobsterix
 
     def self.call(env)
       Blobsterix::StatusInfo.connections+=1
+      Blobsterix.logger.info "RAM USAGE Before[#{Process.pid}]: " + `pmap #{Process.pid} | tail -1`[10,40].strip
       result=router.call(env)
+      Blobsterix.logger.info "RAM USAGE After[#{Process.pid}]: " + `pmap #{Process.pid} | tail -1`[10,40].strip
       Blobsterix::StatusInfo.connections-=1
       result
     end

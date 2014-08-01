@@ -27,7 +27,7 @@ module Blobsterix
 
     private
       def list_buckets
-         Blobsterix.event("s3_api.list_bucket",:bucket => bucket)
+        Blobsterix.event("s3_api.list_bucket",:bucket => bucket)
         Http.OK storage.list(bucket).to_xml, "xml"
       end
 
@@ -41,6 +41,7 @@ module Blobsterix
             Http.NotFound
           end
         else
+          Blobsterix.event("s3_api.list_bucket",:bucket => bucket)
           Http.OK storage.list(bucket).to_xml, "xml"
         end
       end

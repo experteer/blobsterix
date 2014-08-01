@@ -86,7 +86,7 @@ module Blobsterix
   end
 
   def self.logger
-    @logger ||= Logger.new(STDOUT)
+    Thread.current[:in_fiber_logger] ||= BlobsterixLogger.new((@logger||Logger.new(STDOUT)),Logable.next_id)
   end
 
   def self.storage_dir
