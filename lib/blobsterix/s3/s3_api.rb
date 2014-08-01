@@ -67,7 +67,7 @@ module Blobsterix
         blob_access=BlobAccess.new(:source => source, :bucket => bucket_current, :id => file_current, :accept_type => accept, :trafo => trafo_current)
         data = transformation.run(blob_access)
         cached_upload_clear
-        storage.put(bucket_current, file_current, data).response(false)
+        storage.put(bucket_current, file_current, data.open, :close_after_write => true).response(false)
       end
 
       def delete_bucket

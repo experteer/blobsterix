@@ -43,7 +43,7 @@ module Blobsterix
           if raw_trafo? || raw_accept_type?(metaData.accept_type)
             # puts "Load from storage"
             return metaData unless Blobsterix.cache_original?
-            Blobsterix.cache.put(BlobAccess.new(:bucket => bucket, :id => id), metaData.data) if metaData.valid?
+            Blobsterix.cache.put_raw(BlobAccess.new(:bucket => bucket, :id => id), metaData.data) if metaData.valid?
             return Blobsterix.cache.get(BlobAccess.new(:bucket => bucket, :id => id)) if metaData.valid?
           else
             # puts "accept type doesn't work"

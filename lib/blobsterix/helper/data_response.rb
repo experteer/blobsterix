@@ -19,7 +19,7 @@ module Blobsterix
           if env != nil && meta.size > 30000 && Blobsterix.allow_chunked_stream
             chunkresponse
           else
-            [200, meta.header, (with_data ? meta.data : "")]
+            [200, meta.header, (with_data ? File.open(meta.path, "rb") : "")]
           end
         else
           [304, meta.header, ""]

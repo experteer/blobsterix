@@ -14,7 +14,7 @@ module Blobsterix
     end
 
     def cache_upload
-      cache.put(cache_upload_key, env['rack.input'].read)
+      cache.put_stream(cache_upload_key, env['rack.input'])
     end
 
     def cached_upload
@@ -27,7 +27,6 @@ module Blobsterix
     end
 
     def cache_upload_key
-      #@cache_upload_key ||= "upload/"+bucket.gsub("/", "_")+"_"+file.gsub("/", "_")
       @cache_upload_key ||= Blobsterix::BlobAccess.new(:bucket => bucket, :id => "upload_#{file.gsub("/", "_")}")
     end
 

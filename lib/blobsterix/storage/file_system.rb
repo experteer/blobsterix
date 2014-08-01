@@ -26,16 +26,19 @@ module Blobsterix
         else
           if bucket_exist(bucket)
             b = Bucket.new(bucket, time_string_of(bucket))
-            bucket_files(bucket).each do |file|
-              b.contents << BucketEntry.new(file) do |entry|
-                meta = metaData(bucket, file)
-                entry.last_modified =  meta.last_modified.strftime("%Y-%m-%dT%H:%M:%S.000Z")
-                entry.etag =  meta.etag
-                entry.size =  meta.size
-                entry.mimetype = meta.mimetype
-                entry.fullpath = contents(bucket, file).gsub("#{contents}/", "")
+            files = bucket_files(bucket)
+            Blobsterix.wait_for(Proc.new {
+              files.each do |file|
+                b.contents << BucketEntry.new(file) do |entry|
+                  meta = metaData(bucket, file)
+                  entry.last_modified =  meta.last_modified.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+                  entry.etag =  meta.etag
+                  entry.size =  meta.size
+                  entry.mimetype = meta.mimetype
+                  entry.fullpath = contents(bucket, file).gsub("#{contents}/", "")
+                end
               end
-            end
+            })
             b
           else
             Nokogiri::XML::Builder.new do |xml|
@@ -46,7 +49,7 @@ module Blobsterix
       end
 
       def get(bucket, key)
-        if (not File.directory?(contents(bucket, key))) and bucket_files(bucket).include?(key)
+        if (not File.directory?(contents(bucket, key))) # and bucket_files(bucket).include?(key)
           Blobsterix.storage_read(BlobAccess.new(:bucket => bucket, :id => key))
           metaData(bucket, key)
         else
@@ -55,12 +58,15 @@ module Blobsterix
         end
       end
 
-      def put(bucket, key, value)
+      def put(bucket, key, value, opts={})
         Blobsterix.storage_write(BlobAccess.new(:bucket => bucket, :id => key))
 
-        meta = metaData(bucket, key).write() {|f| f.write(value.read) }
+        meta = Blobsterix.wait_for(Proc.new {metaData(bucket, key).write() {|f| FileUtils.copy_stream(value, f) }})
 
-        Blobsterix.cache.invalidate(Blobsterix::BlobAccess.new(:bucket => bucket, :id => key))
+        value.close if opts[:close_after_write]
+
+        Blobsterix.wait_for(Proc.new {Blobsterix.cache.invalidate(Blobsterix::BlobAccess.new(:bucket => bucket, :id => key))})
+
         meta
       end
 
@@ -74,17 +80,15 @@ module Blobsterix
 
       def delete(bucket)
         logger.info "Storage: delete bucket #{contents(bucket)}"
-
         FileUtils.rm_rf(contents(bucket)) if bucket_exist(bucket) && bucket_files(bucket).empty?
-
         #Dir.rmdir(contents(bucket)) if bucket_exist(bucket) && bucket_files(bucket).empty?
       end
 
       def delete_key(bucket, key)
         Blobsterix.storage_delete(BlobAccess.new(:bucket => bucket, :id => key))
-        Blobsterix.cache.invalidate(Blobsterix::BlobAccess.new(:bucket => bucket, :id => key))
+        Blobsterix.wait_for(Proc.new {Blobsterix.cache.invalidate(Blobsterix::BlobAccess.new(:bucket => bucket, :id => key))})
 
-        metaData(bucket, key).delete if bucket_files(bucket).include? key
+        metaData(bucket, key).delete # if bucket_files(bucket).include? key
       end
 
       private
@@ -111,13 +115,15 @@ module Blobsterix
         end
 
         def bucket_files(bucket)
-          if (bucket_exist(bucket))
-            Dir.glob("#{contents}/#{bucket}/**/*").select{|e| !File.directory?(e) and not e.end_with?(".meta")}.map{ |e|
-              e.gsub("#{contents}/#{bucket}/","").gsub(/\w+\/\w+\/\w+\/\w+\/\w+\/\w+\//, "").gsub("\\", "/")
-            }
-          else
-            []
-          end
+          Blobsterix.wait_for(Proc.new {
+            if (bucket_exist(bucket))
+              Dir.glob("#{contents}/#{bucket}/**/*").select{|e| !File.directory?(e) and not e.end_with?(".meta")}.map{ |e|
+                e.gsub("#{contents}/#{bucket}/","").gsub(/\w+\/\w+\/\w+\/\w+\/\w+\/\w+\//, "").gsub("\\", "/")
+              }
+            else
+              []
+            end
+          })
         end
 
         def metaData(bucket, key)

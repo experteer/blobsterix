@@ -50,6 +50,12 @@ module Blobsterix
         end
         self
       end
+      def open
+        if block_given?
+          #should yield file
+        end
+        self
+      end
       def delete
       end
       def response(with_data=true, _etag=nil, env = nil)

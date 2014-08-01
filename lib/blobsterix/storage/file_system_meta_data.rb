@@ -20,10 +20,10 @@ module Blobsterix
 
       def etag
         if @last_modified === last_modified
-          @etag ||= Digest::MD5.hexdigest(data)
+          @etag ||= Digest::MD5.file(path).hexdigest
         else
           @last_modified = last_modified
-          @etag = Digest::MD5.hexdigest(data)
+          @etag = Digest::MD5.file(path).hexdigest
         end
       end
 
@@ -88,6 +88,16 @@ module Blobsterix
         end
         save_meta_file
         self
+      end
+
+      def open
+        if block_given?
+          f = File.open(path, "rb")
+          yield f
+          f.close
+        else
+          File.open(path, "rb")
+        end
       end
 
       def delete

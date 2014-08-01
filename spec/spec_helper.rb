@@ -32,6 +32,7 @@ module Blobsterix
       EM.run {
         f = Fiber.new{
           yield block
+          while not EM.defers_finished?; end
           EM.stop
         }
         f.resume

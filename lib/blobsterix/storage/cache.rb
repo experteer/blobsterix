@@ -4,12 +4,14 @@ module Blobsterix
       include Blobsterix::Logable
 
       def invalidation
-        each_meta_file do |meta_file|
-          blob_access=meta_to_blob_access(meta_file)
-          if Blobsterix.cache_checker.call(blob_access,meta_file.last_accessed,meta_file.last_modified)
-            invalidate(blob_access, true)
+        Blobsterix.wait_for(Proc.new {
+          each_meta_file do |meta_file|
+            blob_access=meta_to_blob_access(meta_file)
+            if Blobsterix.cache_checker.call(blob_access,meta_file.last_accessed,meta_file.last_modified)
+              invalidate(blob_access, true)
+            end
           end
-        end
+        })
       end
       def initialize(path)
         @path = Pathname.new(path)
@@ -20,10 +22,23 @@ module Blobsterix
         FileSystemMetaData.new(cache_file_path(blob_access))
       end
 
-      def put(blob_access, data)
+      def put_raw(blob_access, data)
         FileSystemMetaData.new(cache_file_path(blob_access),:bucket => blob_access.bucket, :id => blob_access.id, :trafo => blob_access.trafo, :accept_type => "#{blob_access.accept_type}").write() {|f|
           f.write(data)
         }
+      end
+
+      def put_stream(blob_access, stream)
+        FileSystemMetaData.new(cache_file_path(blob_access),:bucket => blob_access.bucket, :id => blob_access.id, :trafo => blob_access.trafo, :accept_type => "#{blob_access.accept_type}").write do |f|
+          FileUtils.copy_stream(stream, f)
+        end
+      end
+
+      def put(blob_access, path)
+        target_path = cache_file_path(blob_access)
+        FileUtils.mkdir_p(File.dirname(target_path))
+        FileUtils.cp(path, target_path, :preserve => false)
+        FileSystemMetaData.new(target_path,:bucket => blob_access.bucket, :id => blob_access.id, :trafo => blob_access.trafo, :accept_type => "#{blob_access.accept_type}")
       end
 
       def delete(blob_access)

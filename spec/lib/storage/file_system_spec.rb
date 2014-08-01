@@ -6,9 +6,11 @@ describe Blobsterix::Storage::FileSystem do
   let(:data) {"Hi my name is Test"}
   let(:key) {"test.txt"}
   let(:bucket) {"test"}
-
-
-
+  
+  around(:each) do |example|
+    run_em(&example)
+  end
+  
   describe "bucket" do
     after :each do
       clear_storage

@@ -23,6 +23,10 @@ describe Blobsterix::BlobAccess do
     Blobsterix::BlobAccess.new(:bucket => bucket, :id => key, :trafo => [["raw", ""]], :accept_type => Blobsterix::AcceptType.new("text/plain"))
   end
 
+  around(:each) do |example|
+    run_em(&example)
+  end
+
   describe "blob_access" do
     after :each do
       clear_data

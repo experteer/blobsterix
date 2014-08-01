@@ -227,4 +227,18 @@ module Blobsterix
   def self.storage_delete(blob_access)
     event("storage.delete",:blob_access => blob_access)
   end
+
+  def self.wait_for(op = nil)
+    fiber = Fiber.current
+    EM.defer(op, Proc.new {|result|
+            fiber.resume result
+          })
+    Fiber.yield
+  end
+
+  def self.wait_for_next(op = nil)
+    EM.next_tick do 
+      wait_for(op)
+    end
+  end
 end

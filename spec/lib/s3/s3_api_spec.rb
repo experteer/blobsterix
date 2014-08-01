@@ -11,6 +11,10 @@ describe Blobsterix::S3Api do
   let(:key) {"test.txt"}
   let(:bucket) {"test"}
 
+  around(:each) do |example|
+    run_em(&example)
+  end
+
   after :each do
       clear_data
   end
@@ -18,9 +22,7 @@ describe Blobsterix::S3Api do
   describe "create a bucket" do
     it "should have bucket after creation" do
 
-      run_em do
-        put "/", "", "HTTP_HOST" => "#{bucket}.s3.blah.de"
-      end
+      put "/", "", "HTTP_HOST" => "#{bucket}.s3.blah.de"
 
       get "/#{bucket}"
       expect(last_response.status).to eql(200)
@@ -46,9 +48,7 @@ describe Blobsterix::S3Api do
     it "should have file in bucket after upload" do
       #expect(Blobsterix.transformation).to receive(:cue_transformation).never.and_call_original
 
-      run_em do
-        put "/#{key}", data, {"HTTP_HOST" => "#{bucket}.s3.blah.de"}
-      end
+      put "/#{key}", data, {"HTTP_HOST" => "#{bucket}.s3.blah.de"}
 
       expect(last_response.status).to eql(200)
       expect(Blobsterix.storage.get(bucket, key).read).to eql(data)
@@ -57,9 +57,7 @@ describe Blobsterix::S3Api do
     it "should have file in bucket after upload with trafo" do
       #expect(Blobsterix.transformation).to receive(:cue_transformation).once.and_call_original
 
-      run_em do
-        put "/#{key}", data, {"HTTP_HOST" => "#{bucket}.s3.blah.de", "HTTP_X_AMZ_META_TRAFO" => "dummy_Yeah"}
-      end
+      put "/#{key}", data, {"HTTP_HOST" => "#{bucket}.s3.blah.de", "HTTP_X_AMZ_META_TRAFO" => "dummy_Yeah"}
 
       expect(last_response.status).to eql(200)
       expect(Blobsterix.storage.get(bucket, key).read).to eql("Yeah")

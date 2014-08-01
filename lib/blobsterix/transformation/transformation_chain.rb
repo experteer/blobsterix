@@ -44,7 +44,7 @@ module Blobsterix::Transformations
           break
         end
 
-        cache.put(@target_blob_access,Blobsterix::Storage::FileSystemMetaData.new(last_key).read)
+        cache.put(@target_blob_access, last_key)
         @target_blob_access.reset!
       end unless @target_blob_access.get.valid
 

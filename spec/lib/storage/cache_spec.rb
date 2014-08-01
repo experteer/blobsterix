@@ -12,12 +12,16 @@ describe Blobsterix::Storage::Cache do
   let(:blob_access_2) {Blobsterix::BlobAccess.new(:bucket => bucket, :id => key, :trafo => [["dummy", ""]])}
   let(:blob_access_3) {Blobsterix::BlobAccess.new(:bucket => bucket, :id => key, :trafo => [["test", ""],["dummy", ""]])}
 
+  around(:each) do |example|
+    run_em(&example)
+  end
+
   describe "invalidation" do
     before :each do
-      Blobsterix.cache.put(blob_access, data)
-      Blobsterix.cache.put(blob_access_1, data)
-      Blobsterix.cache.put(blob_access_2, data)
-      Blobsterix.cache.put(blob_access_3, data)
+      Blobsterix.cache.put_raw(blob_access, data)
+      Blobsterix.cache.put_raw(blob_access_1, data)
+      Blobsterix.cache.put_raw(blob_access_2, data)
+      Blobsterix.cache.put_raw(blob_access_3, data)
     end
 
     after :each do
@@ -68,14 +72,32 @@ describe Blobsterix::Storage::Cache do
     end
 
     it "should return valid blob when key exists" do
-      Blobsterix.cache.put(blob_access, data)
+      Blobsterix.cache.put_raw(blob_access, data)
       metaData = Blobsterix.cache.get(blob_access)
       expect(metaData.valid).to be(true)
       expect(metaData.read).to eql(data)
     end
 
+    it "should return valid blob when key exists and was copied via Stream" do
+      Blobsterix.cache.put_stream(blob_access, StringIO.new(data, "r"))
+      metaData = Blobsterix.cache.get(blob_access)
+      expect(metaData.valid).to be(true)
+      expect(metaData.read).to eql(data)
+    end
+
+    it "should return valid blob when key exists and was copied via path" do
+      tmp = Tempfile.new("sldhgs")
+      tmp.write(data)
+      tmp.close
+      Blobsterix.cache.put(blob_access, tmp.path)
+      metaData = Blobsterix.cache.get(blob_access)
+      expect(metaData.valid).to be(true)
+      expect(metaData.read).to eql(data)
+      tmp.unlink
+    end
+
     it "should return invalid blob when key is invalidated" do
-      Blobsterix.cache.put(blob_access, data)
+      Blobsterix.cache.put_raw(blob_access, data)
       metaData = Blobsterix.cache.get(blob_access)
       expect(metaData.valid).to be(true)
       expect(metaData.read).to eql(data)
@@ -86,8 +108,8 @@ describe Blobsterix::Storage::Cache do
     end
 
     it "should return invalid blob when key is invalidated for all trafos" do
-      Blobsterix.cache.put(blob_access, data)
-      Blobsterix.cache.put(blob_access_1, data)
+      Blobsterix.cache.put_raw(blob_access, data)
+      Blobsterix.cache.put_raw(blob_access_1, data)
 
       metaData = Blobsterix.cache.get(blob_access)
       expect(metaData.valid).to be(true)
@@ -104,8 +126,8 @@ describe Blobsterix::Storage::Cache do
     end
 
     it "should return invalid blob when key is invalidated for one trafos" do
-      Blobsterix.cache.put(blob_access, data)
-      Blobsterix.cache.put(blob_access_1, data)
+      Blobsterix.cache.put_raw(blob_access, data)
+      Blobsterix.cache.put_raw(blob_access_1, data)
 
       metaData = Blobsterix.cache.get(blob_access)
       expect(metaData.valid).to be(true)
@@ -122,7 +144,7 @@ describe Blobsterix::Storage::Cache do
     end
 
     it "should return invalid blob when key is deleted" do
-      Blobsterix.cache.put(blob_access, data)
+      Blobsterix.cache.put_raw(blob_access, data)
       metaData = Blobsterix.cache.get(blob_access)
       expect(metaData.valid).to be(true)
       expect(metaData.read).to eql(data)
