@@ -1,3 +1,7 @@
+= 0.0.14
+  * now files are streamed instead of read internally
+  * storages now require IO streams on put
+  * storage is made async
 = 0.0.13
   * fixing getters for 0.0.12
 = 0.0.12
