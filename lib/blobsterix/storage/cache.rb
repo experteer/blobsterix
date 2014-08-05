@@ -4,14 +4,12 @@ module Blobsterix
       include Blobsterix::Logable
 
       def invalidation
-        Blobsterix.wait_for(Proc.new {
-          each_meta_file do |meta_file|
-            blob_access=meta_to_blob_access(meta_file)
-            if Blobsterix.cache_checker.call(blob_access,meta_file.last_accessed,meta_file.last_modified)
-              invalidate(blob_access, true)
-            end
+        each_meta_file do |meta_file|
+          blob_access=meta_to_blob_access(meta_file)
+          if Blobsterix.cache_checker.call(blob_access,meta_file.last_accessed,meta_file.last_modified)
+            invalidate(blob_access, true)
           end
-        })
+        end
       end
 
       def initialize(path)
