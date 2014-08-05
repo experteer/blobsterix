@@ -26,7 +26,6 @@ module Blobsterix
         else
           if bucket_exist(bucket)
             b = Bucket.new(bucket, time_string_of(bucket))
-            # files = bucket_files(bucket)
             Blobsterix.wait_for(Proc.new {
               Blobsterix::DirectoryList.each(contents(bucket)) do |path, file|
                 next if path.join(file).directory? || file.to_s.end_with?(".meta")

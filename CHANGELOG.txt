@@ -1,3 +1,5 @@
+= 0.0.15
+  * changed the way directories are listed to allow direct traversal.
 = 0.0.14
   * now files are streamed instead of read internally
   * storages now require IO streams on put
