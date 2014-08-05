@@ -13,6 +13,7 @@ module Blobsterix
           end
         })
       end
+
       def initialize(path)
         @path = Pathname.new(path)
         FileUtils.mkdir_p(@path) if !Dir.exist?(@path)
@@ -68,8 +69,8 @@ module Blobsterix
       private
 
       def each_meta_file
-        Dir.glob(@path.join("**/*")).each {|file|
-          cache_file = Pathname.new file
+        Blobsterix::DirectoryList.each(@path) {|file_path, file|
+          cache_file = file_path.join file
           if block_given? && !cache_file.to_s.match(/\.meta$/) && !cache_file.directory?
             yield FileSystemMetaData.new(cache_file)
             cache_file

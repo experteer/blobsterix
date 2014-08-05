@@ -26,11 +26,12 @@ module Blobsterix
         else
           if bucket_exist(bucket)
             b = Bucket.new(bucket, time_string_of(bucket))
-            files = bucket_files(bucket)
+            # files = bucket_files(bucket)
             Blobsterix.wait_for(Proc.new {
-              files.each do |file|
-                b.contents << BucketEntry.new(file) do |entry|
-                  meta = metaData(bucket, file)
+              Blobsterix::DirectoryList.each(contents(bucket)) do |path, file|
+                next if path.join(file).directory? || file.to_s.end_with?(".meta")
+                b.contents << BucketEntry.new(file.to_s) do |entry|
+                  meta = metaData(bucket, file.to_s)
                   entry.last_modified =  meta.last_modified.strftime("%Y-%m-%dT%H:%M:%S.000Z")
                   entry.etag =  meta.etag
                   entry.size =  meta.size
