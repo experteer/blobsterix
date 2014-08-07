@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'benchmark'
 
 module Blobsterix
   module Storage
@@ -15,7 +16,7 @@ module Blobsterix
         Dir.entries(contents).include?(bucket) and File.directory?(File.join(contents,bucket))
       end
 
-      def list(bucket="root")
+      def list(bucket="root", opts={})
         if bucket =~ /root/
           BucketList.new do |l|
 
@@ -26,18 +27,26 @@ module Blobsterix
         else
           if bucket_exist(bucket)
             b = Bucket.new(bucket, time_string_of(bucket))
+            b.key_count = 0
             Blobsterix.wait_for(Proc.new {
-              Blobsterix::DirectoryList.each(contents(bucket)) do |path, file|
-                next if path.join(file).directory? || file.to_s.end_with?(".meta")
-                b.contents << BucketEntry.new(file.to_s) do |entry|
-                  meta = metaData(bucket, file.to_s)
-                  entry.last_modified =  meta.last_modified.strftime("%Y-%m-%dT%H:%M:%S.000Z")
-                  entry.etag =  meta.etag
-                  entry.size =  meta.size
-                  entry.mimetype = meta.mimetype
-                  entry.fullpath = contents(bucket, file).gsub("#{contents}/", "")
+              start_path = map_filename(opts[:start_path]) if opts[:start_path]
+              current_obj = Blobsterix::DirectoryList.each_limit(contents(bucket), :limit => 100, :start_path => start_path) do |path, file|
+                # logger.info "Create Entry: #{b.key_count}"
+                if file.to_s.end_with?(".meta")
+                  false
+                else
+                  b.contents << BucketEntry.new(file.to_s) do |entry|
+                    meta = metaData(bucket, file.to_s)
+                    entry.last_modified =  meta.last_modified.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+                    entry.etag =  meta.etag
+                    entry.size =  meta.size
+                    entry.mimetype = meta.mimetype
+                  end
+                  b.key_count+=1
+                  true
                 end
               end
+              b.current=current_obj.current_file if current_obj
             })
             b
           else

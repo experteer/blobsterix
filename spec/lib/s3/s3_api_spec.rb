@@ -109,6 +109,33 @@ describe Blobsterix::S3Api do
     end
   end
 
+  context "with two data objects" do
+    before :each do
+      Blobsterix.storage.put(bucket, key, StringIO.new(data, "r"))
+      Blobsterix.storage.put(bucket, "u#{key}", StringIO.new(data, "r"))
+    end
+
+    after :each do
+      clear_storage
+    end
+
+    describe 'list bucket truncated' do
+      it 'should return all files for the bucket starting at u#{key}' do
+        get "/#{bucket}", "", "HTTP_START_PATH" => "u#{key}"
+        expect(last_response.status).to eql(200)
+        response = Hash.from_xml last_response.body
+        expect(response).to have_key(:ListBucketResult)
+        expect(response[:ListBucketResult]).to have_key(:Name)
+        expect(response[:ListBucketResult][:Name]).to eql(bucket)
+        expect(response[:ListBucketResult][:Contents]).to_not be_empty
+        expect(response[:ListBucketResult][:Contents][:Key]).to eql(key)
+        expect(response[:ListBucketResult][:Contents][:MimeType]).to eql("text/plain")
+        expect(response[:ListBucketResult][:Contents][:Size]).to eql(data.length)
+        expect(response[:ListBucketResult][:Contents][:ETag]).to eql(Digest::MD5.hexdigest(data))
+      end
+    end
+  end
+
   context "with data" do
 
     before :each do

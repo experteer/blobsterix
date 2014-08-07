@@ -21,7 +21,7 @@ module Blobsterix
           xml.Size size
           xml.StorageClass storage_class
           xml.MimeType mimetype
-          xml.FullPath fullpath
+          # xml.FullPath fullpath
         }
       end
     end

@@ -5,8 +5,10 @@ module Blobsterix
 
       def invalidation
         each_meta_file do |meta_file|
-          blob_access=meta_to_blob_access(meta_file)
-          if Blobsterix.cache_checker.call(blob_access,meta_file.last_accessed,meta_file.last_modified)
+          blob_access = Blobsterix::SimpleProxy.new(Proc.new {
+            meta_to_blob_access(FileSystemMetaData.new(meta_file))
+          })
+          if Blobsterix.cache_checker.call(blob_access,File.atime(meta_file),File.ctime(meta_file))
             invalidate(blob_access, true)
           end
         end
@@ -69,8 +71,8 @@ module Blobsterix
       def each_meta_file
         Blobsterix::DirectoryList.each(@path) {|file_path, file|
           cache_file = file_path.join file
-          if block_given? && !cache_file.to_s.match(/\.meta$/) && !cache_file.directory?
-            yield FileSystemMetaData.new(cache_file)
+          if block_given? && !cache_file.to_s.match(/\.meta$/)
+            yield cache_file
             cache_file
           end
         }

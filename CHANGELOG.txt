@@ -1,3 +1,6 @@
+= 0.0.17
+  * updated directory listing, truncated listing of 100 files each
+  * made the invalidation object a proxy that is only called when accessed
 = 0.0.15
   * changed the way directories are listed to allow direct traversal.
 = 0.0.14

@@ -1,7 +1,7 @@
 module Blobsterix
   module Storage
     class Bucket
-      attr_accessor :name, :creation_date, :contents
+      attr_accessor :name, :creation_date, :contents, :current, :key_count
       def initialize(name, date)
         @name = name
         @creation_date = date
@@ -16,7 +16,9 @@ module Blobsterix
               xml.Prefix
               xml.Marker
               xml.MaxKeys 1000
-              xml.IsTruncated false
+              xml.KeyCount key_count
+              xml.Current current
+              xml.IsTruncated current != nil
                 contents.each{|entry|
                   entry.insert_xml(xml)
                 }

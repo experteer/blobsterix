@@ -19,5 +19,16 @@ describe Blobsterix::DirectoryList do
       end
       count.should eql(10)
     end
+    it "should just run shit" do
+      counter = 0
+      a = Blobsterix::DirectoryWalker.new(Blobsterix.cache_dir)
+      while a.next
+        counter += 1
+      end
+      Blobsterix::DirectoryList.each(Blobsterix.cache_dir) do |dir, file|
+        counter -= 1
+      end
+      counter.should eql(0)
+    end
   end
 end
