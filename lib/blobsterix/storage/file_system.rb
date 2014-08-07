@@ -46,7 +46,8 @@ module Blobsterix
                   true
                 end
               end
-              b.current=current_obj.current_file if current_obj
+
+              b.truncated=true if current_obj.next
             })
             b
           else

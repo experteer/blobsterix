@@ -19,6 +19,7 @@ module Blobsterix
     end
 =end
     def response(env)
+      # env["params"] = params
       call_stack(env, BlobApi, StatusApi, S3Api)
     end
 

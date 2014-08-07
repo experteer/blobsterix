@@ -42,7 +42,8 @@ module Blobsterix
           end
         else
           Blobsterix.event("s3_api.list_bucket",:bucket => bucket)
-          Http.OK storage.list(bucket, :start_path => env["HTTP_START_PATH"]).to_xml, "xml"
+          start_path = env["params"]["marker"] if env["params"]
+          Http.OK storage.list(bucket, :start_path => start_path).to_xml, "xml"
         end
       end
 

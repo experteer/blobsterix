@@ -121,7 +121,7 @@ describe Blobsterix::S3Api do
 
     describe 'list bucket truncated' do
       it 'should return all files for the bucket starting at u#{key}' do
-        get "/#{bucket}", "", "HTTP_START_PATH" => "u#{key}"
+        get "/#{bucket}", "", "params" => {"marker" => "u#{key}"}
         expect(last_response.status).to eql(200)
         response = Hash.from_xml last_response.body
         expect(response).to have_key(:ListBucketResult)
