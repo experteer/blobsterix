@@ -28,9 +28,10 @@ module Blobsterix
           if bucket_exist(bucket)
             b = Bucket.new(bucket, time_string_of(bucket))
             b.key_count = 0
+            logger.info "Request filelist: #{bucket} : #{opts}"
             Blobsterix.wait_for(Proc.new {
               start_path = map_filename(opts[:start_path]) if opts[:start_path]
-              current_obj = Blobsterix::DirectoryList.each_limit(contents(bucket), :limit => 100, :start_path => start_path) do |path, file|
+              current_obj = Blobsterix::DirectoryList.each_limit(contents(bucket), :limit => 20, :start_path => start_path) do |path, file|
                 # logger.info "Create Entry: #{b.key_count}"
                 if file.to_s.end_with?(".meta")
                   false
@@ -46,8 +47,11 @@ module Blobsterix
                   true
                 end
               end
-
-              b.truncated=true if current_obj.next
+              next_marker = current_obj.current_file
+              if current_obj.next
+                b.next_marker=next_marker
+                b.truncated=true
+              end
             })
             b
           else

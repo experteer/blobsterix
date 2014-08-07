@@ -28,7 +28,8 @@ module Blobsterix
     private
       def list_buckets
         Blobsterix.event("s3_api.list_bucket",:bucket => bucket)
-        Http.OK storage.list(bucket).to_xml, "xml"
+        start_path = env["params"]["marker"] if env["params"]
+        Http.OK storage.list(bucket, :start_path => start_path).to_xml, "xml"
       end
 
       def get_file(send_with_data=true)
