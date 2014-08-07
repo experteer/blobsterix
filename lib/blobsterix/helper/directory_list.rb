@@ -107,7 +107,6 @@ module Blobsterix
       while (!limit || used < limit) && a.next
         used +=1 if yield a.current_path, a.current_file
       end
-      puts "Reached limit" if used >= limit
       a
     end
     def self.each(path)
