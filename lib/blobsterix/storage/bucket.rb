@@ -1,7 +1,7 @@
 module Blobsterix
   module Storage
     class Bucket
-      attr_accessor :name, :creation_date, :contents, :truncated, :key_count, :next_marker
+      attr_accessor :name, :creation_date, :contents, :truncated, :key_count, :next_marker, :marker
       def initialize(name, date)
         @name = name
         @creation_date = date
@@ -15,7 +15,7 @@ module Blobsterix
             xml.ListBucketResult(:xmlns => "http://doc.s3.amazonaws.com/#{date.year}-#{date.month}-#{date.day}") {
               xml.Name name
               xml.Prefix
-              xml.Marker
+              xml.Marker marker
               xml.NextMarker next_marker
               xml.MaxKeys 1000
               xml.KeyCount key_count

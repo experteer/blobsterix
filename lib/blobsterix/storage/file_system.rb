@@ -28,15 +28,16 @@ module Blobsterix
           if bucket_exist(bucket)
             b = Bucket.new(bucket, time_string_of(bucket))
             b.key_count = 0
+            b.marker = opts[:start_path] if opts[:start_path]
             logger.info "Request filelist: #{bucket} : #{opts}"
             Blobsterix.wait_for(Proc.new {
-              start_path = map_filename(opts[:start_path]) if opts[:start_path]
+              start_path = map_filename(opts[:start_path].to_s.gsub("/", "\\")) if opts[:start_path]
               current_obj = Blobsterix::DirectoryList.each_limit(contents(bucket), :limit => 20, :start_path => start_path) do |path, file|
                 # logger.info "Create Entry: #{b.key_count}"
                 if file.to_s.end_with?(".meta")
                   false
                 else
-                  b.contents << BucketEntry.new(file.to_s) do |entry|
+                  b.contents << BucketEntry.new(file.to_s.gsub("\\", "/")) do |entry|
                     meta = metaData(bucket, file.to_s)
                     entry.last_modified =  meta.last_modified.strftime("%Y-%m-%dT%H:%M:%S.000Z")
                     entry.etag =  meta.etag
@@ -47,7 +48,7 @@ module Blobsterix
                   true
                 end
               end
-              next_marker = current_obj.current_file
+              next_marker = current_obj.current_file.to_s.gsub("\\", "/")
               if current_obj.next
                 b.next_marker=next_marker
                 b.truncated=true
