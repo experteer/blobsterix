@@ -17,7 +17,10 @@ require 'mini_magick'
 require 'json'
 require 'logger'
 require 'erb'
+require 'openssl'
+require 'base64'
 require 'goliath/api'
+
 
 #utility
 require 'blobsterix/mimemagic/tables'
@@ -36,6 +39,7 @@ require 'blobsterix/helper/simple_proxy'
 require 'blobsterix/helper/status_info'
 require 'blobsterix/helper/template_renderer'
 require 'blobsterix/helper/config_loader'
+require 'blobsterix/helper/url_helper'
 
 #router base
 require 'blobsterix/router/app_router'
@@ -44,6 +48,7 @@ require 'blobsterix/router/app_router'
 require 'blobsterix/s3/s3_url_helper'
 require 'blobsterix/blob/blob_url_helper'
 require 'blobsterix/status/status_url_helper'
+require 'blobsterix/s3/s3_auth'
 
 #apis
 require 'blobsterix/s3/s3_api'
@@ -150,6 +155,14 @@ module Blobsterix
 
   def self.decrypt_trafo=(obj)
     @decrypt_trafo=obj
+  end
+
+  def self.secret_key
+    @secret_key
+  end
+
+  def self.secret_key=(obj)
+    @secret_key=obj
   end
 
   def self.decrypt_trafo(blob_access,trafo_string,logger)

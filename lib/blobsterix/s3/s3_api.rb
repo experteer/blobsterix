@@ -1,6 +1,7 @@
 module Blobsterix
   class S3Api < AppRouterBase
     include S3UrlHelper
+    include UrlHelper
 
     get "/", :list_buckets
 
@@ -26,13 +27,21 @@ module Blobsterix
     post "*any", :next_api
 
     private
+      def check_auth
+        logger.info "hey"
+        return true unless Blobsterix.secret_key
+        Blobsterix::S3Auth.authenticate(env).check(Blobsterix.secret_key)
+      end
+
       def list_buckets
+        return Http.NotAuthorized unless check_auth
         Blobsterix.event("s3_api.list_bucket",:bucket => bucket)
         start_path = env["params"]["marker"] if env["params"]
         Http.OK storage.list(bucket, :start_path => start_path).to_xml, "xml"
       end
 
       def get_file(send_with_data=true)
+        return Http.NotAuthorized unless check_auth
         return Http.NotFound if favicon
 
         if bucket?
@@ -49,20 +58,23 @@ module Blobsterix
       end
 
       def get_file_head
-                           #TODO: add event?
+        return Http.NotAuthorized unless check_auth
+        #TODO: add event?
         get_file(false)
       end
 
       def create_bucket
-              Blobsterix.event("s3_api.upload",:bucket => bucket)
+        return Http.NotAuthorized unless check_auth
+        Blobsterix.event("s3_api.upload",:bucket => bucket)
         Http.OK storage.create(bucket), "xml"
       end
 
       def upload_data
+        return Http.NotAuthorized unless check_auth
         source = cached_upload
         accept = AcceptType.new("*/*")#source.accept_type()
 
-        trafo_current = trafo(trafo_string)
+        trafo_current = trafo(transformation_string)
         file_current = file
         bucket_current = bucket
         Blobsterix.event("s3_api.upload", :bucket => bucket_current, 
@@ -74,6 +86,7 @@ module Blobsterix
       end
 
       def delete_bucket
+        return Http.NotAuthorized unless check_auth
         Blobsterix.event("s3_api.delete_bucket", :bucket => bucket)
 
         if bucket?
@@ -84,6 +97,7 @@ module Blobsterix
       end
 
       def delete_file
+        return Http.NotAuthorized unless check_auth
          Blobsterix.event("s3_api.delete_file", :bucket => bucket,:file => file)
         if bucket?
           Http.OK_no_data storage.delete_key(bucket, file), "xml"

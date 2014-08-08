@@ -1,6 +1,7 @@
 module Blobsterix
   class BlobApi < AppRouterBase
     include BlobUrlHelper
+    include UrlHelper
 
     get "/blob/v1", :not_allowed
     get "/blob", :not_allowed

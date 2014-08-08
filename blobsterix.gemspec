@@ -30,6 +30,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "nokogiri",    "~> 1.6.1"
   gem.add_dependency "ruby-webp",   "~> 0.1.0"
   gem.add_dependency "mini_magick", "~> 3.5.0"
+  gem.add_dependency "log4r"
 
   gem.add_development_dependency "rake","~> 0.9.6"
   gem.add_development_dependency "rspec", "~> 2.14.0"

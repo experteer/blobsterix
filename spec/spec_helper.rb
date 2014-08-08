@@ -9,6 +9,7 @@ Bundler.setup
 Bundler.require
 
 require 'rack/test'
+require 'log4r'
 require 'goliath/test_helper'
 
 Blobsterix.storage_dir=Blobsterix.root.join("tmp/contents")
