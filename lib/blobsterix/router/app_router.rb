@@ -44,29 +44,15 @@ module Blobsterix
       {:controller => self.name, :function => :call}.merge(opt)
     end
 
-    def self.get(path, opt = {})
-      path  = Journey::Path::Pattern.new path
-      router.routes.add_route(lambda{|env| call_controller(options(opt), env)}, path, {:request_method => "GET"}, {})
+    def self.http_verbs
+      @http_verbs||=["GET", "POST", "PUT", "DELETE", "HEAD"]
     end
 
-    def self.post(path, opt = {})
-      path  = Journey::Path::Pattern.new path
-      router.routes.add_route(lambda{|env| call_controller(options(opt), env)}, path, {:request_method => "POST"}, {})
-    end
-
-    def self.put(path, opt = {})
-      path  = Journey::Path::Pattern.new path
-      router.routes.add_route(lambda{|env| call_controller(options(opt), env)}, path, {:request_method => "PUT"}, {})
-    end
-
-    def self.delete(path, opt = {})
-      path  = Journey::Path::Pattern.new path
-      router.routes.add_route(lambda{|env| call_controller(options(opt), env)}, path, {:request_method => "DELETE"}, {})
-    end
-
-    def self.head(path, opt = {})
-      path  = Journey::Path::Pattern.new path
-      router.routes.add_route(lambda{|env| call_controller(options(opt), env)}, path, {:request_method => "HEAD"}, {})
+    http_verbs.each do |method|
+      define_singleton_method method.downcase.to_sym do |path, opt = {}|
+        path  = Journey::Path::Pattern.new path
+        router.routes.add_route(lambda{|env| call_controller(options(opt), env)}, path, {:request_method => method}, {})
+      end
     end
 
     def self.call(env)
