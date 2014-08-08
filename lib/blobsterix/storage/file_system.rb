@@ -67,7 +67,7 @@ module Blobsterix
 
       def delete(bucket)
         logger.info "Storage: delete bucket #{contents(bucket)}"
-        FileUtils.rm_rf(contents(bucket)) if bucket_exist(bucket) && bucket_files(bucket).empty?
+        FileUtils.rm_rf(contents(bucket)) if bucket_exist(bucket) && bucket_empty?
         #Dir.rmdir(contents(bucket)) if bucket_exist(bucket) && bucket_files(bucket).empty?
       end
 
@@ -122,6 +122,15 @@ module Blobsterix
           }
           parts.push(filename)
           parts.join("/")
+        end
+
+        def bucket_empty?(bucket)
+          empty = true
+          Blobsterix::DirectoryList.each(contents(bucket)) do
+            empty = false
+            break
+          end
+          empty
         end
 
         def bucket_files(bucket)
