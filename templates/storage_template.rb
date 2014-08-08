@@ -1,7 +1,7 @@
 module Blobsterix
   module Storage
     class $ClassNameStorage < Storage
-      def list(bucket="root")
+      def list(bucket="root", opts={})
         Nokogiri::XML::Builder.new do |xml|
           xml.Error "no such bucket"
         end
@@ -12,7 +12,7 @@ module Blobsterix
       def get(bucket, key)
         Blobsterix::Storage::BlobMetaData.new
       end
-      def put(bucket, key, value)
+      def put(bucket, key, value, opts={})
         Blobsterix::Storage::BlobMetaData.new
       end
       def create(bucket)
