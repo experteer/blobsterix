@@ -19,23 +19,22 @@ module Blobsterix
       end
       obj.get_binding
     end
+
+    def self.error_massages
+      @error_massages||={"Not Found" => 404, "Server Error" => 500, "Not Allowed" => 403, "Not Authorized" => 401}
+    end
+
+    error_massages.each do |error_name, error_code|
+      define_singleton_method error_name.gsub(" ", "").to_sym do |data=error_name, content_type="html"|
+        Response(error_code, renderer.render("error_page", error_object_binding(:title=>error_name, :content=>data, :error_code => 404)), content_type)
+      end
+    end
+
     def self.NextApi(data="Not Found", content_type="txt")
-      [600, {"Content-Type" => MimeMagic.by_extension(content_type).type}, data]
-    end
-    def self.NotFound(data="Not Found", content_type="html")
-      [404, {"Content-Type" => MimeMagic.by_extension(content_type).type}, renderer.render("error_page", error_object_binding(:title=>"Not Found", :content=>data, :error_code => 404))]
-    end
-    def self.ServerError(data="Server Error", content_type="html")
-      [500, {"Content-Type" => MimeMagic.by_extension(content_type).type}, renderer.render("error_page", error_object_binding(:title=>"Server Error", :content=>data, :error_code => 500))]
-    end
-    def self.NotAllowed(data="Not Allowed", content_type="html")
-      [403, {"Content-Type" => MimeMagic.by_extension(content_type).type}, renderer.render("error_page", error_object_binding(:title=>"Not Allowed", :content=>data, :error_code => 403))]
-    end
-    def self.NotAuthorized(data="Not Authorized", content_type="html")
-      [401, {"Content-Type" => MimeMagic.by_extension(content_type).type}, renderer.render("error_page", error_object_binding(:title=>"Not Authorized", :content=>data, :error_code => 401))]
+      Response(600, data, content_type)
     end
     def self.OK(data="", content_type="txt")
-      [200, {"Content-Type" => MimeMagic.by_extension(content_type).type}, data]
+      Response(200, data, content_type)
     end
     def self.Response(status_code=200, data="", content_type="txt")
       [status_code, {"Content-Type" => MimeMagic.by_extension(content_type).type}, data]
