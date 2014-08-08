@@ -67,7 +67,7 @@ module Blobsterix
 
       def delete(bucket)
         logger.info "Storage: delete bucket #{contents(bucket)}"
-        FileUtils.rm_rf(contents(bucket)) if bucket_exist(bucket) && bucket_empty?
+        FileUtils.rm_rf(contents(bucket)) if bucket_exist(bucket) && bucket_empty?(bucket)
         #Dir.rmdir(contents(bucket)) if bucket_exist(bucket) && bucket_files(bucket).empty?
       end
 
@@ -111,17 +111,7 @@ module Blobsterix
         end
 
         def map_filename(filename)
-          hash = Murmur.Hash64B(filename)
-          bits =  hash.to_s(2)
-          parts = []
-          6.times { |index|
-            len = 11
-            len = bits.length if len >= bits.length
-            value = bits.slice!(0, len).to_i(2).to_s(16).rjust(3,"0")
-            parts.push(value)
-          }
-          parts.push(filename)
-          parts.join("/")
+          Murmur.map_filename(filename, filename)
         end
 
         def bucket_empty?(bucket)
@@ -131,18 +121,6 @@ module Blobsterix
             break
           end
           empty
-        end
-
-        def bucket_files(bucket)
-          Blobsterix.wait_for(Proc.new {
-            if (bucket_exist(bucket))
-              Dir.glob("#{contents}/#{bucket}/**/*").select{|e| !File.directory?(e) and not e.end_with?(".meta")}.map{ |e|
-                e.gsub("#{contents}/#{bucket}/","").gsub(/\w+\/\w+\/\w+\/\w+\/\w+\/\w+\//, "").gsub("\\", "/")
-              }
-            else
-              []
-            end
-          })
         end
 
         def metaData(bucket, key)

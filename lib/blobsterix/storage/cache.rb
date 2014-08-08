@@ -99,16 +99,7 @@ module Blobsterix
       end
 
       def hash_filename(filename)
-        hash = Murmur.Hash64B(filename)
-        bits =  hash.to_s(2)
-        parts = []
-        6.times { |index|
-          len = 11
-          len = bits.length if len >= bits.length
-          value = bits.slice!(0, len).to_i(2).to_s(16).rjust(3,"0")
-          parts.push(value)
-        }
-        parts.join("/")
+        Murmur.map_filename(filename)
       end
     end
   end

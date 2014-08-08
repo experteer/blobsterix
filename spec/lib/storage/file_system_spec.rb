@@ -43,6 +43,20 @@ describe Blobsterix::Storage::FileSystem do
       expect(response[:Error]).to eql("no such bucket")
     end
 
+    it "should not destroy bucket when files still exist" do
+      Blobsterix.storage.create(bucket)
+      Blobsterix.storage.put(bucket, key, StringIO.new(data, "r"))
+      response = Hash.from_xml Blobsterix.storage.list(bucket).to_xml
+      expect(response).to have_key(:ListBucketResult)
+      expect(response[:ListBucketResult]).to have_key(:Name)
+      expect(response[:ListBucketResult][:Name]).to eql(bucket)
+
+      Blobsterix.storage.delete(bucket)
+      response = Hash.from_xml Blobsterix.storage.list(bucket).to_xml
+      expect(response).to_not have_key(:Error)
+      expect(response[:Error]).to_not eql("no such bucket")
+    end
+
     it "should return the key info if it exists when listing bucket" do
       Blobsterix.storage.put(bucket, key, StringIO.new(data, "r"))
       response = Hash.from_xml Blobsterix.storage.list(bucket).to_xml
