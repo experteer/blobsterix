@@ -10,6 +10,10 @@ module Blobsterix
   end
 
   class TemplateRenderer
+    def self.create(binding_)
+      (Blobsterix.respond_to?(:env) && Blobsterix.env == :production) ? TemplateRenderer.new(binding_) : ReloadTemplateRenderer.new(binding_)
+    end
+
     def initialize(controller_binding_)
       @controller_binding=controller_binding_
     end

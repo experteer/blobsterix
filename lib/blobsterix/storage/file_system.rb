@@ -18,39 +18,13 @@ module Blobsterix
 
       def list(bucket="root", opts={})
         if bucket =~ /root/
-          BucketList.new do |l|
-
-            Dir.entries("#{contents}").each{|dir|
-              l.buckets << Bucket.new(dir, time_string_of(dir)) if File.directory? File.join("#{contents}",dir) and !(dir =='.' || dir == '..') 
-            }
-          end
+          list_buckets
         else
           if bucket_exist(bucket)
             b = Bucket.new(bucket, time_string_of(bucket))
-            b.key_count = 0
             b.marker = opts[:start_path] if opts[:start_path]
             Blobsterix.wait_for(Proc.new {
-              start_path = map_filename(opts[:start_path].to_s.gsub("/", "\\")) if opts[:start_path]
-              current_obj = Blobsterix::DirectoryList.each_limit(contents(bucket), :limit => 20, :start_path => start_path) do |path, file|
-                if file.to_s.end_with?(".meta")
-                  false
-                else
-                  b.contents << BucketEntry.new(file.to_s.gsub("\\", "/")) do |entry|
-                    meta = metaData(bucket, file.to_s)
-                    entry.last_modified =  meta.last_modified.strftime("%Y-%m-%dT%H:%M:%S.000Z")
-                    entry.etag =  meta.etag
-                    entry.size =  meta.size
-                    entry.mimetype = meta.mimetype
-                  end
-                  b.key_count+=1
-                  true
-                end
-              end
-              next_marker = current_obj.current_file.to_s.gsub("\\", "/")
-              if current_obj.next
-                b.next_marker=next_marker
-                b.truncated=true
-              end
+              collect_bucket_entries(bucket, b, opts)
             })
             b
           else
@@ -93,7 +67,7 @@ module Blobsterix
 
       def delete(bucket)
         logger.info "Storage: delete bucket #{contents(bucket)}"
-        FileUtils.rm_rf(contents(bucket)) if bucket_exist(bucket) && bucket_files(bucket).empty?
+        FileUtils.rm_rf(contents(bucket)) if bucket_exist(bucket) && bucket_empty?(bucket)
         #Dir.rmdir(contents(bucket)) if bucket_exist(bucket) && bucket_files(bucket).empty?
       end
 
@@ -105,6 +79,29 @@ module Blobsterix
       end
 
       private
+        def list_buckets
+          BucketList.new do |l|
+            Dir.entries("#{contents}").each{|dir|
+              l.buckets << Bucket.new(dir, time_string_of(dir)) if File.directory? File.join("#{contents}",dir) and !(dir =='.' || dir == '..') 
+            }
+          end
+        end
+        def collect_bucket_entries(bucket, b, opts)
+          start_path = map_filename(opts[:start_path].to_s.gsub("/", "\\")) if opts[:start_path]
+          current_obj = Blobsterix::DirectoryList.each_limit(contents(bucket), :limit => 20, :start_path => start_path) do |path, file|
+            if file.to_s.end_with?(".meta")
+              false
+            else
+              b.contents << BucketEntry.create(file, metaData(bucket, file.to_s))
+              true
+            end
+          end
+          next_marker = current_obj.current_file.to_s.gsub("\\", "/")
+          if current_obj.next
+            b.next_marker=next_marker
+            b.truncated=true
+          end
+        end
         def contents(bucket=nil, key=nil)
           if bucket
             key ? File.join(@contents, bucket, map_filename(key.gsub("/", "\\"))) : File.join(@contents, bucket)
@@ -114,29 +111,16 @@ module Blobsterix
         end
 
         def map_filename(filename)
-          hash = Murmur.Hash64B(filename)
-          bits =  hash.to_s(2)
-          parts = []
-          6.times { |index|
-            len = 11
-            len = bits.length if len >= bits.length
-            value = bits.slice!(0, len).to_i(2).to_s(16).rjust(3,"0")
-            parts.push(value)
-          }
-          parts.push(filename)
-          parts.join("/")
+          Murmur.map_filename(filename, filename)
         end
 
-        def bucket_files(bucket)
-          Blobsterix.wait_for(Proc.new {
-            if (bucket_exist(bucket))
-              Dir.glob("#{contents}/#{bucket}/**/*").select{|e| !File.directory?(e) and not e.end_with?(".meta")}.map{ |e|
-                e.gsub("#{contents}/#{bucket}/","").gsub(/\w+\/\w+\/\w+\/\w+\/\w+\/\w+\//, "").gsub("\\", "/")
-              }
-            else
-              []
-            end
-          })
+        def bucket_empty?(bucket)
+          empty = true
+          Blobsterix::DirectoryList.each(contents(bucket)) do
+            empty = false
+            break
+          end
+          empty
         end
 
         def metaData(bucket, key)

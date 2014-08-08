@@ -40,6 +40,7 @@ require 'blobsterix/helper/status_info'
 require 'blobsterix/helper/template_renderer'
 require 'blobsterix/helper/config_loader'
 require 'blobsterix/helper/url_helper'
+require 'blobsterix/helper/jsonizer'
 
 #router base
 require 'blobsterix/router/app_router'

@@ -1,7 +1,7 @@
 module Blobsterix
   module Http
     def self.renderer
-      @@renderer||=(Blobsterix.respond_to?(:env) && Blobsterix.env == :production) ? TemplateRenderer.new(binding) : ReloadTemplateRenderer.new(binding)
+      @@renderer||=TemplateRenderer.create(binding)
     end
     def self.error_object_binding(obj)
       obj||={}

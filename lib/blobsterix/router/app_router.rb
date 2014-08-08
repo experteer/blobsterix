@@ -1,25 +1,14 @@
 module Blobsterix
-  module Jsonizer
-    def json_var(*var_names)
-      @json_vars = (@json_vars||[])+var_names.flatten
-    end
-
-    def json_vars
-      @json_vars||= []
-    end
-  end
-
   class AppRouterBase
 
     extend Jsonizer
+    include Jsonizer::Methods
     include Logable
 
-    #attr_reader :logger
     attr_accessor :env
 
     def initialize(env)
       @env = env
-      #@logger = env["rack.logger"]
     end
 
     def storage
@@ -39,7 +28,7 @@ module Blobsterix
     end
 
     def renderer
-      @@renderer||=(Blobsterix.respond_to?(:env) && Blobsterix.env == :production) ? TemplateRenderer.new(binding) : ReloadTemplateRenderer.new(binding)
+      @@renderer||=TemplateRenderer.create(binding)
     end
 
     def render(template_name, status_code=200, bind=nil)
@@ -50,74 +39,33 @@ module Blobsterix
       end
     end
 
-    def render_json(obj=nil)
-      Http.OK (obj||self).to_json, "json"
-    end
-
-    def render_xml(obj=nil)
-      obj = Nokogiri::XML::Builder.new do |xml|
-        yield xml
-      end if block_given?
-      Http.OK (obj||self).to_xml, "xml"
-    end
-
-    def to_json
-      stuff = Hash.new
-      self.class.json_vars.each{|var_name|
-        stuff[var_name.to_sym]=send(var_name) if respond_to?(var_name)
-      }
-      stuff.to_json
-    end
-    def to_xml()
-      xml = Nokogiri::XML::Builder.new do |xml|
-      xml.BlobsterixStatus() {
-        self.class.json_vars.each{|var_name|
-          var = send(var_name)
-          var = var.to_xml if var.respond_to?(:to_xml)
-          xml.send(var_name, var) if respond_to?(var_name)
-        }
-      }
-      end
-      xml.to_xml
-    end
-
     def self.options(opt)
       opt = {:function => opt.to_sym} if opt.class != Hash
       {:controller => self.name, :function => :call}.merge(opt)
     end
 
-    def self.get(path, opt = {})
-      path  = Journey::Path::Pattern.new path
-      router.routes.add_route(lambda{|env| call_controller(options(opt), env)}, path, {:request_method => "GET"}, {})
+    def self.http_verbs
+      @http_verbs||=["GET", "POST", "PUT", "DELETE", "HEAD"]
     end
 
-    def self.post(path, opt = {})
-      path  = Journey::Path::Pattern.new path
-      router.routes.add_route(lambda{|env| call_controller(options(opt), env)}, path, {:request_method => "POST"}, {})
-    end
-
-    def self.put(path, opt = {})
-      path  = Journey::Path::Pattern.new path
-      router.routes.add_route(lambda{|env| call_controller(options(opt), env)}, path, {:request_method => "PUT"}, {})
-    end
-
-    def self.delete(path, opt = {})
-      path  = Journey::Path::Pattern.new path
-      router.routes.add_route(lambda{|env| call_controller(options(opt), env)}, path, {:request_method => "DELETE"}, {})
-    end
-
-    def self.head(path, opt = {})
-      path  = Journey::Path::Pattern.new path
-      router.routes.add_route(lambda{|env| call_controller(options(opt), env)}, path, {:request_method => "HEAD"}, {})
+    http_verbs.each do |method|
+      define_singleton_method method.downcase.to_sym do |path, opt = {}|
+        path  = Journey::Path::Pattern.new path
+        router.routes.add_route(lambda{|env| call_controller(options(opt), env)}, path, {:request_method => method}, {})
+      end
     end
 
     def self.call(env)
       Blobsterix::StatusInfo.connections+=1
-      Blobsterix.logger.info "RAM USAGE Before[#{Process.pid}]: " + `pmap #{Process.pid} | tail -1`[10,40].strip
+      print_ram_usage("RAM USAGE Before")
       result=router.call(env)
-      Blobsterix.logger.info "RAM USAGE After[#{Process.pid}]: " + `pmap #{Process.pid} | tail -1`[10,40].strip
+      print_ram_usage("RAM USAGE After")
       Blobsterix::StatusInfo.connections-=1
       result
+    end
+
+    def self.print_ram_usage(text)
+      Blobsterix.logger.info "#{text}[#{Process.pid}]: " + `pmap #{Process.pid} | tail -1`[10,40].strip
     end
 
     def self.call_controller(options, env)
