@@ -6,6 +6,9 @@ module Blobsterix
       include ::Blobsterix::Logable
       include V2Helper
 
+      # these should actually be used when calculating
+      # the signature when suplied as query parameters, 
+      # but they are not needed in this usecase
       SUBRESOURCES = [
         "acl",
         "lifecycle",
