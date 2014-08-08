@@ -6,37 +6,34 @@ describe Blobsterix::S3Auth do
 
   let(:v2_delete_file) {
     {
-      # :proxy => {:host => "localhost", :port => 9900},
       :path=>"/profile_photo%2F1023066_1407492523",
       :head => {
         "host"=>"career.blob.localhost.local",
         "date" => "Fri, 08 Aug 2014 10:09:03 +0000",
-        "authorization" => "AWS somethingIdid:LxTRXgW+E0SHU2xSkMI5Q62wKhU=",               
+        "authorization" => "AWS somethingIdid:LxTRXgW+E0SHU2xSkMI5Q62wKhU="
       }
     }
   }
 
   let(:v2_list_bucket) {
     {
-      # :proxy => {:host => "localhost", :port => 9900},
       :path=>"/",
       :head => {
         "host"=>"johnsmith.s3.amazonaws.com",
         "date" => "Tue, 27 Mar 2007 19:42:41 +0000",
-        "authorization" => "AWS AKIAIOSFODNN7EXAMPLE:htDYFYduRNen8P9ZfE/s9SuKy0U=",               
+        "authorization" => "AWS AKIAIOSFODNN7EXAMPLE:htDYFYduRNen8P9ZfE/s9SuKy0U="
       }
     }
   }
 
   let(:v2_upload_photo) {
     {
-      # :proxy => {:host => "localhost", :port => 9900},
       :path=>"/photos/puppy.jpg",
       :head => {
         "host"=>"johnsmith.s3.amazonaws.com",
         "content-type" => "image/jpeg",
         "date" => "Tue, 27 Mar 2007 21:15:45 +0000",
-        "authorization" => "AWS AKIAIOSFODNN7EXAMPLE:MyyxeRY7whkBe+bq8fHCL/2kKUg=",               
+        "authorization" => "AWS AKIAIOSFODNN7EXAMPLE:MyyxeRY7whkBe+bq8fHCL/2kKUg="
       }
     }
   }
@@ -46,7 +43,7 @@ describe Blobsterix::S3Auth do
       :path=>"/",
       :head => {
         "date" => "Wed, 28 Mar 2007 01:29:59 +0000",
-        "authorization" => "AWS AKIAIOSFODNN7EXAMPLE:qGdzdERIC03wnaRNKh6OqZehG9s=",               
+        "authorization" => "AWS AKIAIOSFODNN7EXAMPLE:qGdzdERIC03wnaRNKh6OqZehG9s="
       }
     }
   }
@@ -56,7 +53,17 @@ describe Blobsterix::S3Auth do
       :path=>"/",
       :head => {
         "x-amz-date" => "Fri, 08 Aug 2014 10:28:22 +0000",
-        "authorization" => "AWS somethingIdid:CEyyoVY9bnq4Ujjgwwo5ozYXEfI=",               
+        "authorization" => "AWS somethingIdid:CEyyoVY9bnq4Ujjgwwo5ozYXEfI="
+      }
+    }
+  }
+
+  let(:v2_query_download_file) {
+    {
+      :path=>"/photos/puppy.jpg",
+      :query=>"AWSAccessKeyId=AKIAIOSFODNN7EXAMPLE&Signature=NpgCjnDzrM%2BWFzoENXmpNDUsSn8%3D&Expires=1175139620",
+      :head => {
+        "host"=>"johnsmith.s3.amazonaws.com"              
       }
     }
   }
@@ -110,46 +117,27 @@ describe Blobsterix::S3Auth do
     }
   }
 
+  def run_request(method, params, test, key)
+    Blobsterix.secret_key = key
+    with_api( Blobsterix::Service, :log_stdout => false) do |a|
+      Blobsterix.logger = a.logger
+      send(method, params) do |resp|
+        resp.response_header.status.should eql test
+      end
+    end
+  end
+
+  it "should work with aws v2 query" do
+    run_request("put_request", v2_upload_photo, 200, "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY")
+    run_request("get_request", v2_query_download_file, 200, "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY")
+  end
+
   it "should work with aws v2" do
-    Blobsterix.secret_key = "somethingIdidInSecret"
-    with_api( Blobsterix::Service, :log_stdout => false) do |a|
-      # Blobsterix.logger = a.logger
-      get_request(v2_list_root_amz_date) do |resp|
-        resp.response_header.status.should eql 200
-      end
-    end
-
-    Blobsterix.secret_key = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
-    with_api( Blobsterix::Service, :log_stdout => false) do |a|
-      Blobsterix.logger = a.logger
-      get_request(v2_list_root_date) do |resp|
-        resp.response_header.status.should eql 200
-      end
-    end
-
-    Blobsterix.secret_key = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
-    with_api( Blobsterix::Service, :log_stdout => false) do |a|
-      Blobsterix.logger = a.logger
-      put_request(v2_upload_photo) do |resp|
-        resp.response_header.status.should eql 200
-      end
-    end
-
-    Blobsterix.secret_key = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
-    with_api( Blobsterix::Service, :log_stdout => false) do |a|
-      Blobsterix.logger = a.logger
-      get_request(v2_list_bucket) do |resp|
-        resp.response_header.status.should eql 200
-      end
-    end
-
-    Blobsterix.secret_key = "somethingIdidInSecret"
-    with_api( Blobsterix::Service, :log_stdout => false) do |a|
-      Blobsterix.logger = a.logger
-      delete_request(v2_delete_file) do |resp|
-        resp.response_header.status.should eql 204
-      end
-    end
+    run_request("get_request", v2_list_root_amz_date, 200, "somethingIdidInSecret")
+    run_request("get_request", v2_list_root_date, 200, "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY")
+    run_request("put_request", v2_upload_photo, 200, "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY")
+    run_request("get_request", v2_list_bucket, 200, "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY")
+    run_request("delete_request", v2_delete_file, 204, "somethingIdidInSecret")
   end
 
   it "should at least recognize aws v4" do

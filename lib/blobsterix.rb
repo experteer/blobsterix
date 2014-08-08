@@ -48,6 +48,10 @@ require 'blobsterix/router/app_router'
 require 'blobsterix/s3/s3_url_helper'
 require 'blobsterix/blob/blob_url_helper'
 require 'blobsterix/status/status_url_helper'
+require 'blobsterix/s3/s3_auth_v2_helper'
+require 'blobsterix/s3/s3_auth_v2'
+require 'blobsterix/s3/s3_auth_v2_query'
+require 'blobsterix/s3/s3_auth_v4'
 require 'blobsterix/s3/s3_auth'
 
 #apis
