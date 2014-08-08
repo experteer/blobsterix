@@ -42,9 +42,7 @@ module Blobsterix
             Http.NotFound
           end
         else
-          Blobsterix.event("s3_api.list_bucket",:bucket => bucket)
-          start_path = env["params"]["marker"] if env["params"]
-          Http.OK storage.list(bucket, :start_path => start_path).to_xml, "xml"
+          list_buckets
         end
       end
 
