@@ -24,7 +24,7 @@ module Blobsterix
             b = Bucket.new(bucket, time_string_of(bucket))
             b.marker = opts[:start_path] if opts[:start_path]
             Blobsterix.wait_for(Proc.new {
-              collect_bucket_entries(b, opts)
+              collect_bucket_entries(bucket, b, opts)
             })
             b
           else
@@ -86,7 +86,7 @@ module Blobsterix
             }
           end
         end
-        def collect_bucket_entries(b, opts)
+        def collect_bucket_entries(bucket, b, opts)
           start_path = map_filename(opts[:start_path].to_s.gsub("/", "\\")) if opts[:start_path]
           current_obj = Blobsterix::DirectoryList.each_limit(contents(bucket), :limit => 20, :start_path => start_path) do |path, file|
             if file.to_s.end_with?(".meta")
