@@ -1,439 +1,188 @@
 module Blobsterix::Transformations::Impl
-  class ColorSpaceImage < Blobsterix::Transformations::Transformation
-    def name()
-      "grayscale"
-    end
-    def input_type()
-      @input_type ||= Blobsterix::AcceptType.new "image/*"
-    end
+  def self.create_simple_trafo(name_, input, output, is_format_=false, &block)
+    trafo = ::Class.new Blobsterix::Transformations::Transformation do
 
-    def output_type()
-      @output_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def transform(input_path, target_path, value)
-      image = MiniMagick::Image.open(input_path)
-      image.colorspace "gray"
-      image.write target_path
-    end
-  end
-  class RotateImage < Blobsterix::Transformations::Transformation
-    def name()
-      "rotate"
-    end
-    def input_type()
-      @input_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def output_type()
-      @output_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def transform(input_path, target_path, value)
-      image = MiniMagick::Image.open(input_path)
-      image.combine_options do |c|
-        c.background "none"
-        c.rotate value
+      def self.name=(obj)
+        @name=obj
       end
-      image.write target_path
-    end
-  end
 
-  class AdaptiveResizeImage < Blobsterix::Transformations::Transformation
-    def name()
-      "aresize"
-    end
-    def input_type()
-      @input_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def output_type()
-      @output_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def transform(input_path, target_path, value)
-      image = MiniMagick::Image.open(input_path)
-      image.adaptive_resize value
-      image.write target_path
-    end
-  end
-
-  class ResizeImage < Blobsterix::Transformations::Transformation
-    def name()
-      "resize"
-    end
-    def input_type()
-      @input_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def output_type()
-      @output_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def transform(input_path, target_path, value)
-      image = MiniMagick::Image.open(input_path)
-      image.resize value
-      image.write target_path
-    end
-  end
-
-  class MaxsizeImage < Blobsterix::Transformations::Transformation
-    def name()
-      "resizemax"
-    end
-    def input_type()
-      @input_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def output_type()
-      @output_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def transform(input_path, target_path, value)
-      image = MiniMagick::Image.open(input_path)
-      image.resize "#{value}>"
-      image.write target_path
-    end
-  end
-
-  class ShrinkImage < Blobsterix::Transformations::Transformation
-    def name()
-      "shrink"
-    end
-    def input_type()
-      @input_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def output_type()
-      @output_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def transform(input_path, target_path, value)
-      image = MiniMagick::Image.open(input_path)
-      image.resize "#{image[:width]/value.to_i}x#{image[:height]/value.to_i}"
-      image.write target_path
-    end
-  end
-
-  class StripImage < Blobsterix::Transformations::Transformation
-    def name()
-      "strip"
-    end
-    def input_type()
-      @input_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def output_type()
-      @output_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def is_format?()
-      true
-    end
-
-    def transform(input_path, target_path, value)
-      image = MiniMagick::Image.open(input_path)
-      image.strip
-      image.write target_path
-      # system("convert #{input_path} -strip #{target_path}")
-    end
-  end
-
-  class CropImage < Blobsterix::Transformations::Transformation
-    def name()
-      "crop"
-    end
-    def input_type()
-      @input_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def output_type()
-      @output_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def transform(input_path, target_path, value)
-      image = MiniMagick::Image.open(input_path)
-      image.crop value
-      image.write target_path
-    end
-  end
-
-  class Image2HTML < Blobsterix::Transformations::Transformation
-    def input_type()
-      @input_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def output_type()
-      @output_type ||= Blobsterix::AcceptType.new "text/html"
-    end
-
-    def is_format?()
-      true
-    end
-
-    def transform(input_path, target_path, value)
-      type = "image/*"
-      File.open(input_path) {|file|
-        type = MimeMagic.by_magic(file).type
-      }
+      def self.name_
+        @name
+      end
       
-      image = type === "image/webp" ? {:width => "unknown", :height => "unknown"} : MiniMagick::Image.open(input_path)
-      File.open(target_path, "w") {|file|
-        file.write("<html><body>Mimetype: #{type}<br>Width: #{image[:width]}<br>Height: #{image[:height]}</body></html>")
-      }
-    end
-  end
+      def self.is_format=(obj)
+        @is_format=obj
+      end
 
-  class Image2Json < Blobsterix::Transformations::Transformation
-    def name()
-      "json"
-    end
-    
-    def input_type()
-      @input_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def output_type()
-      @output_type ||= Blobsterix::AcceptType.new "text/json"
-    end
-
-    def is_format?()
-      true
-    end
-
-    def transform(input_path, target_path, value)
-      type = "image/*"
-      File.open(input_path) {|file|
-        type = MimeMagic.by_magic(file).type
-      }
+      def self.is_format_
+        @is_format
+      end
       
-      image = type === "image/webp" ? {:width => "unknown", :height => "unknown"} : MiniMagick::Image.open(input_path)
-      File.open(target_path, "w") {|file|
-        file.write({:width => image[:width], :height => image[:height]}.merge(Blobsterix::Storage::FileSystemMetaData.new(input_path).as_json).to_json)
-      }
+      def self.setTypes(input,output)
+        @input= ::Blobsterix::AcceptType.new input
+        @output= ::Blobsterix::AcceptType.new output
+      end
+      
+      def self.input_type_
+        @input
+      end
+      
+      def self.output_type_
+        @input
+      end
+
+      def self.body=(obj)
+        @body=obj
+      end
+
+      def self.body_
+        @body
+      end
+
+      def initialize
+        puts "initialized #{self.class.to_s}"
+      end
+
+      def name
+        self.class.name_
+      end
+
+      def is_format?
+        self.class.is_format_
+      end
+
+      def input_type
+        self.class.input_type_
+      end
+
+      def output_type
+        self.class.output_type_
+      end
+
+      def transform(input_path, target_path, value)
+        self.class.body_.call input_path, target_path, value
+      end
     end
+    trafo.setTypes(input, output)
+    trafo.is_format=is_format_
+    trafo.body=block
+    trafo.name=name_
+    ::Blobsterix::Transformations::Impl.const_set("#{name_.capitalize}Transformation", trafo)
   end
 
-  class Image2Json < Blobsterix::Transformations::Transformation
-    def name()
-      "json_all"
-    end
-    
-    def input_type()
-      @input_type ||= Blobsterix::AcceptType.new "*/*"
-    end
-
-    def output_type()
-      @output_type ||= Blobsterix::AcceptType.new "text/json"
-    end
-
-    def is_format?()
-      true
-    end
-
-    def transform(input_path, target_path, value)
-      File.open(target_path, "w") {|file|
-        file.write(Blobsterix::Storage::FileSystemMetaData.new(input_path).to_json)
-      }
-    end
+  create_simple_trafo("grayscale", "image/*", "image/*", false) do |input_path, target_path, value|
+    puts "grayscale"
+    image = MiniMagick::Image.open(input_path)
+    image.colorspace "gray"
+    image.write target_path
   end
 
-  class RawTransformation < Blobsterix::Transformations::Transformation
-    def name()
-      "raw"
-    end
-
-    def is_format?()
-      true
-    end
-
-    def input_type()
-      @input_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def output_type()
-      @output_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def transform(input_path, target_path, value)
-      raise StandardError.new($?) unless system("cp \"#{input_path}\" \"#{target_path}\"")
-    end
+  create_simple_trafo("resize", "image/*", "image/*", false) do |input_path, target_path, value|
+    image = MiniMagick::Image.open(input_path)
+    image.resize value
+    image.write target_path
   end
 
-  class AsciiTransformation < Blobsterix::Transformations::Transformation
-    def name()
-      "ascii"
-    end
-
-    def is_format?()
-      true
-    end
-
-    def input_type()
-      @input_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def output_type()
-      @output_type ||= Blobsterix::AcceptType.new "text/plain"
-    end
-
-    def transform(input_path, target_path, value)
-      raise StandardError.new($?) unless system("convert \"#{input_path}\" jpg:- | jp2a --width=#{value and value.size > 0 ? value : 100} - > \"#{target_path}\"")
-    end
+  create_simple_trafo("aresize", "image/*", "image/*", false) do |input_path, target_path, value|
+    image = MiniMagick::Image.open(input_path)
+    image.adaptive_resize value
+    image.write target_path
   end
 
-  class AsciiHTMLTransformation < Blobsterix::Transformations::Transformation
-    def name()
-      "asciihtml"
-    end
-
-    def is_format?()
-      true
-    end
-
-    def input_type()
-      @input_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def output_type()
-      @output_type ||= Blobsterix::AcceptType.new "text/plain"
-    end
-
-    def transform(input_path, target_path, value)
-      parts = value.split("x")[0]
-      lines = parts[0]
-      em = parts.length > 1 ? parts[1].to_i : 1
-      raise StandardError.new($?) unless system("convert \"#{input_path}\" jpg:- | jp2a --width=#{lines and lines.to_i > 0 ? value : 100} - > \"#{target_path}\"")
-      text = File.read(target_path)
-      File.write(target_path, "<html><body style='font-size: #{em}em'><pre>#{text.gsub("\n", "<br>")}</pre></body></html>")
-    end
+  create_simple_trafo("resizemax", "image/*", "image/*", false) do |input_path, target_path, value|
+    image = MiniMagick::Image.open(input_path)
+    image.resize "#{value}>"
+    image.write target_path
   end
 
-  class PngTransformation < Blobsterix::Transformations::Transformation
-    def name()
-      "png"
+  create_simple_trafo("rotate", "image/*", "image/*", false) do |input_path, target_path, value|
+    image = MiniMagick::Image.open(input_path)
+    image.combine_options do |c|
+      c.background "none"
+      c.rotate value
     end
-
-    def is_format?()
-      true
-    end
-
-    def input_type()
-      @input_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def output_type()
-      @output_type ||= Blobsterix::AcceptType.new "image/png"
-    end
-
-    def transform(input_path, target_path, value)
-      raise StandardError.new($?) unless system("convert \"#{input_path}\" png:\"#{target_path}\"")
-    end
+    image.write target_path
   end
 
-  class JPegTransformation < Blobsterix::Transformations::Transformation
-    def name()
-      "jpg"
-    end
-
-    def is_format?()
-      true
-    end
-
-    def input_type()
-      @input_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def output_type()
-      @output_type ||= Blobsterix::AcceptType.new "image/jpeg"
-    end
-
-    def transform(input_path, target_path, value)
-      raise StandardError.new($?) unless system("convert \"#{input_path}\" jpg:\"#{target_path}\"")
-    end
+  create_simple_trafo("shrink", "image/*", "image/*", false) do |input_path, target_path, value|
+    image = MiniMagick::Image.open(input_path)
+    image.resize "#{image[:width]/value.to_i}x#{image[:height]/value.to_i}"
+    image.write target_path
   end
 
-  class GifTransformation < Blobsterix::Transformations::Transformation
-    def name()
-      "gif"
-    end
-
-    def is_format?()
-      true
-    end
-
-    def input_type()
-      @input_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def output_type()
-      @output_type ||= Blobsterix::AcceptType.new "image/gif"
-    end
-
-    def transform(input_path, target_path, value)
-      raise StandardError.new($?) unless system("convert \"#{input_path}\" gif:\"#{target_path}\"")
-    end
+  create_simple_trafo("strip", "image/*", "image/*", true) do |input_path, target_path, value|
+    image = MiniMagick::Image.open(input_path)
+    image.strip
+    image.write target_path
   end
 
-  class WebPTransformation < Blobsterix::Transformations::Transformation
-    def name()
-      "webp"
-    end
-
-    def is_format?()
-      true
-    end
-
-    def input_type()
-      @input_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def output_type()
-      @output_type ||= Blobsterix::AcceptType.new "image/webp"
-    end
-
-    def transform(input_path, target_path, value)
-      raise StandardError.new($?) unless system("cwebp \"#{input_path}\" -o \"#{target_path}\"")
-      #system("cp #{input_path} #{target_path}")
-    end
+  create_simple_trafo("crop", "image/*", "image/*", false) do |input_path, target_path, value|
+    image = MiniMagick::Image.open(input_path)
+    image.crop value
+    image.write target_path
   end
 
-  class RenderTextTransformation < Blobsterix::Transformations::Transformation
-    def name()
-      "text"
-    end
+  create_simple_trafo("image2HTML", "image/*", "text/html", true) do |input_path, target_path, value|
+    type = "image/*"
+    File.open(input_path) {|file|
+      type = MimeMagic.by_magic(file).type
+    }
 
-    def input_type()
-      @input_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def output_type()
-      @output_type ||= Blobsterix::AcceptType.new "image/*"
-    end
-
-    def transform(input_path, target_path, value)
-      puts "Render text"
-      raise StandardError.new($?) unless system("convert \"#{input_path}\" -pointsize 20 -draw \"gravity center fill white text 0,12 '#{value.gsub("_", " ").gsub("\"", "'")}'\" \"#{target_path}\"")
-    end
+    image = type === "image/webp" ? {:width => "unknown", :height => "unknown"} : MiniMagick::Image.open(input_path)
+    File.open(target_path, "w") {|file|
+      file.write("<html><body>Mimetype: #{type}<br>Width: #{image[:width]}<br>Height: #{image[:height]}</body></html>")
+    }
   end
 
-  class SleepTransformation < Blobsterix::Transformations::Transformation
-    def name()
-      "sleep"
-    end
+  create_simple_trafo("json", "image/*", "text/json", true) do |input_path, target_path, value|
+    type = "image/*"
+    File.open(input_path) {|file|
+      type = MimeMagic.by_magic(file).type
+    }
 
-    def input_type()
-      @input_type ||= Blobsterix::AcceptType.new "image/*"
-    end
+    image = type === "image/webp" ? {:width => "unknown", :height => "unknown"} : MiniMagick::Image.open(input_path)
+    File.open(target_path, "w") {|file|
+      file.write({:width => image[:width], :height => image[:height]}.merge(Blobsterix::Storage::FileSystemMetaData.new(input_path).as_json).to_json)
+    }
+  end
 
-    def output_type()
-      @output_type ||= Blobsterix::AcceptType.new "image/*"
-    end
+  create_simple_trafo("jsonall", "image/*", "text/json", true) do |input_path, target_path, value|
+    File.open(target_path, "w") {|file|
+      file.write(Blobsterix::Storage::FileSystemMetaData.new(input_path).to_json)
+    }
+  end
 
-    def transform(input_path, target_path, value)
-      p "SLEEEP"
-      sleep(value.to_i)
-      raise StandardError.new($?) unless system("cp \"#{input_path}\" \"#{target_path}\"")
-    end
+  create_simple_trafo("raw", "image/*", "image/*", true) do |input_path, target_path, value|
+    raise StandardError.new($?) unless system("cp \"#{input_path}\" \"#{target_path}\"")
+  end
+
+  create_simple_trafo("ascii", "image/*", "text/plain", true) do |input_path, target_path, value|
+    raise StandardError.new($?) unless system("convert \"#{input_path}\" jpg:- | jp2a --width=#{value and value.size > 0 ? value : 100} - > \"#{target_path}\"")
+  end
+
+  create_simple_trafo("png", "image/*", "image/png", true) do |input_path, target_path, value|
+    raise StandardError.new($?) unless system("convert \"#{input_path}\" png:\"#{target_path}\"")
+  end
+
+  create_simple_trafo("jpg", "image/*", "image/jpeg", true) do |input_path, target_path, value|
+    raise StandardError.new($?) unless system("convert \"#{input_path}\" jpg:\"#{target_path}\"")
+  end
+
+  create_simple_trafo("gif", "image/*", "image/gif", true) do |input_path, target_path, value|
+    raise StandardError.new($?) unless system("convert \"#{input_path}\" gif:\"#{target_path}\"")
+  end
+
+  create_simple_trafo("webp", "image/*", "image/webp", true) do |input_path, target_path, value|
+    raise StandardError.new($?) unless system("cwebp \"#{input_path}\" -o \"#{target_path}\"")
+  end
+
+  create_simple_trafo("text", "image/*", "image/*", true) do |input_path, target_path, value|
+    raise StandardError.new($?) unless system("convert \"#{input_path}\" -pointsize 20 -draw \"gravity center fill white text 0,12 '#{value.gsub("_", " ").gsub("\"", "'")}'\" \"#{target_path}\"")
+  end
+
+  create_simple_trafo("sleep", "image/*", "image/*", true) do |input_path, target_path, value|
+    p "SLEEEP"
+    sleep(value.to_i)
+    raise StandardError.new($?) unless system("cp \"#{input_path}\" \"#{target_path}\"")
   end
 end
