@@ -40,7 +40,6 @@ module Blobsterix::Transformations::Impl
       end
 
       def initialize
-        puts "initialized #{self.class.to_s}"
       end
 
       def name
