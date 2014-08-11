@@ -117,8 +117,18 @@ describe Blobsterix::S3Auth do
     }
   }
 
+  before :all do
+    Blobsterix.secret_key_store = Blobsterix::S3Auth::KeyStore.new(
+      "AKIAIOSFODNN7EXAMPLE" => "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+      "somethingIdid" => "somethingIdidInSecret"
+    )
+  end
+
+  after :all do
+    Blobsterix.secret_key_store = nil
+  end
+
   def run_request(method, params, test, key)
-    Blobsterix.secret_key = key
     with_api( Blobsterix::Service, :log_stdout => false) do |a|
       Blobsterix.logger = a.logger
       send(method, params) do |resp|

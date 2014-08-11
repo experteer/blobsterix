@@ -25,12 +25,11 @@ module Blobsterix
         "#{canonicalized_amz_headers}#{canonicalized_resource(escape)}"
       end
 
-      def check(secret_key)
-        logger.info string_to_sign
-        own_key_0 = server_signature(secret_key, string_to_sign)
-        own_key_1 = server_signature(secret_key, string_to_sign(true))
-        logger.info "[#{@signature}] == [#{own_key_0}] OR [#{@signature}] == [#{own_key_1}]"
-        # puts "[#{@signature}] == [#{own_key_0}] OR [#{@signature}] == [#{own_key_1}]"
+      def check(secret_key_store)
+        # logger.info string_to_sign
+        own_key_0 = server_signature(secret_key_store.get_key(access_key), string_to_sign)
+        own_key_1 = server_signature(secret_key_store.get_key(access_key), string_to_sign(true))
+        # logger.info "[#{@signature}] == [#{own_key_0}] OR [#{@signature}] == [#{own_key_1}]"
         @signature == own_key_0 || @signature == own_key_1
       end
 

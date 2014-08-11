@@ -28,9 +28,8 @@ module Blobsterix
 
     private
       def check_auth
-        logger.info "hey"
-        return true unless Blobsterix.secret_key
-        Blobsterix::S3Auth.authenticate(env).check(Blobsterix.secret_key)
+        return true unless Blobsterix.secret_key_store
+        Blobsterix::S3Auth.authenticate(env).check(Blobsterix.secret_key_store)
       end
 
       def list_buckets

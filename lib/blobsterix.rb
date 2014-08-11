@@ -49,6 +49,7 @@ require 'blobsterix/router/app_router'
 require 'blobsterix/s3/s3_url_helper'
 require 'blobsterix/blob/blob_url_helper'
 require 'blobsterix/status/status_url_helper'
+require 'blobsterix/s3/s3_auth_key_store'
 require 'blobsterix/s3/s3_auth_v2_helper'
 require 'blobsterix/s3/s3_auth_v2'
 require 'blobsterix/s3/s3_auth_v2_query'
@@ -162,12 +163,12 @@ module Blobsterix
     @decrypt_trafo=obj
   end
 
-  def self.secret_key
-    @secret_key
+  def self.secret_key_store
+    @secret_key_store
   end
 
-  def self.secret_key=(obj)
-    @secret_key=obj
+  def self.secret_key_store=(obj)
+    @secret_key_store=obj
   end
 
   def self.decrypt_trafo(blob_access,trafo_string,logger)
