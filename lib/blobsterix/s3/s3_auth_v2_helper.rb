@@ -26,6 +26,7 @@ module Blobsterix
       end
 
       def check(secret_key_store)
+        return false if is_expired?
         # logger.info string_to_sign
         own_key_0 = server_signature(secret_key_store.get_key(access_key), string_to_sign)
         own_key_1 = server_signature(secret_key_store.get_key(access_key), string_to_sign(true))

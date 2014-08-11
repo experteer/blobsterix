@@ -15,6 +15,14 @@ module Blobsterix
       NoAuth.new
     end
 
+    def self.current_time
+      (@current_time||=lambda{Time.now}).call
+    end
+
+    def self.current_time=(obj)
+      @current_time=obj
+    end
+
     class NoAuth
       def check(secret)
         false

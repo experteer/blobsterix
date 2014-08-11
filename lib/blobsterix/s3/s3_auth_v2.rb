@@ -42,6 +42,14 @@ module Blobsterix
         @signature = signature
       end
 
+      def time_to_check
+        env["HTTP_X_AMZ_DATE"]||env["HTTP_DATE"]
+      end
+
+      def is_expired?
+        ::Blobsterix::S3Auth.current_time-Time.parse(time_to_check) > 15*60
+      end
+
       def time_of_request
         env["HTTP_DATE"] unless env["HTTP_X_AMZ_DATE"]
       end

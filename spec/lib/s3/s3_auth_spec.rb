@@ -138,16 +138,35 @@ describe Blobsterix::S3Auth do
   end
 
   it "should work with aws v2 query" do
+    Blobsterix::S3Auth.current_time=lambda{Time.parse("Tue, 27 Mar 2007 21:15:45 +0000")}
     run_request("put_request", v2_upload_photo, 200, "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY")
+    Blobsterix::S3Auth.current_time=lambda{Time.at(1175139610)}
     run_request("get_request", v2_query_download_file, 200, "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY")
   end
 
   it "should work with aws v2" do
+    Blobsterix::S3Auth.current_time=lambda{Time.parse("Fri, 08 Aug 2014 10:28:22 +0000")}
     run_request("get_request", v2_list_root_amz_date, 200, "somethingIdidInSecret")
+    Blobsterix::S3Auth.current_time=lambda{Time.parse("Wed, 28 Mar 2007 01:29:59 +0000")}
     run_request("get_request", v2_list_root_date, 200, "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY")
+    Blobsterix::S3Auth.current_time=lambda{Time.parse("Tue, 27 Mar 2007 21:15:45 +0000")}
     run_request("put_request", v2_upload_photo, 200, "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY")
+    Blobsterix::S3Auth.current_time=lambda{Time.parse("Tue, 27 Mar 2007 19:42:41 +0000")}
     run_request("get_request", v2_list_bucket, 200, "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY")
+    Blobsterix::S3Auth.current_time=lambda{Time.parse("Fri, 08 Aug 2014 10:09:03 +0000")}
     run_request("delete_request", v2_delete_file, 204, "somethingIdidInSecret")
+  end
+
+  it "should expire after 15 minutes" do
+    Blobsterix::S3Auth.current_time=lambda{Time.parse("Fri, 08 Aug 2014 10:28:22 +0000")+60*16}
+    run_request("get_request", v2_list_root_amz_date, 401, "somethingIdidInSecret")
+  end
+
+  it "should expire query when expire time is passed" do
+    Blobsterix::S3Auth.current_time=lambda{Time.parse("Tue, 27 Mar 2007 21:15:45 +0000")}
+    run_request("put_request", v2_upload_photo, 200, "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY")
+    Blobsterix::S3Auth.current_time=lambda{Time.at(1175139621)}
+    run_request("get_request", v2_query_download_file, 401, "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY")
   end
 
   it "should at least recognize aws v4" do

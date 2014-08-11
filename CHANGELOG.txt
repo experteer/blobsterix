@@ -1,3 +1,5 @@
+= 0.0.19
+  * s3 requests expire as expected
 = 0.0.18
   * added s3 authentification
 = 0.0.17

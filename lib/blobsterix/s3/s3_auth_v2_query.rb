@@ -23,6 +23,11 @@ module Blobsterix
         expires
       end
 
+      def is_expired?
+        return false unless expires
+        ::Blobsterix::S3Auth.current_time>Time.at(expires.to_i)
+      end
+
       def server_signature(secret_key, str)
         # URI::encode(gen_signature(secret_key, str))
         gen_signature(secret_key, str)
