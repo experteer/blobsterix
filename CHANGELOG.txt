@@ -1,3 +1,5 @@
+= 0.0.18
+  * added s3 authentification
 = 0.0.17
   * updated directory listing, truncated listing of 100 files each
   * made the invalidation object a proxy that is only called when accessed

@@ -78,7 +78,11 @@ Check the amazon s3 specs for more information. It only supports the REST api wi
   * put file into bucket
   * delete file from bucket
 
-The s3 interface itself is unsecured and should not be visible to the outside.
+The s3 interface can be secured with a key value pair just like the AmazonS3 store:
+
+  * Blobsterix.secret_key_store = Blobsterix::S3Auth::KeyStore.new("myID" => "myVerySecretKey")
+
+You can also create your own key store. The only method it needs to implement is the get_key(ID) method. Simply check the example implementation.
 
 ## Blob interface
 
