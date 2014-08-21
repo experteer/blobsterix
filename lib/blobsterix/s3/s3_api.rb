@@ -79,7 +79,11 @@ module Blobsterix
         blob_access=BlobAccess.new(:source => source, :bucket => bucket_current, :id => file_current, :accept_type => accept, :trafo => trafo_current)
         data = transformation.run(blob_access)
         cached_upload_clear
-        storage.put(bucket_current, file_current, data.open, :close_after_write => true).response(false)
+        if data.valid?
+          storage.put(bucket_current, file_current, data.open, :close_after_write => true).response(false)
+        else
+          Http.ServerError "Upload failed"
+        end
       end
 
       def delete_bucket
