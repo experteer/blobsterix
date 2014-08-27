@@ -1,3 +1,5 @@
+= 0.0.21
+  * removed log that slowed down the whole system
 = 0.0.20
   * s3 upload does not crash the server anymore if the transformation fails
 = 0.0.19

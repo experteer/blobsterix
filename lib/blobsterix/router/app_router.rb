@@ -57,13 +57,14 @@ module Blobsterix
 
     def self.call(env)
       Blobsterix::StatusInfo.connections+=1
-      print_ram_usage("RAM USAGE Before")
+      # print_ram_usage("RAM USAGE Before")
       result=router.call(env)
-      print_ram_usage("RAM USAGE After")
+      # print_ram_usage("RAM USAGE After")
       Blobsterix::StatusInfo.connections-=1
       result
     end
 
+    # Only use this function if you really have to it slows down the whole system
     def self.print_ram_usage(text)
       Blobsterix.logger.info "#{text}[#{Process.pid}]: " + `pmap #{Process.pid} | tail -1`[10,40].strip
     end
