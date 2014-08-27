@@ -262,4 +262,14 @@ module Blobsterix
       wait_for(op)
     end
   end
+
+  def self.at_exit(&proc)
+    (@at_exit_callback||=[]).push(proc)
+  end
+
+  def self.run_at_exit
+    (@at_exit_callback||=[]).each do |proc|
+      proc.call
+    end
+  end
 end

@@ -141,12 +141,17 @@ if ARGV.length == 0
   puts "\t\t storage (StorageName) - Creates a new blobsterix storage with the given name or just new as name."
   exit
 end
-if ARGV[0] == "server"
-  BlobsterixRunner.new(ARGV).run_blobsterix
-elsif ARGV[0] == "console"
-  BlobsterixRunner.new(ARGV).run_console
-elsif ARGV[0] == "run"
-  BlobsterixRunner.new(ARGV).run_command
-elsif ARGV[0] == "generate"
+if ARGV[0] == "generate"
   Generator.new(ARGV).run
+else
+  at_exit do
+    Blobsterix.run_at_exit
+  end
+  if ARGV[0] == "server"
+    BlobsterixRunner.new(ARGV).run_blobsterix
+  elsif ARGV[0] == "console"
+    BlobsterixRunner.new(ARGV).run_console
+  elsif ARGV[0] == "run"
+    BlobsterixRunner.new(ARGV).run_command
+  end
 end
