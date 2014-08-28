@@ -251,10 +251,19 @@ module Blobsterix
 
   def self.wait_for(op = nil)
     fiber = Fiber.current
-    EM.defer(op, Proc.new {|result|
+    EM.defer(Proc.new {
+        begin
+          op.call
+        rescue Exception => e
+          e
+        end
+      },
+      Proc.new {|result|
             fiber.resume result
           })
-    Fiber.yield
+     result = Fiber.yield
+     raise result if result.is_a? Exception
+     result
   end
 
   def self.wait_for_next(op = nil)
