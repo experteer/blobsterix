@@ -83,12 +83,18 @@ module Blobsterix::Transformations
         else
           logger.debug "Transformation: run #{blob_access}"
           EM.defer(Proc.new {
-            chain.do()
+            begin
+              chain.do()
+            rescue Exception => e
+              e
+            end
           }, Proc.new {|result|
             finish_connection(result, blob_access)
           })
 
-          Fiber.yield
+          result = Fiber.yield
+          raise result if result.is_a? Exception
+          result
         end
       end
 
