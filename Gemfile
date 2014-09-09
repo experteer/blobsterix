@@ -8,6 +8,7 @@ gem 'rack-test', :group => :test
 gem 'em-http-request', :group => :test
 
 group :development do 
+  gem 'rubocop', '~> 0.26'
 	gem "capistrano", "2.15.4"
 	gem "capistrano-ext", "1.2.1"
 	gem "rvm-capistrano", "~> 1.5.1"
