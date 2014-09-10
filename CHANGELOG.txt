@@ -1,3 +1,5 @@
+= 0.0.23
+  * fixed output type of transformation output
 = 0.0.22
   * added at exit callback
 = 0.0.21

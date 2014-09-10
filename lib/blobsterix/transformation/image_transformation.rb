@@ -28,7 +28,7 @@ module Blobsterix::Transformations::Impl
       end
       
       def self.output_type_
-        @input
+        @output
       end
 
       def self.body=(obj)
