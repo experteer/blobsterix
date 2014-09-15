@@ -9,10 +9,8 @@ module Blobsterix
       def initialize(path)
         logger.info "Create FileSystem at #{path}"
         @contents = path
-        unless Dir.exist?(@contents)
-          FileUtils.mkdir_p(@contents)
-          FileUtils.touch File.join(@contents,".keep")
-        end
+        FileUtils.mkdir_p(@contents) unless Dir.exist?(@contents)
+        FileUtils.touch File.join(@contents,".keep")
       end
 
       def bucket_exist(bucket="root")
@@ -51,7 +49,13 @@ module Blobsterix
       def put(bucket, key, value, opts={})
         Blobsterix.storage_write(BlobAccess.new(:bucket => bucket, :id => key))
 
-        meta = Blobsterix.wait_for(Proc.new {metaData(bucket, key).write() {|f| FileUtils.copy_stream(value, f) }})
+        meta = Blobsterix.wait_for(Proc.new do
+          result = metaData(bucket, key).write() do |f|
+            FileUtils.copy_stream(value, f)
+          end
+          FileUtils.touch File.join(contents(bucket), ".keep")
+          result
+        end)
 
         value.close if opts[:close_after_write]
 
@@ -62,7 +66,8 @@ module Blobsterix
 
       def create(bucket)
         logger.info "Storage: create bucket #{contents(bucket)}"
-        FileUtils.mkdir_p(contents(bucket)) if not File.exist?(contents(bucket))
+        FileUtils.mkdir_p(contents(bucket)) unless File.exist?(contents(bucket))
+        FileUtils.touch File.join(contents(bucket), ".keep")
 
         Nokogiri::XML::Builder.new do |xml|
         end.to_s

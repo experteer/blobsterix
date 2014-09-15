@@ -80,8 +80,8 @@ module Blobsterix
 
       def write
         if block_given?
-          FileUtils.mkdir_p(File.dirname(path))
           delete
+          FileUtils.mkdir_p(File.dirname(path))
           f = File.open(path, "wb")
           yield f
           f.close
@@ -102,6 +102,7 @@ module Blobsterix
 
       def delete
         File.delete(meta_path) if File.exists?(meta_path)
+        # File.delete(path) if valid
         Pathname.new(path).ascend do |p|
           begin
             p.delete
@@ -110,6 +111,7 @@ module Blobsterix
             break
           end
         end if valid
+        true
       end
 
       def to_json

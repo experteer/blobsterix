@@ -16,7 +16,8 @@ module Blobsterix
 
       def initialize(path)
         @path = Pathname.new(path)
-        FileUtils.mkdir_p(@path) if !Dir.exist?(@path)
+        FileUtils.mkdir_p(@path) unless Dir.exist?(@path)
+        FileUtils.touch File.join(@path,".keep")
       end
 
       def get(blob_access)

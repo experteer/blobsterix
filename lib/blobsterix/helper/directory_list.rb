@@ -48,7 +48,7 @@ module Blobsterix
       begin
         return nil if @current_id+1 > entries.size
         @current_id+=1
-      end while (current_entry == "." || current_entry == "..")
+      end while (current_entry == "." || current_entry == ".." || current_entry == ".keep")
       @current_id
     end
 
