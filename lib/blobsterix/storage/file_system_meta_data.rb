@@ -102,7 +102,14 @@ module Blobsterix
 
       def delete
         File.delete(meta_path) if File.exists?(meta_path)
-        File.delete(path) if valid
+        Pathname.new(path).ascend do |p|
+          begin
+            p.delete
+          rescue Errno::ENOTEMPTY
+            # stop deleting path when non empty dir is reached
+            break
+          end
+        end if valid
       end
 
       def to_json
