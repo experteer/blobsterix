@@ -144,11 +144,11 @@ class Murmur
   end
 
   def self.map_filename(filename, *additional)
-    hash = Murmur.force_overflow_unsigned_18(Murmur.Hash64B(filename))
+    hash = Murmur.force_overflow_unsigned_20(Murmur.Hash64B(filename))
     bits =  hash.to_s(2)
     parts = []
     2.times { |index|
-      len = 9
+      len = 10
       len = bits.length if len >= bits.length
       value = bits.slice!(0, len).to_i(2).to_s(16).rjust(3,"0")
       parts.push(value)
