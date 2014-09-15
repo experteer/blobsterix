@@ -9,7 +9,10 @@ module Blobsterix
       def initialize(path)
         logger.info "Create FileSystem at #{path}"
         @contents = path
-        FileUtils.mkdir_p(@contents) if !Dir.exist?(@contents)
+        unless Dir.exist?(@contents)
+          FileUtils.mkdir_p(@contents)
+          FileUtils.touch File.join(@contents,".keep")
+        end
       end
 
       def bucket_exist(bucket="root")

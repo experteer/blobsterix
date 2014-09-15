@@ -8,6 +8,14 @@ class Murmur
     i % 2**16   # or equivalently: i & 0xffffffff
   end
 
+  def self.force_overflow_unsigned_18(i)
+    i % 2**18   # or equivalently: i & 0xffffffff
+  end
+
+  def self.force_overflow_unsigned_20(i)
+    i % 2**20   # or equivalently: i & 0xffffffff
+  end
+
   def self.force_overflow_unsigned(i)
     i % 2**32   # or equivalently: i & 0xffffffff
   end
@@ -136,11 +144,11 @@ class Murmur
   end
 
   def self.map_filename(filename, *additional)
-    hash = Murmur.Hash64B(filename)
+    hash = Murmur.force_overflow_unsigned_18(Murmur.Hash64B(filename))
     bits =  hash.to_s(2)
     parts = []
-    6.times { |index|
-      len = 11
+    2.times { |index|
+      len = 9
       len = bits.length if len >= bits.length
       value = bits.slice!(0, len).to_i(2).to_s(16).rjust(3,"0")
       parts.push(value)
