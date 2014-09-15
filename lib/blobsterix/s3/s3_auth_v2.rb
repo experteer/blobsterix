@@ -7,25 +7,9 @@ module Blobsterix
       include V2Helper
 
       # these should actually be used when calculating
-      # the signature when suplied as query parameters, 
+      # the signature when suplied as query parameters,
       # but they are not needed in this usecase
-      SUBRESOURCES = [
-        "acl",
-        "lifecycle",
-        "location",
-        "logging",
-        "notification",
-        "partNumber",
-        "policy",
-        "requestPayment",
-        "torrent",
-        "uploadId",
-        "uploads",
-        "versionId",
-        "versioning",
-        "versions",
-        "website"
-      ]
+      SUBRESOURCES = %w(acl lifecycle location logging notification partNumber policy requestPayment torrent uploadId uploads versionId versioning versions website)
 
       V2_REGEX = /AWS (\w+):(.+)/
 
@@ -43,11 +27,11 @@ module Blobsterix
       end
 
       def time_to_check
-        env["HTTP_X_AMZ_DATE"]||env["HTTP_DATE"]
+        env["HTTP_X_AMZ_DATE"] || env["HTTP_DATE"]
       end
 
       def is_expired?
-        ::Blobsterix::S3Auth.current_time-Time.parse(time_to_check) > 15*60
+        ::Blobsterix::S3Auth.current_time - Time.parse(time_to_check) > 15 * 60
       end
 
       def time_of_request

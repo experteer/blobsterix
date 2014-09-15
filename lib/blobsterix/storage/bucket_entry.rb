@@ -11,7 +11,7 @@ module Blobsterix
           entry.mimetype = meta.mimetype
         end
       end
-      
+
       def initialize(key)
         @key = key
         @last_modified = "2009-10-12T17:50:30.000Z"
@@ -24,7 +24,7 @@ module Blobsterix
       end
 
       def insert_xml(xml)
-        xml.Contents{
+        xml.Contents do
           xml.Key key
           xml.LastModified last_modified
           xml.ETag etag
@@ -32,7 +32,7 @@ module Blobsterix
           xml.StorageClass storage_class
           xml.MimeType mimetype
           # xml.FullPath fullpath
-        }
+        end
       end
     end
   end

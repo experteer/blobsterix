@@ -1,6 +1,7 @@
 AllCops:
   Exclude:
     - 'templates/**/*'
+    - 'lib/blobsterix/mimemagic/**/*'
 
 Metrics/LineLength:
   Max: 99

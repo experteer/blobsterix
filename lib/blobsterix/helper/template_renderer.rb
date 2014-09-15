@@ -4,8 +4,8 @@ module Blobsterix
       @binding = binding_
     end
 
-    def render(template_name, bind=nil)
-      TemplateRenderer.new(bind||@binding).render(template_name)
+    def render(template_name, bind = nil)
+      TemplateRenderer.new(bind || @binding).render(template_name)
     end
   end
 
@@ -15,29 +15,25 @@ module Blobsterix
     end
 
     def initialize(controller_binding_)
-      @controller_binding=controller_binding_
+      @controller_binding = controller_binding_
     end
 
-    def render(template_name, bind=nil)
-      template(template_name).result(bind||controller_binding)
+    def render(template_name, bind = nil)
+      template(template_name).result(bind || controller_binding)
     end
 
     private
 
-    def controller_binding
-      @controller_binding
-    end
+    attr_reader :controller_binding
 
     def template(template_name)
-      begin
-        templates[template_name]||=::ERB.new(File.read(Blobsterix.root.join("views", "#{template_name}.erb")))
-      rescue Errno::ENOENT => e
-        templates[template_name]||=::ERB.new(File.read(Blobsterix.root_gem.join("templates/views", "#{template_name}.erb")))
-      end
+      templates[template_name] ||= ::ERB.new(File.read(Blobsterix.root.join("views", "#{template_name}.erb")))
+    rescue Errno::ENOENT => e
+      templates[template_name] ||= ::ERB.new(File.read(Blobsterix.root_gem.join("templates/views", "#{template_name}.erb")))
     end
 
     def templates
-      @templates||={}
+      @templates ||= {}
     end
   end
 end

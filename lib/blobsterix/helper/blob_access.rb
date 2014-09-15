@@ -1,16 +1,16 @@
 module Blobsterix
   class BlobAccess
-    attr_reader :bucket, :id,:trafo,:accept_type
-    attr_reader :source,:target
+    attr_reader :bucket, :id, :trafo, :accept_type
+    attr_reader :source, :target
 
-    def initialize(atts={})
+    def initialize(atts = {})
       @trafo = []
-      atts.each do |key,value| send("#{key}=",value) end
+      atts.each { |key, value| send("#{key}=", value) }
       identifier
     end
 
     def identifier
-       @identifier||= "#{bucket}_#{id.gsub("/","_")}_#{trafo.map {|trafo_pair|"#{trafo_pair[0]}_#{trafo_pair[1]}"}.join(",")}.#{subtype}"
+      @identifier ||= "#{bucket}_#{id.gsub("/", "_")}_#{trafo.map { |trafo_pair|"#{trafo_pair[0]}_#{trafo_pair[1]}" }.join(",")}.#{subtype}"
     end
 
     def to_s
@@ -18,7 +18,7 @@ module Blobsterix
     end
 
     def get
-      @meta||=find_blob
+      @meta ||= find_blob
     end
 
     def equals?(blob_access)
@@ -39,7 +39,7 @@ module Blobsterix
     def find_blob
       unless Blobsterix.cache.exists?(self)
         if trafo.empty? || raw_trafo?
-          metaData = Blobsterix.storage.get(self.bucket, self.id)
+          metaData = Blobsterix.storage.get(bucket, id)
           if raw_trafo? || raw_accept_type?(metaData.accept_type)
             load_from_storage(metaData)
           end
@@ -48,11 +48,11 @@ module Blobsterix
     end
 
     def raw_trafo?
-      @raw_trafo||=(trafo.length == 1 && trafo[0][0]=="raw")
+      @raw_trafo ||= (trafo.length == 1 && trafo[0][0] == "raw")
     end
 
     def raw_accept_type?(other)
-      @raw_accept_type||= (!accept_type || accept_type.equal?(other))
+      @raw_accept_type ||= (!accept_type || accept_type.equal?(other))
     end
 
     def load_from_storage(metaData)
@@ -62,11 +62,10 @@ module Blobsterix
       nil
     end
 
-
     def subtype
       accept_type ? accept_type.subtype : ""
     end
-    attr_writer :bucket, :id,:trafo,:accept_type
+    attr_writer :bucket, :id, :trafo, :accept_type
     attr_writer :source, :target
   end
 end

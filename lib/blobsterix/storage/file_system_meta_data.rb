@@ -1,10 +1,10 @@
 module Blobsterix
   module Storage
     class FileSystemMetaData < BlobMetaData
-    include Blobsterix::Logable
+      include Blobsterix::Logable
 
-      def initialize(path_, payload={})
-        @payload=payload
+      def initialize(path_, payload = {})
+        @payload = payload
         @path = path_
         @last_modified = ""
         load_meta_file
@@ -43,40 +43,36 @@ module Blobsterix
         #   puts e.backtrace
         # end
         # logger.info "VERY EXPENSIVE FILE READ"
-        File.exists?(path) ? File.read(path) : ""
+        File.exist?(path) ? File.read(path) : ""
       end
 
-      def path
-        @path
-      end
+      attr_reader :path
 
       def size
-        @size ||= File.exists?(path) ? File.size(path) : 0
+        @size ||= File.exist?(path) ? File.size(path) : 0
       end
 
       def last_modified
-        File.ctime(path)#.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        File.ctime(path) # .strftime("%Y-%m-%dT%H:%M:%S.000Z")
       end
 
       def last_accessed
-        File.atime(path)#.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        File.atime(path) # .strftime("%Y-%m-%dT%H:%M:%S.000Z")
       end
 
       def accept_type
-        @accept_type ||= AcceptType.new(get_mime().to_s)
+        @accept_type ||= AcceptType.new(get_mime.to_s)
       end
 
-      def header()
-        {"Etag" => etag, "Content-Type" => mimetype, "Last-Modified" => last_modified.strftime("%Y-%m-%dT%H:%M:%S.000Z"), "Cache-Control" => "max-age=#{60*60*24}", "Expires" => (Time.new+(60*60*24)).strftime("%Y-%m-%dT%H:%M:%S.000Z")}
+      def header
+        { "Etag" => etag, "Content-Type" => mimetype, "Last-Modified" => last_modified.strftime("%Y-%m-%dT%H:%M:%S.000Z"), "Cache-Control" => "max-age=#{60 * 60 * 24}", "Expires" => (Time.new + (60 * 60 * 24)).strftime("%Y-%m-%dT%H:%M:%S.000Z") }
       end
 
       def valid
-        File.exists?(path)
+        File.exist?(path)
       end
 
-      def payload
-        @payload
-      end
+      attr_reader :payload
 
       def write
         if block_given?
@@ -101,7 +97,7 @@ module Blobsterix
       end
 
       def delete
-        File.delete(meta_path) if File.exists?(meta_path)
+        File.delete(meta_path) if File.exist?(meta_path)
         # File.delete(path) if valid
         Pathname.new(path).ascend do |p|
           begin
@@ -119,37 +115,40 @@ module Blobsterix
       end
 
       def as_json
-        {'mimetype' => mimetype, 'mediatype' => mediatype, 'etag' => etag, 'size' => size,'payload' => @payload.to_json}
+        { 'mimetype' => mimetype, 'mediatype' => mediatype, 'etag' => etag, 'size' => size, 'payload' => @payload.to_json }
       end
 
       private
-        def meta_path
-          @meta_path ||= "#{path}.meta"
-        end
 
-        def get_mime
-          @mimeclass ||= (MimeMagic.by_magic(File.open(path)) if File.exists?(path) )|| MimeMagic.new("text/plain")
-        end
-        def save_meta_file
-          return if not valid
+      def meta_path
+        @meta_path ||= "#{path}.meta"
+      end
 
-          File.write(meta_path, to_json)
-        end
-        def load_meta_file
-          return if not valid
+      def get_mime
+        @mimeclass ||= (MimeMagic.by_magic(File.open(path)) if File.exist?(path)) || MimeMagic.new("text/plain")
+      end
 
-          if not File.exists?(meta_path)
-            save_meta_file
-          else
-            data = JSON.load File.read(meta_path)
-            @mimetype = data["mimetype"]
-            @mediatype = data["mediatype"]
-            @etag = data["etag"]
-            @size = data["size"]
-            @payload = JSON.load(data["payload"]) || {}
-            @mimeclass = MimeMagic.new(@mimetype)
-          end
+      def save_meta_file
+        return unless valid
+
+        File.write(meta_path, to_json)
+      end
+
+      def load_meta_file
+        return unless valid
+
+        if !File.exist?(meta_path)
+          save_meta_file
+        else
+          data = JSON.load File.read(meta_path)
+          @mimetype = data["mimetype"]
+          @mediatype = data["mediatype"]
+          @etag = data["etag"]
+          @size = data["size"]
+          @payload = JSON.load(data["payload"]) || {}
+          @mimeclass = MimeMagic.new(@mimetype)
         end
+      end
     end
   end
 end

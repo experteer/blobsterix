@@ -18,13 +18,13 @@ uri = URI.parse("http://localhost:9000/blob/v1/rotate_25,ascii_250.images/expire
 #     end
 # end
 
-Net::HTTP.start(uri.host,uri.port) do |http|
+Net::HTTP.start(uri.host, uri.port) do |http|
   open("/home/dsudmann/desktop/syncview21force", "wb") do |file|
-    http.request_get(uri.path){ |resp|
+    http.request_get(uri.path)do |resp|
       puts resp.code
-      resp.read_body{ |seg|
+      resp.read_body do |seg|
         file << seg
-      }
-    }
+      end
+    end
   end
 end

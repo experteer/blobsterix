@@ -14,7 +14,7 @@ module Blobsterix
     end
 
     def cached_upload
-      cache_upload if not cache.exists?(cache_upload_key)
+      cache_upload unless cache.exists?(cache_upload_key)
       cache.get(cache_upload_key)
     end
 
@@ -29,14 +29,14 @@ module Blobsterix
     def transformation_string
       @trafo ||= env["HTTP_X_AMZ_META_TRAFO"] || ""
     end
-    
+
     def bucket
       host = bucket_matcher(env['HTTP_HOST'])
       if host
         host[1]
-      elsif  (env[nil] && env[nil][:bucket])
+      elsif  env[nil] && env[nil][:bucket]
         env[nil][:bucket]
-      elsif  (env[nil] && env[nil][:bucket_or_file])
+      elsif  env[nil] && env[nil][:bucket_or_file]
         if env[nil][:bucket_or_file].include?("/")
           env[nil][:bucket_or_file].split("/")[0]
         else

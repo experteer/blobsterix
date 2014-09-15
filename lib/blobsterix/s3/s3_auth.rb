@@ -1,6 +1,5 @@
 module Blobsterix
   module S3Auth
-
     VERSIONS = [
       V2,
       V2Query,
@@ -16,15 +15,15 @@ module Blobsterix
     end
 
     def self.current_time
-      (@current_time||=lambda{Time.now}).call
+      (@current_time ||= lambda { Time.now }).call
     end
 
-    def self.current_time=(obj)
-      @current_time=obj
+    class << self
+      attr_writer :current_time
     end
 
     class NoAuth
-      def check(secret)
+      def check(_secret)
         false
       end
     end

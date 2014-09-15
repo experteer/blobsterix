@@ -1,19 +1,19 @@
 require "blobsterix/version"
 
-#libs
+# libs
 require 'tempfile'
 require 'scanf'
 require 'nokogiri'
 require 'journey'
-#require 'vips'
-#require 'pry'
+# require 'vips'
+# require 'pry'
 require 'eventmachine'
 require 'em-synchrony'
 require 'mini_magick'
-#require 'mimemagic'
-#require 'ruby-webp'
-#require 'grape'
-#require 'evma_httpserver'
+# require 'mimemagic'
+# require 'ruby-webp'
+# require 'grape'
+# require 'evma_httpserver'
 require 'json'
 require 'logger'
 require 'erb'
@@ -21,13 +21,12 @@ require 'openssl'
 require 'base64'
 require 'goliath/api'
 
-
-#utility
+# utility
 require 'blobsterix/mimemagic/tables'
 require 'blobsterix/mimemagic/version'
 require 'blobsterix/mimemagic/magic'
 
-#helper
+# helper
 require 'blobsterix/helper/http'
 require 'blobsterix/helper/accept_type'
 require 'blobsterix/helper/data_response'
@@ -42,10 +41,10 @@ require 'blobsterix/helper/config_loader'
 require 'blobsterix/helper/url_helper'
 require 'blobsterix/helper/jsonizer'
 
-#router base
+# router base
 require 'blobsterix/router/app_router'
 
-#helper
+# helper
 require 'blobsterix/s3/s3_url_helper'
 require 'blobsterix/blob/blob_url_helper'
 require 'blobsterix/status/status_url_helper'
@@ -56,12 +55,12 @@ require 'blobsterix/s3/s3_auth_v2_query'
 require 'blobsterix/s3/s3_auth_v4'
 require 'blobsterix/s3/s3_auth'
 
-#apis
+# apis
 require 'blobsterix/s3/s3_api'
 require 'blobsterix/blob/blob_api'
 require 'blobsterix/status/status_api'
 
-#interfaces
+# interfaces
 require 'blobsterix/storage/blob_meta_data'
 require 'blobsterix/storage/storage'
 require 'blobsterix/storage/cache'
@@ -73,212 +72,174 @@ require 'blobsterix/transformation/transformation_manager'
 require 'blobsterix/transformation/transformation_chain'
 require 'blobsterix/transformation/transformation'
 
-#implementation
+# implementation
 require 'blobsterix/storage/file_system_meta_data'
 require 'blobsterix/storage/file_system'
 
 require 'blobsterix/transformation/image_transformation'
 
-#service base
+# service base
 require 'blobsterix/service'
 
-BLOBSTERIX_ROOT=Dir.pwd
+BLOBSTERIX_ROOT = Dir.pwd
 BLOBSTERIX_GEM_DIR = File.join(File.dirname(__FILE__), "../")
 
 module Blobsterix
-  def self.root
-    @root ||= Pathname.new(BLOBSTERIX_ROOT)
-  end
+  class << self
+    attr_writer :logger
+    attr_writer :storage_dir
+    attr_writer :storage
+    attr_writer :cache_dir
+    attr_writer :cache_original
+    attr_writer :cache
+    attr_writer :use_x_send_file
+    attr_writer :allow_chunked_stream
+    attr_writer :decrypt_trafo
+    attr_reader :secret_key_store
+    attr_writer :secret_key_store
+    attr_writer :transformation
+    attr_writer :storage_event_listener
 
-  def self.root_gem
-    @root_gem ||= Pathname.new(BLOBSTERIX_GEM_DIR)
-  end
-
-  def self.logger=(obj)
-    @logger=obj
-  end
-
-  def self.logger
-    Thread.current[:in_fiber_logger] ||= BlobsterixLogger.new((@logger||Logger.new(STDOUT)),Logable.next_id)
-  end
-
-  def self.storage_dir
-    @storage_dir||=root.join("contents")
-  end
-
-  def self.storage_dir=(obj)
-    @storage_dir=obj
-  end
-
-  def self.storage
-    @storage ||= Storage::FileSystem.new(storage_dir)
-  end
-
-  def self.storage=(obj)
-    @storage = obj
-  end
-
-  def self.cache_dir
-    @cache_dir||=root.join("cache")
-  end
-
-  def self.cache_dir=(obj)
-    @cache_dir=obj
-  end
-
-  def self.cache_original?
-    @cache_original||=false
-  end
-
-  def self.cache_original=(obj)
-    @cache_original=obj
-  end
-
-  def self.cache
-    @cache ||= Storage::Cache.new(cache_dir)
-  end
-
-  def self.cache=(obj)
-    @cache = obj
-  end
-
-  def self.use_x_send_file
-    !!@use_x_send_file
-  end
-
-  def self.use_x_send_file=(obj)
-    @use_x_send_file=obj
-  end
-  
-  def self.allow_chunked_stream
-    !!@allow_chunked_stream
-  end
-
-  def self.allow_chunked_stream=(obj)
-    @allow_chunked_stream=obj
-  end
-  self.allow_chunked_stream=true #for backwards compatibility
-
-  def self.decrypt_trafo=(obj)
-    @decrypt_trafo=obj
-  end
-
-  def self.secret_key_store
-    @secret_key_store
-  end
-
-  def self.secret_key_store=(obj)
-    @secret_key_store=obj
-  end
-
-  def self.decrypt_trafo(blob_access,trafo_string,logger)
-    @decrypt_trafo||=lambda{|b,t,l|t}
-    if !trafo_string
-      return @decrypt_trafo
+    def root
+      @root ||= Pathname.new(BLOBSTERIX_ROOT)
     end
-    @decrypt_trafo.call(blob_access, trafo_string, logger)
-  end
 
-  def self.transformation
-    @transformation ||= Blobsterix::Transformations::TransformationManager.new
-  end
+    def root_gem
+      @root_gem ||= Pathname.new(BLOBSTERIX_GEM_DIR)
+    end
 
-  def self.transformation=(obj)
-    @transformation=obj
-  end
+    def logger
+      Thread.current[:in_fiber_logger] ||= BlobsterixLogger.new((@logger || Logger.new(STDOUT)), Logable.next_id)
+    end
 
-  def self.cache_checker=(obj)
-     @@cache_checker=obj
-  end
+    def storage_dir
+      @storage_dir ||= root.join("contents")
+    end
 
-  def self.cache_checker
-     @@cache_checker||=lambda{|blob_access, last_accessed_at, created_at|
+    def storage
+      @storage ||= Storage::FileSystem.new(storage_dir)
+    end
+
+    def cache_dir
+      @cache_dir ||= root.join("cache")
+    end
+
+    def cache_original?
+      @cache_original ||= false
+    end
+
+    def cache
+      @cache ||= Storage::Cache.new(cache_dir)
+    end
+
+    def use_x_send_file
+      !!@use_x_send_file
+    end
+
+    def allow_chunked_stream
+      !!@allow_chunked_stream
+    end
+
+    def decrypt_trafo(blob_access, trafo_string, logger)
+      @decrypt_trafo ||= lambda { |_b, t, _l|t }
+      unless trafo_string
+        return @decrypt_trafo
+      end
+      @decrypt_trafo.call(blob_access, trafo_string, logger)
+    end
+
+    def transformation
+      @transformation ||= Blobsterix::Transformations::TransformationManager.new
+    end
+
+    def cache_checker=(obj)
+      @@cache_checker = obj
+    end
+
+    def cache_checker
+      @@cache_checker ||= lambda do|_blob_access, _last_accessed_at, _created_at|
         false
-     }
-  end
+      end
+    end
 
-  def self.storage_event_listener=(obj)
-    @storage_event_listener=obj
-  end
+    def storage_event_listener
+      @storage_event_listener ||= lambda do|target, hash|
+        logger.info("#{target}: #{hash.inspect}")
+      end
+    end
 
-  def self.storage_event_listener
-    @storage_event_listener||=lambda{|target, hash|
-      logger.info("#{target}: #{hash.inspect}")
-    }
-  end
+    def event(name, hash)
+      storage_event_listener.call(name, hash)
+    end
 
-  def self.event(name,hash)
-    storage_event_listener.call(name,hash)
-  end
-  
-  def self.encryption_error(blob_access)
-    event("encryption.error",:blob_access => blob_access)
-  end
+    def encryption_error(blob_access)
+      event("encryption.error", :blob_access => blob_access)
+    end
 
-  def self.cache_miss(blob_access)
-    StatusInfo.cache_miss+=1
-    StatusInfo.cache_access+=1
-    event("cache.miss", :blob_access => blob_access)
-  end
+    def cache_miss(blob_access)
+      StatusInfo.cache_miss += 1
+      StatusInfo.cache_access += 1
+      event("cache.miss", :blob_access => blob_access)
+    end
 
-  def self.cache_fatal_error(blob_access)
-    StatusInfo.cache_error+=1
-    StatusInfo.cache_access+=1
-    event("cache.fatal_error", :blob_access => blob_access)
-  end
+    def cache_fatal_error(blob_access)
+      StatusInfo.cache_error += 1
+      StatusInfo.cache_access += 1
+      event("cache.fatal_error", :blob_access => blob_access)
+    end
 
-  def self.cache_hit(blob_access)
-    StatusInfo.cache_hit+=1
-    StatusInfo.cache_access+=1
-    event("cache.hit",:blob_access => blob_access)
-  end
+    def cache_hit(blob_access)
+      StatusInfo.cache_hit += 1
+      StatusInfo.cache_access += 1
+      event("cache.hit", :blob_access => blob_access)
+    end
 
-  def self.storage_read(blob_access)
-    event("storage.read",:blob_access => blob_access)
-  end
+    def storage_read(blob_access)
+      event("storage.read", :blob_access => blob_access)
+    end
 
-  def self.storage_read_fail(blob_access)
-    event("storage.read_fail",:blob_access => blob_access)
-  end
+    def storage_read_fail(blob_access)
+      event("storage.read_fail", :blob_access => blob_access)
+    end
 
-  def self.storage_write(blob_access)
-    event("storage.write",:blob_access => blob_access)
-  end
+    def storage_write(blob_access)
+      event("storage.write", :blob_access => blob_access)
+    end
 
-  def self.storage_delete(blob_access)
-    event("storage.delete",:blob_access => blob_access)
-  end
+    def storage_delete(blob_access)
+      event("storage.delete", :blob_access => blob_access)
+    end
 
-  def self.wait_for(op = nil)
-    fiber = Fiber.current
-    EM.defer(Proc.new {
-        begin
-          op.call
-        rescue Exception => e
-          e
-        end
-      },
-      Proc.new {|result|
-            fiber.resume result
-          })
-     result = Fiber.yield
-     raise result if result.is_a? Exception
-     result
-  end
+    def wait_for(op = nil)
+      fiber = Fiber.current
+      EM.defer(proc do
+                 begin
+                   op.call
+                 rescue => e
+                   e
+                 end
+               end,
+               proc do|result|
+                 fiber.resume result
+               end)
+      result = Fiber.yield
+      fail result if result.is_a? Exception
+      result
+    end
 
-  def self.wait_for_next(op = nil)
-    EM.next_tick do 
-      wait_for(op)
+    def wait_for_next(op = nil)
+      EM.next_tick do
+        wait_for(op)
+      end
+    end
+
+    def at_exit(&proc)
+      (@at_exit_callback ||= []).push(proc)
+    end
+
+    def run_at_exit
+      (@at_exit_callback ||= []).each(&:call)
     end
   end
-
-  def self.at_exit(&proc)
-    (@at_exit_callback||=[]).push(proc)
-  end
-
-  def self.run_at_exit
-    (@at_exit_callback||=[]).each do |proc|
-      proc.call
-    end
-  end
+  self.allow_chunked_stream = true # for backwards compatibility
 end

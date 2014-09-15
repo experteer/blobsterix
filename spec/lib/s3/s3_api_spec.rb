@@ -7,16 +7,16 @@ describe Blobsterix::S3Api do
     Blobsterix::S3Api
   end
 
-  let(:data) {"Hi my name is Test"}
-  let(:key) {"test.txt"}
-  let(:bucket) {"test"}
+  let(:data) { "Hi my name is Test" }
+  let(:key) { "test.txt" }
+  let(:bucket) { "test" }
 
   around(:each) do |example|
     run_em(&example)
   end
 
   after :each do
-      clear_data
+    clear_data
   end
 
   describe "create a bucket" do
@@ -38,7 +38,7 @@ describe Blobsterix::S3Api do
     end
 
     after :all do
-      Blobsterix.transformation=Blobsterix::Transformations::TransformationManager.new
+      Blobsterix.transformation = Blobsterix::Transformations::TransformationManager.new
     end
 
     after :each do
@@ -46,18 +46,18 @@ describe Blobsterix::S3Api do
     end
 
     it "should have file in bucket after upload" do
-      #expect(Blobsterix.transformation).to receive(:cue_transformation).never.and_call_original
+      # expect(Blobsterix.transformation).to receive(:cue_transformation).never.and_call_original
 
-      put "/#{key}", data, {"HTTP_HOST" => "#{bucket}.s3.blah.de"}
+      put "/#{key}", data, "HTTP_HOST" => "#{bucket}.s3.blah.de"
 
       expect(last_response.status).to eql(200)
       expect(Blobsterix.storage.get(bucket, key).read).to eql(data)
     end
 
     it "should have file in bucket after upload with trafo" do
-      #expect(Blobsterix.transformation).to receive(:cue_transformation).once.and_call_original
+      # expect(Blobsterix.transformation).to receive(:cue_transformation).once.and_call_original
 
-      put "/#{key}", data, {"HTTP_HOST" => "#{bucket}.s3.blah.de", "HTTP_X_AMZ_META_TRAFO" => "dummy_Yeah"}
+      put "/#{key}", data, "HTTP_HOST" => "#{bucket}.s3.blah.de", "HTTP_X_AMZ_META_TRAFO" => "dummy_Yeah"
 
       expect(last_response.status).to eql(200)
       expect(Blobsterix.storage.get(bucket, key).read).to eql("Yeah")
@@ -121,7 +121,7 @@ describe Blobsterix::S3Api do
 
     describe 'list bucket truncated' do
       it 'should return all files for the bucket starting at u#{key}' do
-        get "/#{bucket}", "", "params" => {"marker" => "u#{key}"}
+        get "/#{bucket}", "", "params" => { "marker" => "u#{key}" }
         expect(last_response.status).to eql(200)
         response = Hash.from_xml last_response.body
         expect(response).to have_key(:ListBucketResult)

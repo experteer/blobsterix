@@ -27,84 +27,85 @@ module Blobsterix
     post "*any", :next_api
 
     private
-      def check_auth
-        return true unless Blobsterix.secret_key_store
-        Blobsterix::S3Auth.authenticate(env).check(Blobsterix.secret_key_store)
-      end
 
-      def list_buckets
-        return Http.NotAuthorized unless check_auth
-        Blobsterix.event("s3_api.list_bucket",:bucket => bucket)
-        start_path = env["params"]["marker"] if env["params"]
-        Http.OK storage.list(bucket, :start_path => start_path).to_xml, "xml"
-      end
+    def check_auth
+      return true unless Blobsterix.secret_key_store
+      Blobsterix::S3Auth.authenticate(env).check(Blobsterix.secret_key_store)
+    end
 
-      def get_file(send_with_data=true)
-        return Http.NotAuthorized unless check_auth
-        return Http.NotFound if favicon
+    def list_buckets
+      return Http.NotAuthorized unless check_auth
+      Blobsterix.event("s3_api.list_bucket", :bucket => bucket)
+      start_path = env["params"]["marker"] if env["params"]
+      Http.OK storage.list(bucket, :start_path => start_path).to_xml, "xml"
+    end
 
-        if bucket?
-          if meta = storage.get(bucket, file)
-            send_with_data ? meta.response(true, env["HTTP_IF_NONE_MATCH"], env) : meta.response(false)
-          else
-            Http.NotFound
-          end
+    def get_file(send_with_data = true)
+      return Http.NotAuthorized unless check_auth
+      return Http.NotFound if favicon
+
+      if bucket?
+        if meta = storage.get(bucket, file)
+          send_with_data ? meta.response(true, env["HTTP_IF_NONE_MATCH"], env) : meta.response(false)
         else
-          list_buckets
+          Http.NotFound
         end
+      else
+        list_buckets
       end
+    end
 
-      def get_file_head
-        return Http.NotAuthorized unless check_auth
-        #TODO: add event?
-        get_file(false)
+    def get_file_head
+      return Http.NotAuthorized unless check_auth
+      # TODO: add event?
+      get_file(false)
+    end
+
+    def create_bucket
+      return Http.NotAuthorized unless check_auth
+      Blobsterix.event("s3_api.upload", :bucket => bucket)
+      Http.OK storage.create(bucket), "xml"
+    end
+
+    def upload_data
+      return Http.NotAuthorized unless check_auth
+      source = cached_upload
+      accept = AcceptType.new("*/*") # source.accept_type()
+
+      trafo_current = trafo(transformation_string)
+      file_current = file
+      bucket_current = bucket
+      Blobsterix.event("s3_api.upload", :bucket => bucket_current,
+                                            :file => file_current, :accept_type => accept.type, :trafo => trafo_current)
+      blob_access = BlobAccess.new(:source => source, :bucket => bucket_current, :id => file_current, :accept_type => accept, :trafo => trafo_current)
+      data = transformation.run(blob_access)
+      cached_upload_clear
+      if data.valid?
+        storage.put(bucket_current, file_current, data.open, :close_after_write => true).response(false)
+      else
+        Http.ServerError "Upload failed"
       end
+    end
 
-      def create_bucket
-        return Http.NotAuthorized unless check_auth
-        Blobsterix.event("s3_api.upload",:bucket => bucket)
-        Http.OK storage.create(bucket), "xml"
+    def delete_bucket
+      return Http.NotAuthorized unless check_auth
+      Blobsterix.event("s3_api.delete_bucket", :bucket => bucket)
+
+      if bucket?
+        Http.OK_no_data storage.delete(bucket), "xml"
+      else
+        Http.NotFound "no such bucket"
       end
+    end
 
-      def upload_data
-        return Http.NotAuthorized unless check_auth
-        source = cached_upload
-        accept = AcceptType.new("*/*")#source.accept_type()
-
-        trafo_current = trafo(transformation_string)
-        file_current = file
-        bucket_current = bucket
-        Blobsterix.event("s3_api.upload", :bucket => bucket_current, 
-                                              :file => file_current, :accept_type => accept.type, :trafo => trafo_current)
-        blob_access=BlobAccess.new(:source => source, :bucket => bucket_current, :id => file_current, :accept_type => accept, :trafo => trafo_current)
-        data = transformation.run(blob_access)
-        cached_upload_clear
-        if data.valid?
-          storage.put(bucket_current, file_current, data.open, :close_after_write => true).response(false)
-        else
-          Http.ServerError "Upload failed"
-        end
+    def delete_file
+      return Http.NotAuthorized unless check_auth
+      Blobsterix.event("s3_api.delete_file", :bucket => bucket, :file => file)
+      if bucket?
+        Http.OK_no_data storage.delete_key(bucket, file), "xml"
+      else
+        Http.NotFound "no such bucket"
       end
-
-      def delete_bucket
-        return Http.NotAuthorized unless check_auth
-        Blobsterix.event("s3_api.delete_bucket", :bucket => bucket)
-
-        if bucket?
-          Http.OK_no_data storage.delete(bucket), "xml"
-        else
-          Http.NotFound "no such bucket"
-        end
-      end
-
-      def delete_file
-        return Http.NotAuthorized unless check_auth
-         Blobsterix.event("s3_api.delete_file", :bucket => bucket,:file => file)
-        if bucket?
-          Http.OK_no_data storage.delete_key(bucket, file), "xml"
-        else
-          Http.NotFound "no such bucket"
-        end
-      end
+    end
   end
 end

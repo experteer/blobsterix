@@ -7,10 +7,10 @@ require "blobsterix"
 
 module ArgParser
   def parse(args)
-    args[1..-1].each{|command|
-      @param ||= command if command != "generate" and @type
+    args[1..-1].each do|command|
+      @param ||= command if command != "generate" && @type
       @type ||= command if command != "generate"
-    }
+    end
   end
 end
 
@@ -20,22 +20,22 @@ class Generator
     parse(args)
   end
 
-  def run()
+  def run
     puts "Doing #{@type} with #{@param} in #{Dir.pwd}"
 
-    init(@param||"") if @type == "init"
-    transformation(@param||"NewTrafo") if @type == "transformator"
-    storage(@param||"Special") if @type == "storage"
+    init(@param || "") if @type == "init"
+    transformation(@param || "NewTrafo") if @type == "transformator"
+    storage(@param || "Special") if @type == "storage"
   end
 
   def init(folder)
     puts "Init new Blobsterix Server"
 
     files_to_write = Dir.glob(File.join(BLOBSTERIX_GEM_DIR, "templates/app/**/*"))
-    check_files = files_to_write.map{|file|file.gsub(File.join(BLOBSTERIX_GEM_DIR, "templates/app/"), "")}
+    check_files = files_to_write.map { |file|file.gsub(File.join(BLOBSTERIX_GEM_DIR, "templates/app/"), "") }
 
-    check_files.each_with_index {|file, index|
-      if !Dir.exist?(File.dirname(Blobsterix.root.join(folder, file)))
+    check_files.each_with_index do|file, index|
+      unless Dir.exist?(File.dirname(Blobsterix.root.join(folder, file)))
         puts "Create folder: #{File.dirname(Blobsterix.root.join(folder, file))}"
         FileUtils.mkdir_p(File.dirname(Blobsterix.root.join(folder, file)))
       end
@@ -43,7 +43,7 @@ class Generator
         puts "Create file: #{Blobsterix.root.join(folder, file)}"
         FileUtils.cp(files_to_write[index], Blobsterix.root.join(folder, file))
       end
-    }
+    end
   end
 
   def storage(name)
@@ -80,43 +80,39 @@ class BlobsterixRunner
     parse(args)
   end
 
-  def run_command()
-    begin
-      require "pry"
+  def run_command
+    require "pry"
 
-      require_storages
-      require_config
-      require_transformators
+    require_storages
+    require_config
+    require_transformators
 
-      Kernel.eval(@type)
-      exit
-    rescue LoadError => e
-      warn "=> Unable to load pry: #{e}"
-    end
+    Kernel.eval(@type)
+    exit
+  rescue LoadError => e
+    warn "=> Unable to load pry: #{e}"
   end
 
-  def run_console()
-    begin
-      require "pry"
+  def run_console
+    require "pry"
 
-      require_storages
-      require_config
-      require_transformators
+    require_storages
+    require_config
+    require_transformators
 
-      Pry.start
-      exit
-    rescue LoadError => e
-      warn "=> Unable to load pry: #{e}"
-    end
+    Pry.start
+    exit
+  rescue LoadError => e
+    warn "=> Unable to load pry: #{e}"
   end
 
-  def run_blobsterix()
+  def run_blobsterix
     require_storages
     require_config
     require_transformators
 
     runner = Goliath::Runner.new(ARGV, nil)
-    runner.logger=Blobsterix.logger
+    runner.logger = Blobsterix.logger
     runner.port = Blobsterix.port if Blobsterix.respond_to?(:port)
     runner.address = Blobsterix.address if Blobsterix.respond_to?(:address)
 

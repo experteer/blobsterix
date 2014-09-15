@@ -3,14 +3,14 @@ require "spec_helper"
 describe Blobsterix::Storage::FileSystem do
   include Blobsterix::SpecHelper
 
-  let(:data) {"Hi my name is Test"}
-  let(:key) {"test.txt"}
-  let(:bucket) {"test"}
-  
+  let(:data) { "Hi my name is Test" }
+  let(:key) { "test.txt" }
+  let(:bucket) { "test" }
+
   around(:each) do |example|
     run_em(&example)
   end
-  
+
   describe "bucket" do
     after :each do
       clear_storage
@@ -70,7 +70,7 @@ describe Blobsterix::Storage::FileSystem do
       expect(response[:ListBucketResult][:Contents][:ETag]).to eql(Digest::MD5.hexdigest(data))
     end
   end
-  
+
   describe "keys" do
     after :each do
       clear_storage
