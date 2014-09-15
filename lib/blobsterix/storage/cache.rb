@@ -60,7 +60,7 @@ module Blobsterix
         else
           cache_path(blob_access).entries.each {|cache_file|
             unless cache_file.to_s.match(/\.meta$/) || cache_file.directory?
-              base_name = cache_file.to_s.split("_")[0..1].join("_")
+              base_name = cache_file.to_s
               FileSystemMetaData.new(cache_path(blob_access).join(cache_file)).delete if base_name.match(cache_file_base(blob_access))
             end
           } if Dir.exist?(cache_path(blob_access))
