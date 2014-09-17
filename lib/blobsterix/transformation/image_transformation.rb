@@ -1,42 +1,36 @@
 module Blobsterix::Transformations::Impl
-  def self.create_simple_trafo(name_, input, output, is_format_=false, &block)
+  def self.create_simple_trafo(name_, input, output, is_format_ = false, &block)
     trafo = ::Class.new Blobsterix::Transformations::Transformation do
 
-      def self.name=(obj)
-        @name=obj
-      end
+      class << self
+        attr_writer :name
+        attr_writer :body
+        attr_writer :is_format
 
-      def self.name_
-        @name
-      end
-      
-      def self.is_format=(obj)
-        @is_format=obj
-      end
+        def name_
+          @name
+        end
 
-      def self.is_format_
-        @is_format
-      end
-      
-      def self.setTypes(input,output)
-        @input= ::Blobsterix::AcceptType.new input
-        @output= ::Blobsterix::AcceptType.new output
-      end
-      
-      def self.input_type_
-        @input
-      end
-      
-      def self.output_type_
-        @output
-      end
+        def is_format_
+          @is_format
+        end
 
-      def self.body=(obj)
-        @body=obj
-      end
+        def setTypes(input, output)
+          @input = ::Blobsterix::AcceptType.new input
+          @output = ::Blobsterix::AcceptType.new output
+        end
 
-      def self.body_
-        @body
+        def input_type_
+          @input
+        end
+
+        def output_type_
+          @output
+        end
+
+        def body_
+          @body
+        end
       end
 
       def initialize
@@ -63,13 +57,13 @@ module Blobsterix::Transformations::Impl
       end
     end
     trafo.setTypes(input, output)
-    trafo.is_format=is_format_
-    trafo.body=block
-    trafo.name=name_
+    trafo.is_format = is_format_
+    trafo.body = block
+    trafo.name = name_
     ::Blobsterix::Transformations::Impl.const_set("#{name_.capitalize}Transformation", trafo)
   end
 
-  create_simple_trafo("grayscale", "image/*", "image/*", false) do |input_path, target_path, value|
+  create_simple_trafo("grayscale", "image/*", "image/*", false) do |input_path, target_path, _value|
     puts "grayscale"
     image = MiniMagick::Image.open(input_path)
     image.colorspace "gray"
@@ -105,11 +99,11 @@ module Blobsterix::Transformations::Impl
 
   create_simple_trafo("shrink", "image/*", "image/*", false) do |input_path, target_path, value|
     image = MiniMagick::Image.open(input_path)
-    image.resize "#{image[:width]/value.to_i}x#{image[:height]/value.to_i}"
+    image.resize "#{image[:width] / value.to_i}x#{image[:height] / value.to_i}"
     image.write target_path
   end
 
-  create_simple_trafo("strip", "image/*", "image/*", true) do |input_path, target_path, value|
+  create_simple_trafo("strip", "image/*", "image/*", true) do |input_path, target_path, _value|
     image = MiniMagick::Image.open(input_path)
     image.strip
     image.write target_path
@@ -121,67 +115,67 @@ module Blobsterix::Transformations::Impl
     image.write target_path
   end
 
-  create_simple_trafo("image2HTML", "image/*", "text/html", true) do |input_path, target_path, value|
+  create_simple_trafo("image2HTML", "image/*", "text/html", true) do |input_path, target_path, _value|
     type = "image/*"
-    File.open(input_path) {|file|
+    File.open(input_path) do|file|
       type = MimeMagic.by_magic(file).type
-    }
+    end
 
-    image = type === "image/webp" ? {:width => "unknown", :height => "unknown"} : MiniMagick::Image.open(input_path)
-    File.open(target_path, "w") {|file|
+    image = type === "image/webp" ? { :width => "unknown", :height => "unknown" } : MiniMagick::Image.open(input_path)
+    File.open(target_path, "w") do|file|
       file.write("<html><body>Mimetype: #{type}<br>Width: #{image[:width]}<br>Height: #{image[:height]}</body></html>")
-    }
+    end
   end
 
-  create_simple_trafo("json", "image/*", "text/json", true) do |input_path, target_path, value|
+  create_simple_trafo("json", "image/*", "text/json", true) do |input_path, target_path, _value|
     type = "image/*"
-    File.open(input_path) {|file|
+    File.open(input_path) do|file|
       type = MimeMagic.by_magic(file).type
-    }
+    end
 
-    image = type === "image/webp" ? {:width => "unknown", :height => "unknown"} : MiniMagick::Image.open(input_path)
-    File.open(target_path, "w") {|file|
-      file.write({:width => image[:width], :height => image[:height]}.merge(Blobsterix::Storage::FileSystemMetaData.new(input_path).as_json).to_json)
-    }
+    image = type === "image/webp" ? { :width => "unknown", :height => "unknown" } : MiniMagick::Image.open(input_path)
+    File.open(target_path, "w") do|file|
+      file.write({ :width => image[:width], :height => image[:height] }.merge(Blobsterix::Storage::FileSystemMetaData.new(input_path).as_json).to_json)
+    end
   end
 
-  create_simple_trafo("jsonall", "image/*", "text/json", true) do |input_path, target_path, value|
-    File.open(target_path, "w") {|file|
+  create_simple_trafo("jsonall", "image/*", "text/json", true) do |input_path, target_path, _value|
+    File.open(target_path, "w") do|file|
       file.write(Blobsterix::Storage::FileSystemMetaData.new(input_path).to_json)
-    }
+    end
   end
 
-  create_simple_trafo("raw", "image/*", "image/*", true) do |input_path, target_path, value|
-    raise StandardError.new($?) unless system("cp \"#{input_path}\" \"#{target_path}\"")
+  create_simple_trafo("raw", "image/*", "image/*", true) do |input_path, target_path, _value|
+    fail StandardError.new($CHILD_STATUS) unless system("cp \"#{input_path}\" \"#{target_path}\"")
   end
 
   create_simple_trafo("ascii", "image/*", "text/plain", true) do |input_path, target_path, value|
-    raise StandardError.new($?) unless system("convert \"#{input_path}\" jpg:- | jp2a --width=#{value and value.size > 0 ? value : 100} - > \"#{target_path}\"")
+    fail StandardError.new($CHILD_STATUS) unless system("convert \"#{input_path}\" jpg:- | jp2a --width=#{value and value.size > 0 ? value : 100} - > \"#{target_path}\"")
   end
 
-  create_simple_trafo("png", "image/*", "image/png", true) do |input_path, target_path, value|
-    raise StandardError.new($?) unless system("convert \"#{input_path}\" png:\"#{target_path}\"")
+  create_simple_trafo("png", "image/*", "image/png", true) do |input_path, target_path, _value|
+    fail StandardError.new($CHILD_STATUS) unless system("convert \"#{input_path}\" png:\"#{target_path}\"")
   end
 
-  create_simple_trafo("jpg", "image/*", "image/jpeg", true) do |input_path, target_path, value|
-    raise StandardError.new($?) unless system("convert \"#{input_path}\" jpg:\"#{target_path}\"")
+  create_simple_trafo("jpg", "image/*", "image/jpeg", true) do |input_path, target_path, _value|
+    fail StandardError.new($CHILD_STATUS) unless system("convert \"#{input_path}\" jpg:\"#{target_path}\"")
   end
 
-  create_simple_trafo("gif", "image/*", "image/gif", true) do |input_path, target_path, value|
-    raise StandardError.new($?) unless system("convert \"#{input_path}\" gif:\"#{target_path}\"")
+  create_simple_trafo("gif", "image/*", "image/gif", true) do |input_path, target_path, _value|
+    fail StandardError.new($CHILD_STATUS) unless system("convert \"#{input_path}\" gif:\"#{target_path}\"")
   end
 
-  create_simple_trafo("webp", "image/*", "image/webp", true) do |input_path, target_path, value|
-    raise StandardError.new($?) unless system("cwebp \"#{input_path}\" -o \"#{target_path}\"")
+  create_simple_trafo("webp", "image/*", "image/webp", true) do |input_path, target_path, _value|
+    fail StandardError.new($CHILD_STATUS) unless system("cwebp \"#{input_path}\" -o \"#{target_path}\"")
   end
 
   create_simple_trafo("text", "image/*", "image/*", true) do |input_path, target_path, value|
-    raise StandardError.new($?) unless system("convert \"#{input_path}\" -pointsize 20 -draw \"gravity center fill white text 0,12 '#{value.gsub("_", " ").gsub("\"", "'")}'\" \"#{target_path}\"")
+    fail StandardError.new($CHILD_STATUS) unless system("convert \"#{input_path}\" -pointsize 20 -draw \"gravity center fill white text 0,12 '#{value.gsub("_", " ").gsub("\"", "'")}'\" \"#{target_path}\"")
   end
 
   create_simple_trafo("sleep", "image/*", "image/*", true) do |input_path, target_path, value|
     p "SLEEEP"
     sleep(value.to_i)
-    raise StandardError.new($?) unless system("cp \"#{input_path}\" \"#{target_path}\"")
+    fail StandardError.new($CHILD_STATUS) unless system("cp \"#{input_path}\" \"#{target_path}\"")
   end
 end

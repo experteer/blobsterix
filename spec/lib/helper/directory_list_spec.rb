@@ -14,16 +14,16 @@ describe Blobsterix::DirectoryList do
     end
     it "should give the same entries as glob" do
       count = Dir.glob("#{Blobsterix.cache_dir}/**/*").select { |f| File.file?(f) && !f.to_s.match(/\.meta$/) }.length
-      Blobsterix::DirectoryList.each(Blobsterix.cache_dir) do |path, filename|
-        count-=1 if !filename.to_s.match(/\.meta$/)
+      Blobsterix::DirectoryList.each(Blobsterix.cache_dir) do |_path, filename|
+        count -= 1 unless filename.to_s.match(/\.meta$/)
       end
       count.should eql 0
     end
     it "should list all files in the directories" do
       count = 0
       Blobsterix.cache.delete(Blobsterix::BlobAccess.new(:bucket => "test", :id => "5"))
-      Blobsterix::DirectoryList.each(Blobsterix.cache_dir) do |path, filename|
-        count+=1 if !filename.to_s.match(/\.meta$/)
+      Blobsterix::DirectoryList.each(Blobsterix.cache_dir) do |_path, filename|
+        count += 1 unless filename.to_s.match(/\.meta$/)
       end
       count.should eql(9)
     end
@@ -42,7 +42,7 @@ describe Blobsterix::DirectoryList do
       while a.next
         counter += 1
       end
-      Blobsterix::DirectoryList.each(Blobsterix.cache_dir) do |dir, file|
+      Blobsterix::DirectoryList.each(Blobsterix.cache_dir) do |_dir, _file|
         counter -= 1
       end
       counter.should eql(0)

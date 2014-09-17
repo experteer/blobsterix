@@ -3,7 +3,6 @@ module Blobsterix
     class V4
       include ::Blobsterix::S3UrlHelper
       include ::Blobsterix::UrlHelper
-      
 
       V4_REGEX = /AWS4-HMAC-SHA256 Credential=(\w+\/\d+\/.+\/\w+\/aws4_request),.*SignedHeaders=(.+),.*Signature=(\w+)/
 
@@ -20,6 +19,7 @@ module Blobsterix
         @signed_headers = signed_headers
         @signature = signature
       end
+
       def getSignatureKey(key, dateStamp, regionName, serviceName)
         kDate    = OpenSSL::HMAC.digest('sha256', "AWS4" + key, dateStamp)
         kRegion  = OpenSSL::HMAC.digest('sha256', kDate, regionName)

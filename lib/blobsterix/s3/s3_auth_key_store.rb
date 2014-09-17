@@ -1,9 +1,9 @@
 module Blobsterix
   module S3Auth
     class KeyStore
-      def initialize(keys={})
+      def initialize(keys = {})
         @keys = keys
-        @keys.default=""
+        @keys.default = ""
       end
       # if no key is found it should return an empty string
       def get_key(id)

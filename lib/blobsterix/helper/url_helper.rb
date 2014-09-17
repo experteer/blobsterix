@@ -1,18 +1,17 @@
 module Blobsterix
   module UrlHelper
-    
     def favicon
       @favicon ||= file.match /favicon/
     end
 
-    #TransformationCommand
-    def trafo(trafo_s='')
+    # TransformationCommand
+    def trafo(trafo_s = '')
       trafo_a = []
-      trafo_s.split(",").each{|command|
+      trafo_s.split(",").each do|command|
         parts = command.split("_")
         key = parts.delete_at(0)
         trafo_a << [key, parts.join("_")]
-      }
+      end
       trafo_a
     end
 

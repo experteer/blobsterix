@@ -22,7 +22,7 @@ module Blobsterix::Transformations
       Blobsterix::AcceptType.new
     end
 
-    def transform(input_path, target_path, value)
+    def transform(input_path, target_path, _value)
       logger.debug "run transformation!!!!!"
       system("cp #{input_path} #{target_path}")
     end

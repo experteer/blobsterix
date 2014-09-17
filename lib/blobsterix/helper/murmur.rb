@@ -1,4 +1,4 @@
-#only usefull to hash strings
+# only usefull to hash strings
 class Murmur
   def self.force_overflow_signed(i)
     force_overflow_unsigned(i + 2**31) - 2**31
@@ -24,15 +24,15 @@ class Murmur
     i % 2**64   # or equivalently: i & 0xffffffff
   end
 
-  #64bit processors
-  def self.Hash64A (key)
+  # 64bit processors
+  def self.Hash64A(key)
     len = key.size
     seed = 11
 
     m = 0xc6a4a7935bd1e995
     r = 47
 
-    h = seed ^ len;
+    h = seed ^ len
 
     data = String.new(key)
 
@@ -43,10 +43,10 @@ class Murmur
       k ^= k >> r
       k = force_overflow_unsigned_64(k * m)
 
-      h ^= k;
+      h ^= k
       h = force_overflow_unsigned_64(h * m)
 
-      len-=8
+      len -= 8
     end
 
     h ^= data.slice(6).to_i << 48 if len == 7
@@ -71,19 +71,19 @@ class Murmur
     num.to_s.unpack("C")[0]
   end
 
-  #32bit processors
+  # 32bit processors
   def self.Hash64B(key)
     len = key.size
     seed = 11
 
-    m = 0x5bd1e995 #1540483477
+    m = 0x5bd1e995 # 1540483477
     r = 24
 
     h1 = seed ^ len
     h2 = 0
 
-    data = String.new(key)#.force_encoding('ASCII-8BIT')
-    
+    data = String.new(key) # .force_encoding('ASCII-8BIT')
+
     while len >= 8
       k1 = data.slice!(0..3).unpack("I")[0]
 
@@ -95,7 +95,6 @@ class Murmur
 
       h1 ^= k1
       len -= 4
-
 
       k2 = data.slice!(0..3).unpack("I")[0]
 
@@ -147,13 +146,13 @@ class Murmur
     hash = Murmur.force_overflow_unsigned_20(Murmur.Hash64B(filename))
     bits =  hash.to_s(2)
     parts = []
-    2.times { |index|
+    2.times do |_index|
       len = 10
       len = bits.length if len >= bits.length
-      value = bits.slice!(0, len).to_i(2).to_s(16).rjust(3,"0")
+      value = bits.slice!(0, len).to_i(2).to_s(16).rjust(3, "0")
       parts.push(value)
-    }
-    parts = parts+additional
+    end
+    parts = parts + additional
     parts.join("/")
   end
 end

@@ -9,18 +9,17 @@ type = "image/webp"
 trafo = "rotate_20,shrink_2"
 etag = "1fea74d710de911a9fd2807250765a20"
 
-#trafo = trafoManager.create(:bucket => bucket, :id => id, :type => type, :trafo => trafo)
-#trafo.run
+# trafo = trafoManager.create(:bucket => bucket, :id => id, :type => type, :trafo => trafo)
+# trafo.run
 
 trafoManager.create(:bucket => bucket, :id => id, :type => type, :trafo => trafo).run
 trafoManager.create(:bucket => bucket, :id => id, :type => type, :trafo => trafo).run
 
+# f = File.open('contents/test/droid2.png')
+# blob = f.read
 
-#f = File.open('contents/test/droid2.png')
-#blob = f.read
-
-##image = Magick::Image.from_blob(blob)
-#ilist = Magick::ImageList.new.from_blob(blob)
-##ilist << image[0]
-#ilist.background_color = "none"
-#ilist.rotate(20).write("out.png")
+# #image = Magick::Image.from_blob(blob)
+# ilist = Magick::ImageList.new.from_blob(blob)
+# #ilist << image[0]
+# ilist.background_color = "none"
+# ilist.rotate(20).write("out.png")

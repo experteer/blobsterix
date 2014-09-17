@@ -1,8 +1,7 @@
 module Blobsterix
   module BlobUrlHelper
-    
     def bucket
-      if  (env[nil] && env[nil][:bucket])
+      if  env[nil] && env[nil][:bucket]
         env[nil][:bucket]
       elsif included_bucket
         env[nil][:bucket]

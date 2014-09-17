@@ -21,17 +21,17 @@ describe Blobsterix::BlobApi do
   describe 'Transformed get' do
 
     context "with data" do
-      let(:data) {"Hi my name is Test"}
-      let(:data_transformed) {"Hi_my_name_is_Test_Transformed"}
-      let(:key) {"test.txt"}
-      let(:bucket) {"test"}
+      let(:data) { "Hi my name is Test" }
+      let(:data_transformed) { "Hi_my_name_is_Test_Transformed" }
+      let(:key) { "test.txt" }
+      let(:bucket) { "test" }
 
       before :all do
         Blobsterix.transformation.add Blobsterix::SpecHelper::DummyTrafo.new
       end
 
       after :all do
-        Blobsterix.transformation=Blobsterix::Transformations::TransformationManager.new
+        Blobsterix.transformation = Blobsterix::Transformations::TransformationManager.new
       end
 
       before :each do

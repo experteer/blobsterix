@@ -9,20 +9,19 @@ Gem::Specification.new do |gem|
   gem.homepage      = "https://github.com/experteer/blobsterix"
   gem.license       = "MIT License"
 
-  gem.files         = `git ls-files`.split($\).select{|filename|
+  gem.files         = `git ls-files`.split($OUTPUT_RECORD_SEPARATOR).select{|filename|
     if filename.match(/^(\"contents).*/)
       false
     else
       true
     end
   }
-  gem.executables   = ["blobsterix"]#gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
+  gem.executables   = ["blobsterix"] # gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.name          = "blobsterix"
   gem.require_paths = ["lib"]
   gem.version       = Blobsterix::VERSION
   gem.required_ruby_version = ">= 2.0.0.451"
-  
 
   gem.add_dependency "json",        "~> 1.8.1"
   gem.add_dependency "goliath",     "~> 1.0.3"
@@ -32,11 +31,10 @@ Gem::Specification.new do |gem|
   gem.add_dependency "mini_magick", "~> 3.5.0"
   gem.add_dependency "log4r"
 
-  gem.add_development_dependency "rake","~> 0.9.6"
+  gem.add_development_dependency "rake", "~> 0.9.6"
   gem.add_development_dependency "rspec", "~> 2.14.0"
   gem.add_development_dependency "rspec-core"
   gem.add_development_dependency "rspec-expectations"
   gem.add_development_dependency "rspec-mocks"
   gem.add_development_dependency "pry"
 end
-

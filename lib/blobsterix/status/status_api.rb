@@ -24,39 +24,39 @@ module Blobsterix
     end
 
     def ram_usage
-      `pmap #{Process.pid} | tail -1`[10,40].strip
+      `pmap #{Process.pid} | tail -1`[10, 40].strip
     end
 
     def uptime
-      @uptime||=StatusInfo.uptime
+      @uptime ||= StatusInfo.uptime
     end
 
     def cache_hits
-      @cache_hits||=StatusInfo.cache_hit
+      @cache_hits ||= StatusInfo.cache_hit
     end
 
     def cache_hit_rate
       if cache_hits > 0 && cache_accesses > 0
-        cache_hits.to_f/cache_accesses.to_f
+        cache_hits.to_f / cache_accesses.to_f
       else
         1.to_f
       end
     end
 
     def cache_misses
-      @cache_misses||=StatusInfo.cache_miss
+      @cache_misses ||= StatusInfo.cache_miss
     end
 
     def cache_errors
-      @cache_errors||=StatusInfo.cache_error
+      @cache_errors ||= StatusInfo.cache_error
     end
 
     def cache_accesses
-      @cache_accesses||=StatusInfo.cache_access
+      @cache_accesses ||= StatusInfo.cache_access
     end
 
     def connections
-      @connections||=StatusInfo.connections
+      @connections ||= StatusInfo.connections
     end
   end
 end
