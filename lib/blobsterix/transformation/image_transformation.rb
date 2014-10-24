@@ -186,13 +186,14 @@ module Blobsterix::Transformations::Impl
   end
 
   create_simple_trafo("unzip", "*/*", "*/*", true) do |input_path, target_path, value|
-    file_name = value.gsub("_", ".")
+    file_name = value.gsub("_dot_", ".")
+    file_name = file_name.gsub("_slash_", "/")
+    file_name = file_name[1..-1] if file_name[0] == "/"
     ::Zip::File.open(input_path) do |zip_file|
       # Handle entries one by one
       zip_file.each do |entry|
         # Extract to file/directory/symlink
         if  entry.name == file_name
-          puts "Extracting #{entry.name}"
           entry.extract(target_path)
           break
         end
