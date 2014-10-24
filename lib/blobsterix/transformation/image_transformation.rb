@@ -185,7 +185,7 @@ module Blobsterix::Transformations::Impl
     raise StandardError.new($?) unless system("cp \"#{input_path}\" \"#{target_path}\"")
   end
 
-  create_simple_trafo("unzip", "*/*", "*/*", true) do |input_path, target_path, value|
+  create_simple_trafo("unzip", "application/zip", "*/*", false) do |input_path, target_path, value|
     file_name = value.gsub("_dot_", ".")
     file_name = file_name.gsub("_slash_", "/")
     file_name = file_name[1..-1] if file_name[0] == "/"
