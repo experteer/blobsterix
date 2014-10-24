@@ -184,4 +184,19 @@ module Blobsterix::Transformations::Impl
     sleep(value.to_i)
     raise StandardError.new($?) unless system("cp \"#{input_path}\" \"#{target_path}\"")
   end
+
+  create_simple_trafo("unzip", "*/*", "*/*", true) do |input_path, target_path, value|
+    file_name = value.gsub("_", ".")
+    ::Zip::File.open(input_path) do |zip_file|
+      # Handle entries one by one
+      zip_file.each do |entry|
+        # Extract to file/directory/symlink
+        if  entry.name == file_name
+          puts "Extracting #{entry.name}"
+          entry.extract(target_path)
+          break
+        end
+      end
+    end
+  end
 end

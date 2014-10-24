@@ -28,15 +28,29 @@ module Blobsterix
       def get_file(send_with_data=true)
         accept = AcceptType.get(env, format)[0]
 
+        bucket
+
+        special_file = file.split(".zip")
+
+        bare_file = special_file[0]
+        sugar_file = special_file[1] if special_file.length > 1
+        bare_file += ".zip" if file.include?(".zip")
+
         # check trafo encryption
-        trafo_string = Blobsterix.decrypt_trafo(BlobAccess.new(:bucket => bucket, :id => file), transformation_string, logger)
+        trafo_string = Blobsterix.decrypt_trafo(BlobAccess.new(:bucket => bucket, :id => bare_file), transformation_string, logger)
         if !trafo_string
           Blobsterix.encryption_error(BlobAccess.new(:bucket => bucket, :id => file))
           return Http.NotAuthorized
         end
 
+        transformation_array = trafo(trafo_string)
+        transformation_array.each do |entry|
+          if entry[0] == "unzip"
+            entry[1] = sugar_file if sugar_file
+          end
+        end
         
-        blob_access=BlobAccess.new(:bucket => bucket, :id => file, :accept_type => accept, :trafo => trafo(trafo_string))
+        blob_access=BlobAccess.new(:bucket => bucket, :id => bare_file, :accept_type => accept, :trafo => transformation_array)
         Blobsterix.storage_event_listener.call("blob_api.get", :trafo_string => trafo_string, :blob_access => blob_access)
 
         begin

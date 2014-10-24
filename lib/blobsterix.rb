@@ -19,6 +19,7 @@ require 'logger'
 require 'erb'
 require 'openssl'
 require 'base64'
+require 'zip'
 require 'goliath/api'
 
 
