@@ -28,14 +28,6 @@ module Blobsterix
       def get_file(send_with_data=true)
         accept = AcceptType.get(env, format)[0]
 
-        bucket
-
-        special_file = file.split(".zip")
-
-        bare_file = special_file[0]
-        sugar_file = special_file[1] if special_file.length > 1
-        bare_file += ".zip" if file.include?(".zip")
-
         # check trafo encryption
         trafo_string = Blobsterix.decrypt_trafo(BlobAccess.new(:bucket => bucket, :id => bare_file), transformation_string, logger)
         if !trafo_string
@@ -44,11 +36,7 @@ module Blobsterix
         end
 
         transformation_array = trafo(trafo_string)
-        transformation_array.each do |entry|
-          if entry[0] == "unzip"
-            entry[1] = sugar_file if sugar_file
-          end
-        end
+        insert_zip_into_trafo(transformation_array)
         
         blob_access=BlobAccess.new(:bucket => bucket, :id => bare_file, :accept_type => accept, :trafo => transformation_array)
         Blobsterix.storage_event_listener.call("blob_api.get", :trafo_string => trafo_string, :blob_access => blob_access)
@@ -65,6 +53,36 @@ module Blobsterix
 
       def get_file_head
         get_file(false)
+      end
+
+      def insert_zip_into_trafo(transformation_array)
+        transformation_array.each do |entry|
+          if entry[0] == "unzip"
+            entry[1] = sugar_file if sugar_file
+          end
+        end
+      end
+
+      def bare_file
+        @bare_file||=bare_zip_file_split
+      end
+
+      def sugar_file
+        if special_file.length > 1
+          @sugar_file ||= special_file[1]
+        else
+          nil
+        end
+      end
+
+      def special_file
+        @special_file ||= file.split(".zip")
+      end
+
+      def bare_zip_file_split
+        bare_file = special_file[0]
+        bare_file += ".zip" if file.include?(".zip")
+        bare_file
       end
   end
 end
