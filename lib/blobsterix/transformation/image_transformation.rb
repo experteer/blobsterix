@@ -200,4 +200,21 @@ module Blobsterix::Transformations::Impl
       end
     end
   end
+
+  create_simple_trafo("zip2json", "application/zip", "text/json", true) do |input_path, target_path, value|
+    file = ::Blobsterix::ZipFilePresenter.new
+    file.size = File.size(input_path)
+
+    ::Zip::File.open(input_path) do |zip_file|
+      # Handle entries one by one
+      zip_file.each do |entry|
+        # Extract to file/directory/symlink
+        file.addFile(entry.name)
+      end
+    end
+
+    File.open(target_path, "w+") do |out|
+      out.write(file.as_json.to_json)
+    end
+  end
 end
