@@ -31,7 +31,7 @@ module Blobsterix
           env["params"]["filename"]
         end
         def filename?
-          env["params"].has_key? "filename"
+          env["params"].has_key? "filename" if env && env["params"]
         end
         def content_disposition_header
           filename? ? {"Content-Disposition" => "attachment; filename=#{filename}"} : {}
