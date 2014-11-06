@@ -1,3 +1,5 @@
+= 0.0.27
+  * added mimetype recognition by extension for zip files
 = 0.0.26
   * bug fix
 = 0.0.25

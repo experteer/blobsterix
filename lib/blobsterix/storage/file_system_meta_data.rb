@@ -75,7 +75,7 @@ module Blobsterix
       end
 
       def payload
-        @payload
+        @payload||={}
       end
 
       def write
@@ -119,16 +119,22 @@ module Blobsterix
       end
 
       def as_json
-        {'mimetype' => mimetype, 'mediatype' => mediatype, 'etag' => etag, 'size' => size,'payload' => @payload.to_json}
+        {'mimetype' => mimetype, 'mediatype' => mediatype, 'etag' => etag, 'size' => size,'payload' => payload.to_json}
       end
 
       private
+        def mime_path
+          unzip_trafo = (payload[:trafo].select do |t|
+                          t[0] == "unzip"
+                        end if payload && payload[:trafo]) || [[nil,nil]]
+          (unzip_trafo[0][1] if unzip_trafo[0]) || path
+        end
         def meta_path
           @meta_path ||= "#{path}.meta"
         end
 
         def get_mime
-          @mimeclass ||= (MimeMagic.by_magic(File.open(path)) if File.exists?(path) )|| MimeMagic.new("text/plain")
+          @mimeclass ||= (MimeMagic.by_path(mime_path) || ((MimeMagic.by_magic(File.open(path)) if File.exists?(path)) ) || MimeMagic.new("text/plain"))
         end
         def save_meta_file
           return if not valid
