@@ -163,6 +163,17 @@ module Blobsterix::Transformations::Impl
     raise StandardError.new($?) unless system("convert \"#{input_path}\" png:\"#{target_path}\"")
   end
 
+  create_simple_trafo("base642bin", "text/plain", "*/*", false) do |input_path, target_path, value|
+    File.open(target_path, "w") { |io| io.write(Base64.decode64(File.read(input_path).split("base64,")[1])) }
+  end
+
+  create_simple_trafo("tobase64", "*/*", "*/*", false) do |input_path, target_path, value|
+    File.open(target_path, "w") do |io|
+      io.write "data:#{MimeMagic.by_magic(File.open(input_path)).type};base64,"
+      io.write(Base64.encode64(File.read(input_path)))
+    end
+  end
+
   create_simple_trafo("jpg", "image/*", "image/jpeg", true) do |input_path, target_path, value|
     raise StandardError.new($?) unless system("convert \"#{input_path}\" jpg:\"#{target_path}\"")
   end

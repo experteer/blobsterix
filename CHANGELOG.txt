@@ -1,3 +1,5 @@
+= 0.0.28
+  * added header bucket option for s3 upload, added base64 decode/encode
 = 0.0.27
   * added mimetype recognition by extension for zip files
 = 0.0.26

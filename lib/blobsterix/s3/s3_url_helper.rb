@@ -31,6 +31,7 @@ module Blobsterix
     end
     
     def bucket
+      return env['HTTP_X_AMZ_BUCKET'] if env['HTTP_X_AMZ_BUCKET']
       host = bucket_matcher(env['HTTP_HOST'])
       if host
         host[1]
@@ -49,7 +50,7 @@ module Blobsterix
 
     def bucket?
       host = bucket_matcher(env['HTTP_HOST'])
-      host || env[nil][:bucket] || included_bucket
+      host || env[nil][:bucket] || included_bucket || env['HTTP_X_AMZ_BUCKET']
     end
   end
 end
