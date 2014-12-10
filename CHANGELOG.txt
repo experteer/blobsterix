@@ -1,3 +1,5 @@
+= 0.0.29
+  * changed some standard transformations
 = 0.0.28
   * added header bucket option for s3 upload, added base64 decode/encode
 = 0.0.27

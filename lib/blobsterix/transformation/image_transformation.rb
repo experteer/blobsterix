@@ -121,17 +121,17 @@ module Blobsterix::Transformations::Impl
     image.write target_path
   end
 
-  create_simple_trafo("image2HTML", "image/*", "text/html", true) do |input_path, target_path, value|
-    type = "image/*"
-    File.open(input_path) {|file|
-      type = MimeMagic.by_magic(file).type
-    }
+  # create_simple_trafo("image2HTML", "image/*", "text/html", true) do |input_path, target_path, value|
+  #   type = "image/*"
+  #   File.open(input_path) {|file|
+  #     type = MimeMagic.by_magic(file).type
+  #   }
 
-    image = type === "image/webp" ? {:width => "unknown", :height => "unknown"} : MiniMagick::Image.open(input_path)
-    File.open(target_path, "w") {|file|
-      file.write("<html><body>Mimetype: #{type}<br>Width: #{image[:width]}<br>Height: #{image[:height]}</body></html>")
-    }
-  end
+  #   image = type === "image/webp" ? {:width => "unknown", :height => "unknown"} : MiniMagick::Image.open(input_path)
+  #   File.open(target_path, "w") {|file|
+  #     file.write("<html><body>Mimetype: #{type}<br>Width: #{image[:width]}<br>Height: #{image[:height]}</body></html>")
+  #   }
+  # end
 
   create_simple_trafo("json", "image/*", "text/json", true) do |input_path, target_path, value|
     type = "image/*"
@@ -182,7 +182,11 @@ module Blobsterix::Transformations::Impl
     raise StandardError.new($?) unless system("convert \"#{input_path}\" gif:\"#{target_path}\"")
   end
 
-  create_simple_trafo("webp", "image/*", "image/webp", true) do |input_path, target_path, value|
+  create_simple_trafo("webp", "image/png", "image/webp", true) do |input_path, target_path, value|
+    raise StandardError.new($?) unless system("cwebp \"#{input_path}\" -o \"#{target_path}\"")
+  end
+
+  create_simple_trafo("webp", "image/jpeg", "image/webp", true) do |input_path, target_path, value|
     raise StandardError.new($?) unless system("cwebp \"#{input_path}\" -o \"#{target_path}\"")
   end
 
