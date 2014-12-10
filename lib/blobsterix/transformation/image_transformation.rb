@@ -186,10 +186,6 @@ module Blobsterix::Transformations::Impl
     raise StandardError.new($?) unless system("cwebp \"#{input_path}\" -o \"#{target_path}\"")
   end
 
-  create_simple_trafo("webp", "image/jpeg", "image/webp", true) do |input_path, target_path, value|
-    raise StandardError.new($?) unless system("cwebp \"#{input_path}\" -o \"#{target_path}\"")
-  end
-
   create_simple_trafo("text", "image/*", "image/*", true) do |input_path, target_path, value|
     raise StandardError.new($?) unless system("convert \"#{input_path}\" -pointsize 20 -draw \"gravity center fill white text 0,12 '#{value.gsub("_", " ").gsub("\"", "'")}'\" \"#{target_path}\"")
   end
