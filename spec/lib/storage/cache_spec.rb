@@ -26,13 +26,13 @@ describe Blobsterix::Storage::Cache do
 
     after :each do
       clear_cache
-      Blobsterix.cache_checker=lambda{|blob_access, last_accessed_at, created_at|
+      Blobsterix.cache_checker=lambda{|blob_access, meta_data, last_accessed_at, created_at|
         false
       }
     end
 
     it "should follow invalidation structure" do
-      Blobsterix.cache_checker=lambda{|blob_access_, last_accessed_at, created_at|
+      Blobsterix.cache_checker=lambda{|blob_access_, meta_data, last_accessed_at, created_at|
         blob_access_1.equals?(blob_access_) || blob_access_3.equals?(blob_access_)
       }
       Blobsterix.cache.invalidation
@@ -43,7 +43,7 @@ describe Blobsterix::Storage::Cache do
     end
 
     it "should invalidate all" do
-      Blobsterix.cache_checker=lambda{|blob_access_, last_accessed_at, created_at|
+      Blobsterix.cache_checker=lambda{|blob_access_, meta_data, last_accessed_at, created_at|
         true
       }
       Blobsterix.cache.invalidation

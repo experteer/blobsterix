@@ -196,7 +196,7 @@ module Blobsterix
   end
 
   def self.cache_checker
-     @@cache_checker||=lambda{|blob_access, last_accessed_at, created_at|
+     @@cache_checker||=lambda{|blob_access, meta_data, last_accessed_at, created_at|
         false
      }
   end

@@ -8,7 +8,10 @@ module Blobsterix
           meta_data = Blobsterix::SimpleProxy.new(Proc.new {
             FileSystemMetaData.new(meta_file)
           })
-          if Blobsterix.cache_checker.call(meta_data,File.atime(meta_file),File.ctime(meta_file))
+          blob_access = Blobsterix::SimpleProxy.new(Proc.new {
+            meta_to_blob_access(FileSystemMetaData.new(meta_file))
+          })
+          if Blobsterix.cache_checker.call(blob_access, meta_data, File.atime(meta_file), File.ctime(meta_file))
             meta_data.delete
           end
         end
