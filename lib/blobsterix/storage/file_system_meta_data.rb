@@ -147,13 +147,17 @@ module Blobsterix
           if not File.exists?(meta_path)
             save_meta_file
           else
-            data = JSON.load File.read(meta_path)
-            @mimetype = data["mimetype"]
-            @mediatype = data["mediatype"]
-            @etag = data["etag"]
-            @size = data["size"]
-            @payload = JSON.load(data["payload"]) || {}
-            @mimeclass = MimeMagic.new(@mimetype)
+            begin
+              data = JSON.load(File.read(meta_path)) || {}
+              @mimetype = data["mimetype"]
+              @mediatype = data["mediatype"]
+              @etag = data["etag"]
+              @size = data["size"]
+              @payload = JSON.load(data["payload"]) || {}
+              @mimeclass = @mimetype ? MimeMagic.new(@mimetype) : nil
+            rescue JSON::ParserError => e
+              save_meta_file
+            end
           end
         end
     end

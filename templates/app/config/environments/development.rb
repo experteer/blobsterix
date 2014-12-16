@@ -24,7 +24,7 @@
 # }
 
 # # Use a specific cache checker for invalidation
-# Blobsterix.cache_checker= lambda { |blob_access, last_accessed_at, created_at|
+# Blobsterix.cache_checker= lambda { |meta_data, last_accessed_at, created_at|
 #   false # return true to invalidate the cache entry
 # }
 

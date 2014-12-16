@@ -1,3 +1,5 @@
+= 0.0.31
+  * changed the cache invalidation call to use a meta-data object instead of a blobaccess
 = 0.0.29
   * changed some standard transformations
 = 0.0.28
