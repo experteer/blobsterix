@@ -9,7 +9,7 @@ module Blobsterix::Transformations::Impl
       def self.name_
         @name
       end
-      
+
       def self.is_format=(obj)
         @is_format=obj
       end
@@ -17,16 +17,16 @@ module Blobsterix::Transformations::Impl
       def self.is_format_
         @is_format
       end
-      
+
       def self.setTypes(input,output)
         @input= ::Blobsterix::AcceptType.new input
         @output= ::Blobsterix::AcceptType.new output
       end
-      
+
       def self.input_type_
         @input
       end
-      
+
       def self.output_type_
         @output
       end
@@ -118,6 +118,17 @@ module Blobsterix::Transformations::Impl
   create_simple_trafo("crop", "image/*", "image/*", false) do |input_path, target_path, value|
     image = MiniMagick::Image.open(input_path)
     image.crop value
+    image.write target_path
+  end
+
+  create_simple_trafo("croppercent", "image/*", "image/*", false) do |input_path, target_path, value|
+    values = /(\d+)x(\d+)\+(\d+)\+(\d+)/.match(value)
+    raise StandardError.new("The provided cropping values are wrong") unless values
+    width,height,x,y = values[1..-1].map{|i| i.to_i}
+    raise StandardError.new("Values are to big") if width+x>1000 || height+y>1000
+
+    image = MiniMagick::Image.open(input_path)
+    image.crop "#{width/1000.0*image[:width]}x#{height/1000.0*image[:height]}+#{x/1000.0*image[:width]}+#{y/1000.0*image[:height]}"
     image.write target_path
   end
 

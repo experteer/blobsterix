@@ -1,3 +1,9 @@
+= 0.0.32
+  * added new transformation: croppercent allows a picture to be cropped via
+    percentage. 100%=1000, 1%=10, 0.5%=5
+    500x500+100+100
+        width: 50%, height: 50%, x: 10%, y: 10%
+    wrong values will fail the transformation
 = 0.0.31
   * changed the cache invalidation call to use a meta_data object as well as blobaccess
   * brakes current cache_checker implementations!
@@ -59,4 +65,3 @@
  * adding maxsize
 = 0.0.4
  * The first rc
-
