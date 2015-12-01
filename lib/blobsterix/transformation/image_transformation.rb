@@ -94,6 +94,19 @@ module Blobsterix::Transformations::Impl
     image.write target_path
   end
 
+  create_simple_trafo("extent", "image/*", "image/*", false) do |input_path, target_path, value|
+    gravity = value.match(/gravity=(.*?);/)[1]
+    background = value.match(/background=(.*?);/)[1]
+    size = value.match(/size=(.*?);/)[1]
+    image = MiniMagick::Image.open(input_path)
+    image.combine_options do |c|
+      c.background background
+      c.gravity gravity
+      c.extent size
+    end
+    image.write target_path
+  end
+
   create_simple_trafo("rotate", "image/*", "image/*", false) do |input_path, target_path, value|
     image = MiniMagick::Image.open(input_path)
     image.combine_options do |c|
