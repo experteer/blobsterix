@@ -1,4 +1,5 @@
 module Blobsterix::Transformations::Impl
+
   def self.create_simple_trafo(name_, input, output, is_format_=false, &block)
     trafo = ::Class.new Blobsterix::Transformations::Transformation do
 
@@ -97,8 +98,12 @@ module Blobsterix::Transformations::Impl
   # extent takes gravity, background and size arguments e.g. "gravity=center;background=transparent;size=100x100;"
   create_simple_trafo("extent", "image/*", "image/*", false) do |input_path, target_path, value|
     gravity = value.match(/gravity=(.*?);/)[1]
+    raise BlobsterixTransformationError.new("No gravity specified") unless gravity
     background = value.match(/background=(.*?);/)[1]
+    raise BlobsterixTransformationError.new("No background specified") unless background
     size = value.match(/size=(.*?);/)[1]
+    raise BlobsterixTransformationError.new("No extent size specified") unless size
+    raise BlobsterixTransformationError.new("Bad size format") unless size.match(/^[0-9]+x[0-9]+$/)
     image = MiniMagick::Image.open(input_path)
     image.combine_options do |c|
       c.background background
@@ -137,9 +142,9 @@ module Blobsterix::Transformations::Impl
 
   create_simple_trafo("croppercent", "image/*", "image/*", false) do |input_path, target_path, value|
     values = /(\d+)x(\d+)\+(\d+)\+(\d+)/.match(value)
-    raise StandardError.new("The provided cropping values are wrong") unless values
+    raise BlobsterixTransformationError.new("The provided cropping values are wrong") unless values
     width,height,x,y = values[1..-1].map{|i| i.to_i}
-    raise StandardError.new("Values are to big") if width+x>1000 || height+y>1000
+    raise BlobsterixTransformationError.new("Values are to big") if width+x>1000 || height+y>1000
 
     image = MiniMagick::Image.open(input_path)
     image.crop "#{width/1000.0*image[:width]}x#{height/1000.0*image[:height]}+#{x/1000.0*image[:width]}+#{y/1000.0*image[:height]}"
@@ -177,15 +182,15 @@ module Blobsterix::Transformations::Impl
   end
 
   create_simple_trafo("raw", "image/*", "image/*", true) do |input_path, target_path, value|
-    raise StandardError.new($?) unless system("cp \"#{input_path}\" \"#{target_path}\"")
+    raise BlobsterixTransformationError.new($?) unless system("cp \"#{input_path}\" \"#{target_path}\"")
   end
 
   create_simple_trafo("ascii", "image/*", "text/plain", true) do |input_path, target_path, value|
-    raise StandardError.new($?) unless system("convert \"#{input_path}\" jpg:- | jp2a --width=#{value and value.size > 0 ? value : 100} - > \"#{target_path}\"")
+    raise BlobsterixTransformationError.new($?) unless system("convert \"#{input_path}\" jpg:- | jp2a --width=#{value and value.size > 0 ? value : 100} - > \"#{target_path}\"")
   end
 
   create_simple_trafo("png", "image/*", "image/png", true) do |input_path, target_path, value|
-    raise StandardError.new($?) unless system("convert \"#{input_path}\" png:\"#{target_path}\"")
+    raise BlobsterixTransformationError.new($?) unless system("convert \"#{input_path}\" png:\"#{target_path}\"")
   end
 
   create_simple_trafo("base642bin", "text/plain", "*/*", false) do |input_path, target_path, value|
@@ -200,25 +205,25 @@ module Blobsterix::Transformations::Impl
   end
 
   create_simple_trafo("jpg", "image/*", "image/jpeg", true) do |input_path, target_path, value|
-    raise StandardError.new($?) unless system("convert \"#{input_path}\" jpg:\"#{target_path}\"")
+    raise BlobsterixTransformationError.new($?) unless system("convert \"#{input_path}\" jpg:\"#{target_path}\"")
   end
 
   create_simple_trafo("gif", "image/*", "image/gif", true) do |input_path, target_path, value|
-    raise StandardError.new($?) unless system("convert \"#{input_path}\" gif:\"#{target_path}\"")
+    raise BlobsterixTransformationError.new($?) unless system("convert \"#{input_path}\" gif:\"#{target_path}\"")
   end
 
   create_simple_trafo("webp", "image/png", "image/webp", true) do |input_path, target_path, value|
-    raise StandardError.new($?) unless system("cwebp \"#{input_path}\" -o \"#{target_path}\"")
+    raise BlobsterixTransformationError.new($?) unless system("cwebp \"#{input_path}\" -o \"#{target_path}\"")
   end
 
   create_simple_trafo("text", "image/*", "image/*", true) do |input_path, target_path, value|
-    raise StandardError.new($?) unless system("convert \"#{input_path}\" -pointsize 20 -draw \"gravity center fill white text 0,12 '#{value.gsub("_", " ").gsub("\"", "'")}'\" \"#{target_path}\"")
+    raise BlobsterixTransformationError.new($?) unless system("convert \"#{input_path}\" -pointsize 20 -draw \"gravity center fill white text 0,12 '#{value.gsub("_", " ").gsub("\"", "'")}'\" \"#{target_path}\"")
   end
 
   create_simple_trafo("sleep", "image/*", "image/*", true) do |input_path, target_path, value|
     p "SLEEEP"
     sleep(value.to_i)
-    raise StandardError.new($?) unless system("cp \"#{input_path}\" \"#{target_path}\"")
+    raise BlobsterixTransformationError.new($?) unless system("cp \"#{input_path}\" \"#{target_path}\"")
   end
 
   create_simple_trafo("unzip", "application/zip", "*/*", false) do |input_path, target_path, value|

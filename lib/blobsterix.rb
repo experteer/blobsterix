@@ -90,6 +90,7 @@ BLOBSTERIX_GEM_DIR = File.join(File.dirname(__FILE__), "../")
 Zip.on_exists_proc = true
 
 module Blobsterix
+
   def self.root
     @root ||= Pathname.new(BLOBSTERIX_ROOT)
   end
