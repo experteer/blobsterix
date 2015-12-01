@@ -94,6 +94,7 @@ module Blobsterix::Transformations::Impl
     image.write target_path
   end
 
+  # extent takes gravity, background and size arguments e.g. "gravity=center;background=transparent;size=100x100;"
   create_simple_trafo("extent", "image/*", "image/*", false) do |input_path, target_path, value|
     gravity = value.match(/gravity=(.*?);/)[1]
     background = value.match(/background=(.*?);/)[1]
