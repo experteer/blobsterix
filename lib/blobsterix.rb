@@ -84,6 +84,9 @@ require 'blobsterix/transformation/image_transformation'
 #service base
 require 'blobsterix/service'
 
+#exceptions
+require 'blobsterix/exceptions'
+
 BLOBSTERIX_ROOT=Dir.pwd
 BLOBSTERIX_GEM_DIR = File.join(File.dirname(__FILE__), "../")
 
