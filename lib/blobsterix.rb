@@ -22,6 +22,8 @@ require 'base64'
 require 'zip'
 require 'goliath/api'
 
+#exceptions
+require 'blobsterix/exceptions'
 
 #utility
 require 'blobsterix/mimemagic/tables'
@@ -83,9 +85,6 @@ require 'blobsterix/transformation/image_transformation'
 
 #service base
 require 'blobsterix/service'
-
-#exceptions
-require 'blobsterix/exceptions'
 
 BLOBSTERIX_ROOT=Dir.pwd
 BLOBSTERIX_GEM_DIR = File.join(File.dirname(__FILE__), "../")
@@ -157,7 +156,7 @@ module Blobsterix
   def self.use_x_send_file=(obj)
     @use_x_send_file=obj
   end
-  
+
   def self.allow_chunked_stream
     !!@allow_chunked_stream
   end
@@ -218,7 +217,7 @@ module Blobsterix
   def self.event(name,hash)
     storage_event_listener.call(name,hash)
   end
-  
+
   def self.encryption_error(blob_access)
     event("encryption.error",:blob_access => blob_access)
   end
@@ -275,7 +274,7 @@ module Blobsterix
   end
 
   def self.wait_for_next(op = nil)
-    EM.next_tick do 
+    EM.next_tick do
       wait_for(op)
     end
   end
