@@ -67,7 +67,7 @@ module Blobsterix
       end
 
       def header()
-        {"Etag" => etag, "Content-Type" => mimetype, "Last-Modified" => last_modified.strftime("%Y-%m-%dT%H:%M:%S.000Z"), "Cache-Control" => "max-age=#{60*60*24}", "Expires" => (Time.new+(60*60*24)).strftime("%Y-%m-%dT%H:%M:%S.000Z")}
+        {"Etag" => etag, "Content-Type" => mimetype, "Last-Modified" => last_modified.strftime("%a, %d %b %Y %H:%M:%S GMT"), "Cache-Control" => "max-age=#{60*60*24}", "Expires" => (Time.new+(60*60*24)).strftime("%a, %d %b %Y %H:%M:%S GMT")}
       end
 
       def valid
@@ -79,24 +79,32 @@ module Blobsterix
       end
 
       def write
-        if block_given?
-          delete
-          FileUtils.mkdir_p(File.dirname(path))
-          f = File.open(path, "wb")
-          yield f
-          f.close
+        begin
+          if block_given?
+            delete
+            FileUtils.mkdir_p(File.dirname(path))
+            f = File.open(path, "wb")
+            yield f
+            f.close
+          end
+          save_meta_file
+          self
+        rescue
+          raise ::Blosterix::BlobsterixStorageError.new("Could not create MetaData entry")
         end
-        save_meta_file
-        self
       end
 
       def open
-        if block_given?
-          f = File.open(path, "rb")
-          yield f
-          f.close
-        else
-          File.open(path, "rb")
+        begin
+          if block_given?
+            f = File.open(path, "rb")
+            yield f
+            f.close
+          else
+            File.open(path, "rb")
+          end
+        rescue
+          raise ::Blosterix::BlobsterixStorageError.new("Could not open FilesystemMetaData")
         end
       end
 
@@ -138,8 +146,11 @@ module Blobsterix
         end
         def save_meta_file
           return if not valid
-
-          File.write(meta_path, to_json)
+          begin
+            File.write(meta_path, to_json)
+          rescue
+            raise ::Blosterix::BlobsterixStorageError.new("Could not create MetaData entry")
+          end
         end
         def load_meta_file
           return if not valid

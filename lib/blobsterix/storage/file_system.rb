@@ -7,90 +7,121 @@ module Blobsterix
       include Blobsterix::Logable
 
       def initialize(path)
-        logger.info "Create FileSystem at #{path}"
-        @contents = path
-        FileUtils.mkdir_p(@contents) unless Dir.exist?(@contents)
-        FileUtils.touch File.join(@contents,".keep")
+        begin
+          logger.info "Create FileSystem at #{path}"
+          @contents = path
+          FileUtils.mkdir_p(@contents) unless Dir.exist?(@contents)
+          FileUtils.touch File.join(@contents,".keep")
+        rescue
+          raise ::Blosterix::BlobsterixStorageError.new("Could not connect to FileSystem")
+        end
       end
 
       def bucket_exist(bucket="root")
-        Dir.entries(contents).include?(bucket) and File.directory?(File.join(contents,bucket))
+        begin
+          Dir.entries(contents).include?(bucket) and File.directory?(File.join(contents,bucket))
+        rescue
+          raise ::Blosterix::BlobsterixStorageError.new("Could not check for bucket")
+        end
       end
 
       def list(bucket="root", opts={})
-        if bucket =~ /root/
-          list_buckets
-        else
-          if bucket_exist(bucket)
-            b = Bucket.new(bucket, time_string_of(bucket))
-            b.marker = opts[:start_path] if opts[:start_path]
-            Blobsterix.wait_for(Proc.new {
-              collect_bucket_entries(bucket, b, opts)
-            })
-            b
+        begin
+          if bucket =~ /root/
+            list_buckets
           else
-            Nokogiri::XML::Builder.new do |xml|
-              xml.Error "no such bucket"
+            if bucket_exist(bucket)
+              b = Bucket.new(bucket, time_string_of(bucket))
+              b.marker = opts[:start_path] if opts[:start_path]
+              Blobsterix.wait_for(Proc.new {
+                collect_bucket_entries(bucket, b, opts)
+              })
+              b
+            else
+              Nokogiri::XML::Builder.new do |xml|
+                xml.Error "no such bucket"
+              end
             end
           end
+        rescue
+          raise ::Blosterix::BlobsterixStorageError.new("Could not list bucket(s)")
         end
       end
 
       def get(bucket, key)
-        if (not File.directory?(contents(bucket, key))) # and bucket_files(bucket).include?(key)
-          Blobsterix.storage_read(BlobAccess.new(:bucket => bucket, :id => key))
-          metaData(bucket, key)
-        else
-          Blobsterix.storage_read_fail(BlobAccess.new(:bucket => bucket, :id => key))
-          Blobsterix::Storage::BlobMetaData.new
+        begin
+          if (not File.directory?(contents(bucket, key))) # and bucket_files(bucket).include?(key)
+            Blobsterix.storage_read(BlobAccess.new(:bucket => bucket, :id => key))
+            metaData(bucket, key)
+          else
+            Blobsterix.storage_read_fail(BlobAccess.new(:bucket => bucket, :id => key))
+            Blobsterix::Storage::BlobMetaData.new
+          end
+        rescue
+          raise ::Blosterix::BlobsterixStorageError.new("Could not get bucket entry")
         end
       end
 
       def put(bucket, key, value, opts={})
-        Blobsterix.storage_write(BlobAccess.new(:bucket => bucket, :id => key))
+        begin
+          Blobsterix.storage_write(BlobAccess.new(:bucket => bucket, :id => key))
 
-        meta = Blobsterix.wait_for(Proc.new do
-          result = metaData(bucket, key).write() do |f|
-            FileUtils.copy_stream(value, f)
-          end
-          FileUtils.touch File.join(contents(bucket), ".keep")
-          result
-        end)
+          meta = Blobsterix.wait_for(Proc.new do
+            result = metaData(bucket, key).write() do |f|
+              FileUtils.copy_stream(value, f)
+            end
+            FileUtils.touch File.join(contents(bucket), ".keep")
+            result
+          end)
 
-        value.close if opts[:close_after_write]
+          value.close if opts[:close_after_write]
 
-        Blobsterix.wait_for(Proc.new {Blobsterix.cache.invalidate(Blobsterix::BlobAccess.new(:bucket => bucket, :id => key))})
+          Blobsterix.wait_for(Proc.new {Blobsterix.cache.invalidate(Blobsterix::BlobAccess.new(:bucket => bucket, :id => key))})
 
-        meta
+          meta
+        rescue
+          raise ::Blosterix::BlobsterixStorageError.new("Could not create bucket entry")
+        end
       end
 
       def create(bucket)
-        logger.info "Storage: create bucket #{contents(bucket)}"
-        FileUtils.mkdir_p(contents(bucket)) unless File.exist?(contents(bucket))
-        FileUtils.touch File.join(contents(bucket), ".keep")
+        begin
+          logger.info "Storage: create bucket #{contents(bucket)}"
+          FileUtils.mkdir_p(contents(bucket)) unless File.exist?(contents(bucket))
+          FileUtils.touch File.join(contents(bucket), ".keep")
 
-        Nokogiri::XML::Builder.new do |xml|
-        end.to_s
+          Nokogiri::XML::Builder.new do |xml|
+          end.to_s
+        rescue
+          raise ::Blosterix::BlobsterixStorageError.new("Could not create bucket")
+        end
       end
 
       def delete(bucket)
-        logger.info "Storage: delete bucket #{contents(bucket)}"
-        FileUtils.rm_rf(contents(bucket)) if bucket_exist(bucket) && bucket_empty?(bucket)
-        #Dir.rmdir(contents(bucket)) if bucket_exist(bucket) && bucket_files(bucket).empty?
+        begin
+          logger.info "Storage: delete bucket #{contents(bucket)}"
+          FileUtils.rm_rf(contents(bucket)) if bucket_exist(bucket) && bucket_empty?(bucket)
+        rescue
+          raise ::Blosterix::BlobsterixStorageError.new("Could not delete bucket")
+        end
       end
 
       def delete_key(bucket, key)
-        Blobsterix.storage_delete(BlobAccess.new(:bucket => bucket, :id => key))
-        Blobsterix.wait_for(Proc.new {Blobsterix.cache.invalidate(Blobsterix::BlobAccess.new(:bucket => bucket, :id => key))})
+        begin
+          Blobsterix.storage_delete(BlobAccess.new(:bucket => bucket, :id => key))
+          Blobsterix.wait_for(Proc.new {Blobsterix.cache.invalidate(Blobsterix::BlobAccess.new(:bucket => bucket, :id => key))})
 
-        metaData(bucket, key).delete # if bucket_files(bucket).include? key
+          metaData(bucket, key).delete # if bucket_files(bucket).include? key
+        rescue
+          raise ::Blosterix::BlobsterixStorageError.new("Could not delete bucket key")
+        end
       end
 
       private
         def list_buckets
           BucketList.new do |l|
             Dir.entries("#{contents}").each{|dir|
-              l.buckets << Bucket.new(dir, time_string_of(dir)) if File.directory? File.join("#{contents}",dir) and !(dir =='.' || dir == '..') 
+              l.buckets << Bucket.new(dir, time_string_of(dir)) if File.directory? File.join("#{contents}",dir) and !(dir =='.' || dir == '..')
             }
           end
         end
