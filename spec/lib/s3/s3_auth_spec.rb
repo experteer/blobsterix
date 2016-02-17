@@ -63,7 +63,7 @@ describe Blobsterix::S3Auth do
       :path=>"/photos/puppy.jpg",
       :query=>"AWSAccessKeyId=AKIAIOSFODNN7EXAMPLE&Signature=NpgCjnDzrM%2BWFzoENXmpNDUsSn8%3D&Expires=1175139620",
       :head => {
-        "host"=>"johnsmith.s3.amazonaws.com"              
+        "host"=>"johnsmith.s3.amazonaws.com"
       }
     }
   }
@@ -97,12 +97,12 @@ describe Blobsterix::S3Auth do
       "HTTP_PROXY_CONNECTION"=>"Keep-Alive",
       "HTTP_DATE"=>"Fri, 24 May 2013 00:00:00 GMT",
       "HTTP_AUTHORIZATION"=>"AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20130524/us-east-1/s3/aws4_request,SignedHeaders=host;range;x-amz-content-sha256;x-amz-date,Signature=f0e8bdb87c964420e857bd35b5d6ed310bd44f0170aba48dd91039c6036bdb41",
-      "HTTP_HOST"=>"examplebucket.s3.amazonaws.com:80",
+      "HTTP_HOST"=>"examplebucket.s3.amazonaws.com",
       "HTTP_TE"=>"trailers, deflate, gzip",
       "HTTP_CONNECTION"=>"TE, close",
       "CONTENT_LENGTH"=>"0",
       "REQUEST_METHOD"=>"GET",
-      "REQUEST_URI"=>"http://examplebucket.s3.amazonaws.com:80/test.txt",
+      "REQUEST_URI"=>"http://examplebucket.s3.amazonaws.com/test.txt",
       "QUERY_STRING"=>nil,
       "HTTP_VERSION"=>"1.1",
       "SCRIPT_NAME"=>"",
@@ -114,6 +114,42 @@ describe Blobsterix::S3Auth do
       nil => {
         :file => "test.txt"
       }
+    }
+  }
+
+  let(:v4_req_env_with_query_param) {
+    {
+      "HTTP_HOST"=>"firefox.s3.amazonaws.com",
+      "HTTP_ACCEPT_ENCODING"=>"identity",
+      "HTTP_X_AMZ_CONTENT_SHA256"=>"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "HTTP_AUTHORIZATION"=>"AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20160217/US/s3/aws4_request,SignedHeaders=host;x-amz-content-sha256;x-amz-date,Signature=10681a4fd1254dce4d80d7c254ae521dd8031b5ef871d77b7ffb28b260ee8372",
+      "HTTP_X_AMZ_DATE"=>"20160217T134245Z",
+      "CONTENT_LENGTH"=>"0",
+      "REQUEST_METHOD"=>"GET",
+      "REQUEST_URI"=>"http://firefox.s3.amazonaws.com/?delimiter=/",
+      "QUERY_STRING"=>"delimiter=/",
+      "HTTP_VERSION"=>"1.1",
+      "SCRIPT_NAME"=>"",
+      "REQUEST_PATH"=>"/",
+      "PATH_INFO"=>"/"
+    }
+  }
+
+  let(:v4_req_env_with_query_param_2) {
+    {
+      "HTTP_HOST"=>"firefox.s3.amazonaws.com",
+      "HTTP_ACCEPT_ENCODING"=>"identity",
+      "HTTP_X_AMZ_CONTENT_SHA256"=>"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "HTTP_AUTHORIZATION"=>"AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20160217/US/s3/aws4_request,SignedHeaders=host;x-amz-content-sha256;x-amz-date,Signature=d8fe8bcca8ada96996626125bec12258ed4ba0462f7c277d7412a8b9c230430d",
+      "HTTP_X_AMZ_DATE"=>"20160217T134245Z",
+      "CONTENT_LENGTH"=>"0",
+      "REQUEST_METHOD"=>"GET",
+      "REQUEST_URI"=>"http://firefox.s3.amazonaws.com/?location",
+      "QUERY_STRING"=>"location",
+      "HTTP_VERSION"=>"1.1",
+      "SCRIPT_NAME"=>"",
+      "REQUEST_PATH"=>"/",
+      "PATH_INFO"=>"/"
     }
   }
 
@@ -172,6 +208,26 @@ describe Blobsterix::S3Auth do
   it "should at least recognize aws v4" do
     auth = Blobsterix::S3Auth.authenticate(v4_req_env)
     auth.class.should eql Blobsterix::S3Auth::V4
+  end
+
+  it "should authenticate v4 request if the signature match and request time is within 15minutes window" do
+    Blobsterix::S3Auth.current_time=lambda{Time.parse("Fri, 24 May 2013 00:14:59 GMT")}
+    Blobsterix::S3Auth.authenticate(v4_req_env).check(Blobsterix.secret_key_store).should be_true
+  end
+
+  it "should not authenticate v4 request if the signature match but request time is older than 15 minutes" do
+    Blobsterix::S3Auth.current_time=lambda{Time.parse("Fri, 24 May 2013 00:15:01 GMT")}
+    Blobsterix::S3Auth.authenticate(v4_req_env).check(Blobsterix.secret_key_store).should be_false
+  end
+
+  it "should authenticate v4 request with query params" do
+    Blobsterix::S3Auth.current_time=lambda{Time.parse("20160217T135245Z")}
+    Blobsterix::S3Auth.authenticate(v4_req_env_with_query_param).check(Blobsterix.secret_key_store).should be_true
+  end
+
+  it "should authenticate v4 request with query param without equal character" do
+    Blobsterix::S3Auth.current_time=lambda{Time.parse("20160217T135245Z")}
+    Blobsterix::S3Auth.authenticate(v4_req_env_with_query_param_2).check(Blobsterix.secret_key_store).should be_true
   end
 
   it "should at least recognize aws v2" do
