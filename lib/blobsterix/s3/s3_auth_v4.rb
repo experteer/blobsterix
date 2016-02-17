@@ -60,7 +60,8 @@ module Blobsterix
 
       def canonical_query
         @env["QUERY_STRING"].to_s.split("&").sort.map do |param|
-          param.split("=").map { |k_or_v| escape(k_or_v) }.join("=")
+          escaped = param.split("=").map { |k_or_v| escape(k_or_v) }.join("=")
+          escaped["="] ? escaped : "#{escaped}="
         end.join("&")
       end
 

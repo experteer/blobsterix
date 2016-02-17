@@ -122,12 +122,30 @@ describe Blobsterix::S3Auth do
       "HTTP_HOST"=>"firefox.s3.amazonaws.com",
       "HTTP_ACCEPT_ENCODING"=>"identity",
       "HTTP_X_AMZ_CONTENT_SHA256"=>"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "HTTP_AUTHORIZATION"=>"AWS4-HMAC-SHA256 Credential=DFSUREGMHDSFGSFGPz/20160217/US/s3/aws4_request,SignedHeaders=host;x-amz-content-sha256;x-amz-date,Signature=088522bc6ba5ed4af606ac959801b816f752fc979f81bd80641c9078136bae9c",
+      "HTTP_AUTHORIZATION"=>"AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20160217/US/s3/aws4_request,SignedHeaders=host;x-amz-content-sha256;x-amz-date,Signature=10681a4fd1254dce4d80d7c254ae521dd8031b5ef871d77b7ffb28b260ee8372",
       "HTTP_X_AMZ_DATE"=>"20160217T134245Z",
       "CONTENT_LENGTH"=>"0",
       "REQUEST_METHOD"=>"GET",
       "REQUEST_URI"=>"http://firefox.s3.amazonaws.com/?delimiter=/",
       "QUERY_STRING"=>"delimiter=/",
+      "HTTP_VERSION"=>"1.1",
+      "SCRIPT_NAME"=>"",
+      "REQUEST_PATH"=>"/",
+      "PATH_INFO"=>"/"
+    }
+  }
+
+  let(:v4_req_env_with_query_param_2) {
+    {
+      "HTTP_HOST"=>"firefox.s3.amazonaws.com",
+      "HTTP_ACCEPT_ENCODING"=>"identity",
+      "HTTP_X_AMZ_CONTENT_SHA256"=>"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "HTTP_AUTHORIZATION"=>"AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20160217/US/s3/aws4_request,SignedHeaders=host;x-amz-content-sha256;x-amz-date,Signature=d8fe8bcca8ada96996626125bec12258ed4ba0462f7c277d7412a8b9c230430d",
+      "HTTP_X_AMZ_DATE"=>"20160217T134245Z",
+      "CONTENT_LENGTH"=>"0",
+      "REQUEST_METHOD"=>"GET",
+      "REQUEST_URI"=>"http://firefox.s3.amazonaws.com/?location",
+      "QUERY_STRING"=>"location",
       "HTTP_VERSION"=>"1.1",
       "SCRIPT_NAME"=>"",
       "REQUEST_PATH"=>"/",
@@ -205,6 +223,11 @@ describe Blobsterix::S3Auth do
   it "should authenticate v4 request with query params" do
     Blobsterix::S3Auth.current_time=lambda{Time.parse("20160217T135245Z")}
     Blobsterix::S3Auth.authenticate(v4_req_env_with_query_param).check(Blobsterix.secret_key_store).should be_true
+  end
+
+  it "should authenticate v4 request with query param without equal character" do
+    Blobsterix::S3Auth.current_time=lambda{Time.parse("20160217T135245Z")}
+    Blobsterix::S3Auth.authenticate(v4_req_env_with_query_param_2).check(Blobsterix.secret_key_store).should be_true
   end
 
   it "should at least recognize aws v2" do
