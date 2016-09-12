@@ -102,7 +102,7 @@ module Blobsterix::Transformations
         logger.debug "Transformation: done #{blob_access} finish connections"
         running_transformations[blob_access.identifier].each{|fiber|
           fiber.resume(result)
-        }
+        } if running_transformations[blob_access.identifier] # check if there are pending fibers or if the connection was already closed
         uncue_transformation(blob_access)
       end
 
