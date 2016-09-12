@@ -25,6 +25,9 @@ module Blobsterix
       def delete_key(bucket, key)
         nil
       end
+      def name
+        "none"
+      end
     end
   end
 end
