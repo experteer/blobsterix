@@ -151,6 +151,12 @@ module Blobsterix::Transformations::Impl
     image.write target_path
   end
 
+  create_simple_trafo("blur", "image/*", "image/*", false) do |input_path, target_path, value|
+    image = MiniMagick::Image.open(input_path)
+    image.blur value
+    image.write target_path
+  end
+
   # create_simple_trafo("image2HTML", "image/*", "text/html", true) do |input_path, target_path, value|
   #   type = "image/*"
   #   File.open(input_path) {|file|
