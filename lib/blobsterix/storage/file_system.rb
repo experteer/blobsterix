@@ -15,10 +15,10 @@ module Blobsterix
         begin
           Dir.entries(contents).include?(bucket) and File.directory?(File.join(contents,bucket))
         rescue => e
-          if e.is_a? ::Blosterix::BlobsterixStorageError
+          if e.is_a? ::Blobsterix::StorageError
             raise e
           else
-            raise ::Blosterix::BlobsterixStorageError.new("Could not check for bucket")
+            raise ::Blobsterix::StorageError.new("Could not check for bucket")
           end
         end
       end
@@ -42,10 +42,10 @@ module Blobsterix
             end
           end
         rescue => e
-          if e.is_a? ::Blosterix::BlobsterixStorageError
+          if e.is_a? ::Blobsterix::StorageError
             raise e
           else
-            raise ::Blosterix::BlobsterixStorageError.new("Could not list bucket(s)")
+            raise ::Blobsterix::StorageError.new("Could not list bucket(s)")
           end
         end
       end
@@ -60,10 +60,10 @@ module Blobsterix
             Blobsterix::Storage::BlobMetaData.new
           end
         rescue => e
-          if e.is_a? ::Blosterix::BlobsterixStorageError
+          if e.is_a? ::Blobsterix::StorageError
             raise e
           else
-            raise ::Blosterix::BlobsterixStorageError.new("Could not get bucket entry: #{@contents_path}")
+            raise ::Blobsterix::StorageError.new("Could not get bucket entry: #{@contents_path}")
           end
         end
       end
@@ -86,10 +86,10 @@ module Blobsterix
 
           meta
         rescue => e
-          if e.is_a? ::Blosterix::BlobsterixStorageError
+          if e.is_a? ::Blobsterix::StorageError
             raise e
           else
-            raise ::Blosterix::BlobsterixStorageError.new("Could not create bucket entry")
+            raise ::Blobsterix::StorageError.new("Could not create bucket entry")
           end
         end
       end
@@ -103,10 +103,10 @@ module Blobsterix
           Nokogiri::XML::Builder.new do |xml|
           end.to_s
         rescue => e
-          if e.is_a? ::Blosterix::BlobsterixStorageError
+          if e.is_a? ::Blobsterix::StorageError
             raise e
           else
-            raise ::Blosterix::BlobsterixStorageError.new("Could not create bucket")
+            raise ::Blobsterix::StorageError.new("Could not create bucket")
           end
         end
       end
@@ -116,10 +116,10 @@ module Blobsterix
           logger.info "Storage: delete bucket #{contents(bucket)}"
           FileUtils.rm_rf(contents(bucket)) if bucket_exist(bucket) && bucket_empty?(bucket)
         rescue => e
-          if e.is_a? ::Blosterix::BlobsterixStorageError
+          if e.is_a? ::Blobsterix::StorageError
             raise e
           else
-            raise ::Blosterix::BlobsterixStorageError.new("Could not delete bucket")
+            raise ::Blobsterix::StorageError.new("Could not delete bucket")
           end
         end
       end
@@ -131,10 +131,10 @@ module Blobsterix
 
           metaData(bucket, key).delete # if bucket_files(bucket).include? key
         rescue => e
-          if e.is_a? ::Blosterix::BlobsterixStorageError
+          if e.is_a? ::Blobsterix::StorageError
             raise e
           else
-            raise ::Blosterix::BlobsterixStorageError.new("Could not delete bucket key")
+            raise ::Blobsterix::StorageError.new("Could not delete bucket key")
           end
         end
       end
@@ -186,7 +186,7 @@ module Blobsterix
             FileUtils.touch File.join(@contents_path,".keep")
             @contents = @contents_path
           rescue
-            raise ::Blosterix::BlobsterixStorageError.new("Could not connect to FileSystem")
+            raise ::Blobsterix::StorageError.new("Could not connect to FileSystem")
           end
         end
 

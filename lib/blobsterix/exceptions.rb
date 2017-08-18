@@ -1,7 +1,7 @@
-module Blosterix
+module Blobsterix
 
-  class BlobsertixTransformationError < StandardError; end
+  class TransformationError < StandardError; end
 
-  class BlobsterixStorageError < StandardError; end
+  class StorageError < StandardError; end
 
 end

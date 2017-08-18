@@ -90,7 +90,7 @@ module Blobsterix
           save_meta_file
           self
         rescue
-          raise ::Blosterix::BlobsterixStorageError.new("Could not create MetaData entry")
+          raise ::Blobsterix::StorageError.new("Could not create MetaData entry")
         end
       end
 
@@ -104,7 +104,7 @@ module Blobsterix
             File.open(path, "rb")
           end
         rescue
-          raise ::Blosterix::BlobsterixStorageError.new("Could not open FilesystemMetaData")
+          raise ::Blobsterix::StorageError.new("Could not open FilesystemMetaData")
         end
       end
 
@@ -149,7 +149,7 @@ module Blobsterix
           begin
             File.write(meta_path, to_json)
           rescue
-            raise ::Blosterix::BlobsterixStorageError.new("Could not create MetaData entry")
+            raise ::Blobsterix::StorageError.new("Could not create MetaData entry")
           end
         end
         def load_meta_file
