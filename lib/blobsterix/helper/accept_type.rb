@@ -57,7 +57,7 @@ module Blobsterix
     private
     def set_q_factor_string(str)
       str.scanf("%c=%f"){|char, num|
-        @q_factor = num if char === 'q'
+        @q_factor = ( char === 'q' ? num : 0 )
       }
     end
   end
